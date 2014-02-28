@@ -10,4 +10,20 @@ Using a SparkFun Redboard (Uno clone) it's able to generate in excess of a
 In theory it can go over 100,000 RPM though that needs more analysis to be 
 sure the signal isn't too jittery at that level.
 
+Tested with an Arduino Uno (SprkFun Redboard (Uno clone)
 
+To build load the .ino file with the arduino toolkit compile and install
+Pin 8 will provide the wheel signal.
+
+Running on tiny's, Mega's or other arduino variants beside the Uno
+may require code modifications or have a different output pin number, so YMMV.
+
+
+
+There is no guarantee,  if you blow up your arduino, hurt yourself, burn 
+down your house or hurt others youare completely liable for your actions 
+and you will hold the author and the rest of the life on this and any other
+planet blameless for your own actions.
+
+
+Be safe out there...
