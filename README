@@ -1,0 +1,13 @@
+Copyright (C) 2014 David J. Andruczyk
+License: http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
+
+This is a work-in-progress on making a wheel simulator with an Arduino 
+leveraging its onboard timers and ultra cheap price..
+
+Using a SparkFun Redboard (Uno clone) it's able to generate in excess of a 
+32,000 RPM 60-2 crank trigger digital signal.
+
+In theory it can go over 100,000 RPM though that needs more analysis to be 
+sure the signal isn't too jittery at that level.
+
+
