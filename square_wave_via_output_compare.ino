@@ -1,7 +1,8 @@
 
 /*
  * 60-2 wheel pattern generator
- * copyright 2014 David J. Andruczyk
+ * Copyright (C) 2014 David J. Andruczyk
+ * License: http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  *
  */
  
