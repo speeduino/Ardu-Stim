@@ -9,7 +9,9 @@
  volatile unsigned char teethcount = 0;
  volatile unsigned char pinstate = 0;
  volatile unsigned char tmp = 0;
- 
+ volatile unsigned char real_teeth = 58;
+ volatile unsigned char missing_edges = 4;  /* 2 teeth * 2 edges per tooth (rising and falling) */
+  
  void setup() {
    cli(); // stop interrupts
    
@@ -18,7 +20,12 @@
    TCCR1B = 0;
    TCNT1 = 0;
    // Set compare registers 
-   OCR1A = 8000; 
+   // OCR1A = 8000;  /* 1000 RPM */
+   OCR1A = 4000;  /* 2000  RPM */ 
+   OCR1A = 2000;  /* 4000  RPM */
+   OCR1A = 1000;  /* 8000  RPM */
+   OCR1A = 500;   /* 16000 RPM */
+   //OCR1A = 250;   /* 32000 RPM */
 
    // Turn on CTC mode
    TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
@@ -36,9 +43,9 @@
    if (pinstate) { /* If high count it as a tooth */
      teethcount++; /* increment tooth counter... */
    }
-   if (teethcount >= 58 && pinstate == 0) { /* End of "real" teeth, beginning of missing tooth window */
+   if (teethcount >= real_teeth && pinstate == 0) { /* End of "real" teeth, beginning of missing tooth window */
      edgecount++; /* Start counting edges (2 edges per tooth, interrupt handlers runs for each edge */
-     if (edgecount == 4) { /* 4 edges == 2 teeth equivalent (the missing ones... ) */
+     if (edgecount == missing_edges) { /* 4 edges == 2 teeth equivalent (the missing ones... ) */
        teethcount = 0; /* Reset counters and return */
        edgecount = 0;
        return;
