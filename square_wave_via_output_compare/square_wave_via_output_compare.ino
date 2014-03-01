@@ -8,11 +8,19 @@
  volatile unsigned char edgecount = 0;
  volatile unsigned char teethcount = 0;
  volatile unsigned char pinstate = 0;
- volatile unsigned char tmp = 0;
  volatile unsigned char real_teeth = 58;
  volatile unsigned char missing_edges = 4;  /* 2 teeth * 2 edges per tooth (rising and falling) */
-  
+ volatile unsigned int new_OCR1A = 1000;
+ enum  { DESCENDING, ASCENDING };
+ byte state = DESCENDING;
+ #define RPM_STEP 5
+ #define RPM_MAX 10000
+ #define RPM_MIN 200
+ #define RPM_STEP_DELAY 5
+ unsigned int wanted_rpm = 1000;
+   
  void setup() {
+   Serial.begin(9600);
    cli(); // stop interrupts
    
    // Set timer1 to generate pulses
@@ -24,7 +32,7 @@
    OCR1A = 4000;  /* 2000  RPM */ 
    OCR1A = 2000;  /* 4000  RPM */
    OCR1A = 1000;  /* 8000  RPM */
-   OCR1A = 500;   /* 16000 RPM */
+   //OCR1A = 500;   /* 16000 RPM */
    //OCR1A = 250;   /* 32000 RPM */
 
    // Turn on CTC mode
@@ -48,6 +56,7 @@
      if (edgecount == missing_edges) { /* 4 edges == 2 teeth equivalent (the missing ones... ) */
        teethcount = 0; /* Reset counters and return */
        edgecount = 0;
+       OCR1A = new_OCR1A;
        return;
      }
      return;
@@ -57,11 +66,35 @@
  }
  
  void loop() {
+   
 /* We could do one of the following:
  * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
  * read a pot and modify it
  * read the serial port and modify it
  * read other inputs to switch wheel modes
  */
+   
+   switch (state) {
+     case DESCENDING:
+     wanted_rpm -= RPM_STEP;
+     if (wanted_rpm <= RPM_MIN) {
+       state = ASCENDING;
+     }
+     //Serial.print("Descending, wanted_rpm is: ");
+     //Serial.println(wanted_rpm);
+     break;
+     case ASCENDING:
+     wanted_rpm += RPM_STEP;
+     if (wanted_rpm >= RPM_MAX) {
+       state = DESCENDING;
+     }
+     //Serial.print("Ascending, wanted_rpm is: ");
+     //Serial.println(wanted_rpm);    break;   
+   }
+   new_OCR1A=8000.0/(wanted_rpm/1000.0);
+   //Serial.print("new_OCR1A var is: ");
+   //Serial.println(new_OCR1A);
+   delay(RPM_STEP_DELAY);
+
 
  }
