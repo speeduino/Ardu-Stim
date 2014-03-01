@@ -5,20 +5,82 @@
  *
  */
  
+/* The "RPM" of the wheel is dependent on the number of edges
+ * so for a 60-2 wheel (120 edges), the time between teeth is
+ * 8000000/RPM,  but for lesser teeth wheels this will be different
+ * Thus we need a corresponding array to fix that, so that the 
+ * requested RPM is actually exported as we want
+ */
 
 #define MAX_EDGES 120   /* 60 teeth max?, each tooth has two edges */
 enum { \
-  SIXTY_MINUS_TWO = 0, \
+  DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
+  DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
+  DIZZY_EIGHT_CYLINDER, /* 8 evenly spaced teeth */
+  SIXTY_MINUS_TWO, \
   THIRTY_SIX_MINUS_ONE,\  
   MAX_WHEELS,
 };
 volatile byte selected_wheel = SIXTY_MINUS_TWO;
  volatile unsigned char edge_counter = 0;
- const byte wheel_max_edges[MAX_WHEELS] = {
-   120,
-   72,
+ const float rpm_scaler[MAX_WHEELS] = {
+  1.0, /* dizzy 4 */
+  1.0, /* dizzy 6 */
+  1.0, /* dizzy 8 */
+  1.0, /* 60-2 */
+  0.6, /* 36-1  (72 edges/120) */
  };
+ const byte wheel_max_edges[MAX_WHEELS] = {
+   120, /* dizzy 4 */
+   120, /* dizzy 6 */
+   120, /* dizzy 8 */
+   120, /* 60-2 */
+   72,  /* 36 -1 */
+ };
+ 
  const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
+   { /* dizzy 4 cyl */
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0
+   },
+   { /* dizzy 6 cyl */
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,1,1,1,1,1, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0
+   },
+   { /* dizzy 8 cyl */
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0, \
+     1,1,1,1,1,1,1,1,1,1, \
+     1,1,1,1,1,0,0,0,0,0, \
+     0,0,0,0,0,0,0,0,0,0
+   },
    { /* 60-2 */
      1,0,1,0,1,0,1,0,1,0, \
      1,0,1,0,1,0,1,0,1,0, \
@@ -43,6 +105,7 @@ volatile byte selected_wheel = SIXTY_MINUS_TWO;
      1,0,1,0,1,0,1,0,1,0, \
      0,0
    },
+   
  };
  volatile unsigned int new_OCR1A = 8000;
  enum  { DESCENDING, ASCENDING };
@@ -117,7 +180,7 @@ volatile byte selected_wheel = SIXTY_MINUS_TWO;
      //Serial.print("Ascending, wanted_rpm is: ");
      //Serial.println(wanted_rpm);    break;   
    }
-   new_OCR1A=8000000/(wanted_rpm);
+   new_OCR1A=8000000/(wanted_rpm*rpm_scaler[selected_wheel]);
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
