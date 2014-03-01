@@ -10,13 +10,13 @@
  volatile unsigned char pinstate = 0;
  volatile unsigned char real_teeth = 58;
  volatile unsigned char missing_edges = 4;  /* 2 teeth * 2 edges per tooth (rising and falling) */
- volatile unsigned int new_OCR1A = 1000;
+ volatile unsigned int new_OCR1A = 8000;
  enum  { DESCENDING, ASCENDING };
- byte state = DESCENDING;
- #define RPM_STEP 5
- #define RPM_MAX 10000
- #define RPM_MIN 200
- #define RPM_STEP_DELAY 5
+ byte state = ASCENDING;
+ #define RPM_STEP 1
+ #define RPM_MAX 16000
+ #define RPM_MIN 100
+ #define RPM_STEP_DELAY 1
  unsigned int wanted_rpm = 1000;
    
  void setup() {
@@ -56,13 +56,14 @@
      if (edgecount == missing_edges) { /* 4 edges == 2 teeth equivalent (the missing ones... ) */
        teethcount = 0; /* Reset counters and return */
        edgecount = 0;
-       OCR1A = new_OCR1A;
+
        return;
      }
      return;
    }
    pinstate ^= 1; /* Toggle pin state */
    PORTB = pinstate;   /* Write it to the port */
+   OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
  }
  
  void loop() {
@@ -91,7 +92,7 @@
      //Serial.print("Ascending, wanted_rpm is: ");
      //Serial.println(wanted_rpm);    break;   
    }
-   new_OCR1A=8000.0/(wanted_rpm/1000.0);
+   new_OCR1A=8000000/(wanted_rpm);
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
