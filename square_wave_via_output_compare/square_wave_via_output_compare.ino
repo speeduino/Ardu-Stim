@@ -12,23 +12,33 @@
  * requested RPM is actually exported as we want
  */
 
+
+#define RPM_STEP 2
+#define RPM_MAX 8000
+#define RPM_MIN 300
+#define RPM_STEP_DELAY 1
 #define MAX_EDGES 120   /* 60 teeth max?, each tooth has two edges */
-enum { \
-  DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
-  DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
-  DIZZY_EIGHT_CYLINDER, /* 8 evenly spaced teeth */
-  SIXTY_MINUS_TWO, \
-  THIRTY_SIX_MINUS_ONE,\  
-  MAX_WHEELS,
-};
-volatile byte selected_wheel = SIXTY_MINUS_TWO;
+
+ volatile unsigned int new_OCR1A = 8000; /* sane default */
+ enum  { DESCENDING, ASCENDING };
+ byte state = ASCENDING;
+
+ unsigned int wanted_rpm = 1000;enum { 
+   DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
+   DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
+   DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
+   SIXTY_MINUS_TWO, \
+   THIRTY_SIX_MINUS_ONE,\  
+   MAX_WHEELS,
+ };
+ volatile byte selected_wheel = SIXTY_MINUS_TWO;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
-  1.0, /* dizzy 4 */
-  1.0, /* dizzy 6 */
-  1.0, /* dizzy 8 */
-  1.0, /* 60-2 */
-  0.6, /* 36-1  (72 edges/120) */
+   1.0, /* dizzy 4 */
+   1.0, /* dizzy 6 */
+   1.0, /* dizzy 8 */
+   1.0, /* 60-2 */
+   0.6, /* 36-1  (72 edges/120) */
  };
  const byte wheel_max_edges[MAX_WHEELS] = {
    120, /* dizzy 4 */
@@ -107,14 +117,7 @@ volatile byte selected_wheel = SIXTY_MINUS_TWO;
    },
    
  };
- volatile unsigned int new_OCR1A = 8000;
- enum  { DESCENDING, ASCENDING };
- byte state = ASCENDING;
- #define RPM_STEP 0
- #define RPM_MAX 4000
- #define RPM_MIN 3000
- #define RPM_STEP_DELAY 100
- unsigned int wanted_rpm = 1000;
+
    
  void setup() {
    Serial.begin(9600);
