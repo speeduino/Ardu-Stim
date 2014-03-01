@@ -1,23 +1,56 @@
 
 /*
- * 60-2 wheel pattern generator
- * Copyright (C) 2014 David J. Andruczyk
- * License: http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
+ * Arbritrary wheel pattern generator (60-2 and 36-1 so far... )
+ * copyright 2014 David J. Andruczyk
  *
  */
  
- volatile unsigned char edgecount = 0;
- volatile unsigned char teethcount = 0;
- volatile unsigned char pinstate = 0;
- volatile unsigned char real_teeth = 58;
- volatile unsigned char missing_edges = 4;  /* 2 teeth * 2 edges per tooth (rising and falling) */
+
+#define MAX_EDGES 120   /* 60 teeth max?, each tooth has two edges */
+enum { \
+  SIXTY_MINUS_TWO = 0, \
+  THIRTY_SIX_MINUS_ONE,\  
+  MAX_WHEELS,
+};
+volatile byte selected_wheel = SIXTY_MINUS_TWO;
+ volatile unsigned char edge_counter = 0;
+ const byte wheel_max_edges[MAX_WHEELS] = {
+   120,
+   72,
+ };
+ const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
+   { /* 60-2 */
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,0,0,0,0
+   },
+   { /* 36-1 */
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     0,0
+   },
+ };
  volatile unsigned int new_OCR1A = 8000;
  enum  { DESCENDING, ASCENDING };
  byte state = ASCENDING;
- #define RPM_STEP 1
- #define RPM_MAX 16000
- #define RPM_MIN 100
- #define RPM_STEP_DELAY 1
+ #define RPM_STEP 0
+ #define RPM_MAX 4000
+ #define RPM_MIN 3000
+ #define RPM_STEP_DELAY 100
  unsigned int wanted_rpm = 1000;
    
  void setup() {
@@ -49,21 +82,12 @@
  } // End setup
  
  ISR(TIMER1_COMPA_vect) {
-   if (pinstate) { /* If high count it as a tooth */
-     teethcount++; /* increment tooth counter... */
+   /* This is VERY simple, just walk the array and wrap when we hit the limit */
+   edge_counter++;
+   if (edge_counter >= wheel_max_edges[selected_wheel]) {
+     edge_counter = 0;
    }
-   if (teethcount >= real_teeth && pinstate == 0) { /* End of "real" teeth, beginning of missing tooth window */
-     edgecount++; /* Start counting edges (2 edges per tooth, interrupt handlers runs for each edge */
-     if (edgecount == missing_edges) { /* 4 edges == 2 teeth equivalent (the missing ones... ) */
-       teethcount = 0; /* Reset counters and return */
-       edgecount = 0;
-
-       return;
-     }
-     return;
-   }
-   pinstate ^= 1; /* Toggle pin state */
-   PORTB = pinstate;   /* Write it to the port */
+   PORTB = edge_states[selected_wheel][edge_counter];   /* Write it to the port */
    OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
  }
  
