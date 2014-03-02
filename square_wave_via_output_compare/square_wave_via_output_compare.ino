@@ -35,10 +35,11 @@
    SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
    TWELVE_MINUS_ONE,      /* 12-1 crank + cam */
    FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank */
+   DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
    MAX_WHEELS,
  };
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = FOURTY_MINUS_ONE;
+ volatile byte selected_wheel = DIZZY_TRIGGER_RETURN;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
@@ -51,6 +52,7 @@
    0.3,     /* 6-1 with cam */
    1.2,     /* 12-1 with cam */
    0.66667, /* 40-1 */
+   0.075,   /* dizzy trigger return */
  };
  const byte wheel_max_edges[MAX_WHEELS] = {
    4, /* dizzy 4 */
@@ -63,6 +65,7 @@
    36,  /* 6-1 with cam */
    144,  /* 12-1 with cam */
    80,  /* 40-1 */
+   9,
  };
  
  const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
@@ -140,6 +143,9 @@
      0,1,0,1,0,1,0,1,0,1, \
      0,1,0,1,0,1,0,1,0,1, \
      0,1,0,1,0,1,0,1,0,0, \
+   },
+   { /* dizzy trigger return */
+     0,0,0,0,0,1,1,1,1
    },
 };
 
