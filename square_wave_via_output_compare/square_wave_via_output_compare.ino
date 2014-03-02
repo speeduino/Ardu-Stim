@@ -17,14 +17,14 @@
 #define RPM_MAX 2000
 #define RPM_MIN 300
 #define RPM_STEP_DELAY 1
-#define MAX_EDGES 150
+#define MAX_EDGES 144
 
  volatile unsigned int new_OCR1A = 8000; /* sane default */
  enum  { DESCENDING, ASCENDING };
  byte state = ASCENDING;
 
  unsigned int wanted_rpm = 8000;
- enum { 
+ typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
    DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
@@ -36,10 +36,12 @@
    TWELVE_MINUS_ONE,      /* 12-1 crank + cam */
    FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank */
    DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
+   ODDFIRE_VR,            /* Oddfire VR (from jimstim) */
    MAX_WHEELS,
- };
+ }WheelType;
+ 
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = DIZZY_TRIGGER_RETURN;
+ volatile byte selected_wheel = ODDFIRE_VR;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
@@ -53,19 +55,21 @@
    1.2,     /* 12-1 with cam */
    0.66667, /* 40-1 */
    0.075,   /* dizzy trigger return */
+   0.2,     /* Oddfire VR */
  };
  const byte wheel_max_edges[MAX_WHEELS] = {
-   4, /* dizzy 4 */
-   6, /* dizzy 6 */
-   6, /* dizzy 8 */
+   4,   /* dizzy 4 */
+   6,   /* dizzy 6 */
+   6,   /* dizzy 8 */
    120, /* 60-2 */
    72,  /* 36 -1 */
    16,  /* 4-1 with cam */
    16,  /* 8-1 */
    36,  /* 6-1 with cam */
-   144,  /* 12-1 with cam */
+   144, /* 12-1 with cam */
    80,  /* 40-1 */
-   9,
+   9,   /* dizzy trigger return */
+   24,  /* Oddfire VR */
  };
  
  const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
@@ -146,6 +150,11 @@
    },
    { /* dizzy trigger return */
      0,0,0,0,0,1,1,1,1
+   },
+   { /* Oddfire VR */
+     1,0,0,0,0,0,0,0,0,1, \
+     0,0,0,0,0,0,0,0,0,0, \
+     0,0,0,0
    },
 };
 
