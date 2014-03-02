@@ -15,16 +15,18 @@
 #include <avr/pgmspace.h>
 
 #define RPM_STEP 0
-#define RPM_MAX 2000
-#define RPM_MIN 300
+#define RPM_MAX 1000
+#define RPM_MIN 100
 #define RPM_STEP_DELAY 1
 #define MAX_EDGES 360
 
- volatile unsigned int new_OCR1A = 8000; /* sane default */
+ volatile byte BIT_CS10 = 0;
+ volatile byte BIT_CS11 = 0;
+ volatile uint16_t new_OCR1A = 5000; /* sane default */
  enum  { DESCENDING, ASCENDING };
  byte state = ASCENDING;
 
- unsigned int wanted_rpm = 36000;
+ unsigned int wanted_rpm = 1000;
  typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
@@ -41,7 +43,7 @@
    MAX_WHEELS,
  }WheelType;
  
- volatile byte selected_wheel = SIXTY_MINUS_TWO;
+ volatile byte selected_wheel = DIZZY_FOUR_CYLINDER;
  //volatile byte selected_wheel = ODDFIRE_VR;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
@@ -58,6 +60,7 @@
    0.075,   /* dizzy trigger return */
    0.2,     /* Oddfire VR */
  };
+
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
    4,   /* dizzy 4 */
    6,   /* dizzy 6 */
@@ -197,11 +200,16 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
    }
    /* The tables are in flash so we need pgm_read_byte() */
    PORTB = pgm_read_byte(&edge_states[selected_wheel][edge_counter]);   /* Write it to the port */
+
+   /* Reset Prescaler */
+   TCCR1B &= ~(1 << BIT_CS10); /* Clear CS10 */
+   TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11);
+   /* Reset next compare value for RPM changes */
    OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
  }
  
  void loop() {
-   
+   uint32_t tmp = 0;
 /* We could do one of the following:
  * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
  * read a pot and modify it
@@ -226,7 +234,21 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
      //Serial.print("Ascending, wanted_rpm is: ");
      //Serial.println(wanted_rpm);    break;   
    }
-   new_OCR1A=8000000/(wanted_rpm*rpm_scaler[selected_wheel]);
+   tmp=8000000/(wanted_rpm*rpm_scaler[selected_wheel]);
+   BIT_CS10 = 1;
+   BIT_CS11 = 0;
+   if (tmp > 524288 ) {
+   /* Need to reset prescaler to 64 to prevent overflow */
+      BIT_CS11=1;
+      new_OCR1A = tmp/64;
+   } else if (tmp > 65536) {
+      BIT_CS10=0;
+      BIT_CS11=1;
+      new_OCR1A = tmp/8;
+   }
+   else {
+     new_OCR1A = (uint16_t)tmp;
+   }
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
