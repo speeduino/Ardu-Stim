@@ -12,18 +12,19 @@
  * requested RPM is actually exported as we want
  */
 
+#include <avr/pgmspace.h>
 
 #define RPM_STEP 0
 #define RPM_MAX 2000
 #define RPM_MIN 300
 #define RPM_STEP_DELAY 1
-#define MAX_EDGES 144
+#define MAX_EDGES 360
 
  volatile unsigned int new_OCR1A = 8000; /* sane default */
  enum  { DESCENDING, ASCENDING };
  byte state = ASCENDING;
 
- unsigned int wanted_rpm = 8000;
+ unsigned int wanted_rpm = 36000;
  typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
@@ -40,8 +41,8 @@
    MAX_WHEELS,
  }WheelType;
  
- //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = ODDFIRE_VR;
+ volatile byte selected_wheel = SIXTY_MINUS_TWO;
+ //volatile byte selected_wheel = ODDFIRE_VR;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
@@ -57,7 +58,7 @@
    0.075,   /* dizzy trigger return */
    0.2,     /* Oddfire VR */
  };
- const byte wheel_max_edges[MAX_WHEELS] = {
+ const uint16_t wheel_max_edges[MAX_WHEELS] = {
    4,   /* dizzy 4 */
    6,   /* dizzy 6 */
    6,   /* dizzy 8 */
@@ -72,7 +73,8 @@
    24,  /* Oddfire VR */
  };
  
- const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
+ /* Stick it in flash as we only have 1K of RAM */
+PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
    { /* dizzy 4 cyl */
      1,0,1,0
   },
@@ -193,7 +195,8 @@
    if (edge_counter >= wheel_max_edges[selected_wheel]) {
      edge_counter = 0;
    }
-   PORTB = edge_states[selected_wheel][edge_counter];   /* Write it to the port */
+   /* The tables are in flash so we need pgm_read_byte() */
+   PORTB = pgm_read_byte(&edge_states[selected_wheel][edge_counter]);   /* Write it to the port */
    OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
  }
  
