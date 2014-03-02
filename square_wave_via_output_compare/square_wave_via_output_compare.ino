@@ -14,19 +14,31 @@
 
 #include <avr/pgmspace.h>
 
-#define RPM_STEP 0
-#define RPM_MAX 1000
-#define RPM_MIN 100
-#define RPM_STEP_DELAY 1
+/* Setting RPM_STEP to any value over 0 will enabled sweeping */
+#define RPM_STEP 2
+#define RPM_MIN 1000
+#define RPM_MAX 3000
+#define RPM_STEP_DELAY 2
 #define MAX_EDGES 360
 
+ volatile byte reset_prescaler = 0;
  volatile byte BIT_CS10 = 0;
  volatile byte BIT_CS11 = 0;
+ volatile byte BIT_CS12 = 0;
  volatile uint16_t new_OCR1A = 5000; /* sane default */
- enum  { DESCENDING, ASCENDING };
+ enum { 
+   DESCENDING, 
+   ASCENDING 
+ };
+ enum { 
+   PRESCALE_1, 
+   PRESCALE_8,
+   PRESCALE_64, 
+   PRESCALE_256 
+ };
  byte state = ASCENDING;
 
- unsigned int wanted_rpm = 1000;
+ unsigned int wanted_rpm = 3000;
  typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
@@ -43,8 +55,8 @@
    MAX_WHEELS,
  }WheelType;
  
+ //volatile byte selected_wheel = SIXTY_MINUS_TWO;
  volatile byte selected_wheel = DIZZY_FOUR_CYLINDER;
- //volatile byte selected_wheel = ODDFIRE_VR;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
@@ -201,15 +213,22 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
    /* The tables are in flash so we need pgm_read_byte() */
    PORTB = pgm_read_byte(&edge_states[selected_wheel][edge_counter]);   /* Write it to the port */
 
-   /* Reset Prescaler */
-   TCCR1B &= ~(1 << BIT_CS10); /* Clear CS10 */
-   TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11);
+   /* Reset Prescaler, this is INEFFICIENT to do this on every loop through 
+    * Find a way to ONLY reset it when necessary */
+   if (reset_prescaler)
+   {
+     TCCR1B &= ~((1 << BIT_CS10) | (1 << BIT_CS11) | (1 << BIT_CS12)); /* Clear CS10, CS11 and CS12 */
+     TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11) | (BIT_CS12 << CS12);
+     reset_prescaler = 0;
+   }
    /* Reset next compare value for RPM changes */
    OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
  }
  
  void loop() {
    uint32_t tmp = 0;
+   byte last_state = PRESCALE_1;
+   byte new_state = PRESCALE_1;
 /* We could do one of the following:
  * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
  * read a pot and modify it
@@ -237,18 +256,33 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
    tmp=8000000/(wanted_rpm*rpm_scaler[selected_wheel]);
    BIT_CS10 = 1;
    BIT_CS11 = 0;
-   if (tmp > 524288 ) {
-   /* Need to reset prescaler to 64 to prevent overflow */
+   BIT_CS12 = 0;
+   if (tmp > 16776960) {
+      /* Need to set prescaler to x256 */
+      BIT_CS12 = 1;
+      new_OCR1A = tmp/256;
+      new_state = PRESCALE_256; 
+   } 
+   else if (tmp > 524288 ) {
+      /* Need to reset prescaler to 64 to prevent overflow */
       BIT_CS11=1;
       new_OCR1A = tmp/64;
-   } else if (tmp > 65536) {
+      new_state = PRESCALE_64;
+   } 
+   else if (tmp > 65536) {
       BIT_CS10=0;
       BIT_CS11=1;
       new_OCR1A = tmp/8;
+      new_state = PRESCALE_8;
    }
    else {
      new_OCR1A = (uint16_t)tmp;
+     new_state = PRESCALE_1;
    }
+   if (new_state != last_state) {
+     reset_prescaler = 1;
+   }
+   last_state = new_state;
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
