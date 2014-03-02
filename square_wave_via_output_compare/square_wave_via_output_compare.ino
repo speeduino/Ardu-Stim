@@ -34,10 +34,11 @@
    EIGHT_MINUS_ONE,       /* 8-1 */
    SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
    TWELVE_MINUS_ONE,      /* 12-1 crank + cam */
+   FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank */
    MAX_WHEELS,
  };
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = TWELVE_MINUS_ONE;
+ volatile byte selected_wheel = FOURTY_MINUS_ONE;
  volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
@@ -48,7 +49,8 @@
    0.13333, /* 4-1 with cam */
    0.13333, /* 8-1 */
    0.3,     /* 6-1 with cam */
-   1.2,    /* 12-1 with cam */
+   1.2,     /* 12-1 with cam */
+   0.66667, /* 40-1 */
  };
  const byte wheel_max_edges[MAX_WHEELS] = {
    4, /* dizzy 4 */
@@ -60,6 +62,7 @@
    16,  /* 8-1 */
    36,  /* 6-1 with cam */
    144,  /* 12-1 with cam */
+   80,  /* 40-1 */
  };
  
  const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
@@ -127,6 +130,16 @@
      0,0,0,0,0,1,2,2,2,2, \
      2,1,0,0,0,0,0,1,0,0, \
      0,0,0,0
+   },
+   { /* 40-1 */
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,0, \
    },
 };
 
