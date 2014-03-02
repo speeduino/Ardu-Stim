@@ -17,7 +17,7 @@
 #define RPM_MAX 2000
 #define RPM_MIN 300
 #define RPM_STEP_DELAY 1
-#define MAX_EDGES 120   /* 2 revolutions with 3deg resolution */
+#define MAX_EDGES 150
 
  volatile unsigned int new_OCR1A = 8000; /* sane default */
  enum  { DESCENDING, ASCENDING };
@@ -33,7 +33,7 @@
    FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
    EIGHT_MINUS_ONE,       /* 8-1 */
    SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
-   TWELVE_MINUS_ONE,      /* 12-1 crank only */
+   TWELVE_MINUS_ONE,      /* 12-1 crank + cam */
    MAX_WHEELS,
  };
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
@@ -48,7 +48,7 @@
    0.13333, /* 4-1 with cam */
    0.13333, /* 8-1 */
    0.3,     /* 6-1 with cam */
-   0.58333, /* 12-1 */
+   1.2,    /* 12-1 with cam */
  };
  const byte wheel_max_edges[MAX_WHEELS] = {
    4, /* dizzy 4 */
@@ -59,7 +59,7 @@
    16,  /* 4-1 with cam */
    16,  /* 8-1 */
    36,  /* 6-1 with cam */
-   70,  /* 12-1 */
+   144,  /* 12-1 with cam */
  };
  
  const byte edge_states[MAX_WHEELS][MAX_EDGES] = {
@@ -111,14 +111,22 @@
      1,0,0,1,2,2,1,0,0,1, \
      0,0,1,0,0,0
    },
-   { /* 12-1 */
+   { /* 12-1 with cam */
      0,0,0,0,0,1,0,0,0,0, \
-     1,0,0,0,0,0,1,0,0,0, \
-     0,0,1,0,0,0,0,0,1,0, \
-     0,0,0,0,1,0,0,0,0,0, \
-     1,0,0,0,0,0,1,0,0,0, \
-     0,0,1,0,0,0,0,0,1,0, \
-     0,0,0,0,1,0,0,0,0,0
+     0,1,0,0,0,0,0,1,0,0, \
+     0,0,0,1,0,0,0,0,0,1, \
+     0,0,0,0,0,1,0,0,0,0, \
+     0,1,0,0,0,0,0,1,0,0, \
+     0,0,0,1,0,0,0,0,0,1, \
+     0,0,0,0,0,1,0,0,0,0, \
+     0,0,0,0,0,0,0,1,0,0, \
+     0,0,0,1,0,0,0,0,0,1, \
+     0,0,0,0,0,1,0,0,0,0, \
+     0,1,0,0,0,0,0,1,0,0, \
+     0,0,0,1,0,0,0,0,0,1, \
+     0,0,0,0,0,1,2,2,2,2, \
+     2,1,0,0,0,0,0,1,0,0, \
+     0,0,0,0
    },
 };
 
