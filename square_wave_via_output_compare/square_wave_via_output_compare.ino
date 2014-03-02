@@ -16,29 +16,38 @@
 
 /* Setting RPM_STEP to any value over 0 will enabled sweeping */
 #define RPM_STEP 2
-#define RPM_MIN 1000
+#define RPM_MIN 100
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
-#define MAX_EDGES 360
-
+#define MAX_EDGES 720  /* handle up to 360 tooth wheel */
+ 
+ unsigned int wanted_rpm = 3000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ volatile unsigned char edge_counter = 0;
+ 
+ /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
  volatile byte reset_prescaler = 0;
  volatile byte BIT_CS10 = 0;
  volatile byte BIT_CS11 = 0;
  volatile byte BIT_CS12 = 0;
- volatile uint16_t new_OCR1A = 5000; /* sane default */
- enum { 
-   DESCENDING, 
-   ASCENDING 
- };
+ 
  enum { 
    PRESCALE_1, 
    PRESCALE_8,
    PRESCALE_64, 
    PRESCALE_256 
  };
- byte state = ASCENDING;
+ byte last_prescale = PRESCALE_1;
+ byte new_prescale = PRESCALE_1;
+ 
+ enum { 
+   DESCENDING, 
+   ASCENDING 
+ };
+ byte sweep_state = ASCENDING;
 
- unsigned int wanted_rpm = 3000;
+ volatile uint16_t new_OCR1A = 5000; /* sane default */
+ 
+ /* Wheel types we know about */
  typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
@@ -57,7 +66,6 @@
  
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
  volatile byte selected_wheel = DIZZY_FOUR_CYLINDER;
- volatile unsigned char edge_counter = 0;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
    0.05, /* dizzy 6 */
@@ -227,8 +235,7 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
  
  void loop() {
    uint32_t tmp = 0;
-   byte last_state = PRESCALE_1;
-   byte new_state = PRESCALE_1;
+
 /* We could do one of the following:
  * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
  * read a pot and modify it
@@ -236,11 +243,11 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
  * read other inputs to switch wheel modes
  */
    
-   switch (state) {
+   switch (sweep_state) {
      case DESCENDING:
      wanted_rpm -= RPM_STEP;
      if (wanted_rpm <= RPM_MIN) {
-       state = ASCENDING;
+       sweep_state = ASCENDING;
      }
      //Serial.print("Descending, wanted_rpm is: ");
      //Serial.println(wanted_rpm);
@@ -248,7 +255,7 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
      case ASCENDING:
      wanted_rpm += RPM_STEP;
      if (wanted_rpm >= RPM_MAX) {
-       state = DESCENDING;
+       sweep_state = DESCENDING;
      }
      //Serial.print("Ascending, wanted_rpm is: ");
      //Serial.println(wanted_rpm);    break;   
@@ -261,28 +268,28 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
       /* Need to set prescaler to x256 */
       BIT_CS12 = 1;
       new_OCR1A = tmp/256;
-      new_state = PRESCALE_256; 
+      new_prescale = PRESCALE_256; 
    } 
    else if (tmp > 524288 ) {
       /* Need to reset prescaler to 64 to prevent overflow */
       BIT_CS11=1;
       new_OCR1A = tmp/64;
-      new_state = PRESCALE_64;
+      new_prescale = PRESCALE_64;
    } 
    else if (tmp > 65536) {
       BIT_CS10=0;
       BIT_CS11=1;
       new_OCR1A = tmp/8;
-      new_state = PRESCALE_8;
+      new_prescale = PRESCALE_8;
    }
    else {
      new_OCR1A = (uint16_t)tmp;
-     new_state = PRESCALE_1;
+     new_prescale = PRESCALE_1;
    }
-   if (new_state != last_state) {
+   if (new_prescale != last_prescale) {
      reset_prescaler = 1;
    }
-   last_state = new_state;
+   last_prescale = new_prescale;
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
