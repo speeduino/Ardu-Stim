@@ -13,22 +13,23 @@
  */
 
 
-#define RPM_STEP 2
-#define RPM_MAX 8000
+#define RPM_STEP 1
+#define RPM_MAX 2000
 #define RPM_MIN 300
 #define RPM_STEP_DELAY 1
-#define MAX_EDGES 120   /* 60 teeth max?, each tooth has two edges */
+#define MAX_EDGES 120   /* 2 revolutions with 3deg resolution */
 
  volatile unsigned int new_OCR1A = 8000; /* sane default */
  enum  { DESCENDING, ASCENDING };
  byte state = ASCENDING;
 
- unsigned int wanted_rpm = 1000;enum { 
+ unsigned int wanted_rpm = 8000;
+ enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
    DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
-   SIXTY_MINUS_TWO, \
-   THIRTY_SIX_MINUS_ONE,\  
+   SIXTY_MINUS_TWO,      /* 60-2 crank only */
+   THIRTY_SIX_MINUS_ONE, /* 36-1 crank only */
    MAX_WHEELS,
  };
  volatile byte selected_wheel = SIXTY_MINUS_TWO;
@@ -115,7 +116,6 @@
      1,0,1,0,1,0,1,0,1,0, \
      0,0
    },
-   
  };
 
    
@@ -143,7 +143,7 @@
    TIMSK1 |= (1 << OCIE1A);
    
    sei(); // Enable interrupts
-   DDRB = B00000001; /* Set pin 8 as output */
+   DDRB = B00000011; /* Set pin 8 and 9 as output (crank and cam respectively) */
    //pinMode(8, OUTPUT);
  } // End setup
  
