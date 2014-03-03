@@ -11,17 +11,17 @@
  * Thus we need a corresponding array to fix that, so that the 
  * requested RPM is actually exported as we want
  */
-
+ 
+#include "wheel_defs.h"
 #include <avr/pgmspace.h>
 
 /* Setting RPM_STEP to any value over 0 will enabled sweeping */
-#define RPM_STEP 2
+#define RPM_STEP 0
 #define RPM_MIN 100
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
-#define MAX_EDGES 720  /* handle up to 360 tooth wheel */
  
- unsigned int wanted_rpm = 3000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ unsigned int wanted_rpm = 1000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
  volatile unsigned char edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -57,7 +57,7 @@
    FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
    EIGHT_MINUS_ONE,       /* 8-1 */
    SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
-   TWELVE_MINUS_ONE,      /* 12-1 crank + cam */
+   TWELVE_MINUS_ONE_WITH_CAM, /* 12-1 crank + cam */
    FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank */
    DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
    ODDFIRE_VR,            /* Oddfire VR (from jimstim) */
@@ -65,7 +65,7 @@
  }WheelType;
  
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = DIZZY_FOUR_CYLINDER;
+ volatile byte selected_wheel = ODDFIRE_VR;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
    0.05, /* dizzy 6 */
@@ -97,93 +97,22 @@
  };
  
  /* Stick it in flash as we only have 1K of RAM */
-PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
-   { /* dizzy 4 cyl */
-     1,0,1,0
-  },
-   { /* dizzy 6 cyl */
-     1,0,1,0,1,0
-   },
-   { /* dizzy 8 cyl */
-     1,0,1,0,1,0,1,0
-     
-   },
-   { /* 60-2 */
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,0,0,0,0
-   },
-   { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     0,0
-   },
-   { /* 4-1 with cam */
-     0,1,0,1,0,1,0,0,0,1, \
-     2,1,0,1,0,0
-   },
-   { /* 8-1 */
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,0
-   },
-   { /* 6-1 with cam */
-     0,0,1,0,0,1,0,0,1,0, \
-     0,1,0,0,1,0,0,0,0,0, \
-     1,0,0,1,2,2,1,0,0,1, \
-     0,0,1,0,0,0
-   },
-   { /* 12-1 with cam */
-     0,0,0,0,0,1,0,0,0,0, \
-     0,1,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,0,0,0,0, \
-     0,1,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,0,0,0,0, \
-     0,0,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,0,0,0,0, \
-     0,1,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,2,2,2,2, \
-     2,1,0,0,0,0,0,1,0,0, \
-     0,0,0,0
-   },
-   { /* 40-1 */
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,0, \
-   },
-   { /* dizzy trigger return */
-     0,0,0,0,0,1,1,1,1
-   },
-   { /* Oddfire VR */
-     1,0,0,0,0,0,0,0,0,1, \
-     0,0,0,0,0,0,0,0,0,0, \
-     0,0,0,0
-   },
-};
-
-   
+ prog_uchar *edge_states_ptr[MAX_WHEELS] = {
+   dizzy_four_cylinder, \
+   dizzy_six_cylinder, \
+   dizzy_eight_cylinder, \
+   sixty_minus_two, \
+   thirty_six_minus_one, \
+   four_minus_one_with_cam, \
+   eight_minus_one, \
+   six_minus_one_with_cam, \
+   twelve_minus_one_with_cam, \
+   fourty_minus_one, \
+   dizzy_trigger_return, \
+   oddfire_vr, \
+ };
+ 
+  
  void setup() {
    Serial.begin(9600);
    cli(); // stop interrupts
@@ -219,7 +148,7 @@ PROGMEM prog_uchar edge_states[MAX_WHEELS][MAX_EDGES]  = {
      edge_counter = 0;
    }
    /* The tables are in flash so we need pgm_read_byte() */
-   PORTB = pgm_read_byte(&edge_states[selected_wheel][edge_counter]);   /* Write it to the port */
+   PORTB = pgm_read_byte(&edge_states_ptr[selected_wheel][edge_counter]);   /* Write it to the port */
 
    /* Reset Prescaler, this is INEFFICIENT to do this on every loop through 
     * Find a way to ONLY reset it when necessary */
