@@ -35,7 +35,7 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
- unsigned int wanted_rpm = 11000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ unsigned int wanted_rpm = 1000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
  volatile uint16_t edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -63,22 +63,8 @@
  
 
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = OPTISPARK_LT1;
- const uint16_t wheel_max_edges[MAX_WHEELS] = {
-   4,   /* dizzy 4 */
-   6,   /* dizzy 6 */
-   6,   /* dizzy 8 */
-   120, /* 60-2 */
-   72,  /* 36 -1 */
-   16,  /* 4-1 with cam */
-   16,  /* 8-1 */
-   36,  /* 6-1 with cam */
-   144, /* 12-1 with cam */
-   80,  /* 40-1 */
-   9,   /* dizzy trigger return */
-   24,  /* Oddfire VR */
-   720, /* Optispark LT1 (360 and 8) */
- };
+ volatile byte selected_wheel = TWELVE_MINUS_THREE;
+
  
  /* Stick it in flash as we only have 1K of RAM */
  prog_uchar *edge_states_ptr[MAX_WHEELS] = {
@@ -95,6 +81,7 @@
    dizzy_trigger_return, \
    oddfire_vr, \
    optispark_lt1, \
+   twelve_minus_three, \
  };
  
   

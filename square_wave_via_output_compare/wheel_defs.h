@@ -56,6 +56,7 @@
    DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
    ODDFIRE_VR,            /* Oddfire V-twin */
    OPTISPARK_LT1,         /* Optispark 360 and 8 */
+   TWELVE_MINUS_THREE,    /* 12-3 */
    MAX_WHEELS,
  }WheelType;
  
@@ -74,8 +75,26 @@
    0.075,   /* dizzy trigger return */
    0.2,     /* Oddfire VR */
    6.0,     /* Optispark LTA (360 and 8) */ 
+   0.4,     /* 12-3 */
  }; 
   
+ const uint16_t wheel_max_edges[MAX_WHEELS] = {
+   4,   /* dizzy 4 */
+   6,   /* dizzy 6 */
+   6,   /* dizzy 8 */
+   120, /* 60-2 */
+   72,  /* 36 -1 */
+   16,  /* 4-1 with cam */
+   16,  /* 8-1 */
+   36,  /* 6-1 with cam */
+   144, /* 12-1 with cam */
+   80,  /* 40-1 */
+   9,   /* dizzy trigger return */
+   24,  /* Oddfire VR */
+   720, /* Optispark LT1 (360 and 8) */
+   48,  /* 12-3 */
+ };
+ 
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_four_cylinder[] = \
    { /* dizzy 4 cylinder */
@@ -212,5 +231,13 @@
     1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 331-360 */
   };
   
-  
+  PROGMEM prog_uchar twelve_minus_three[] = \
+  { /* 12-3, http://www.msextra.com/doc/triggers/12_3_wheel_133.jpg */
+    1,0,0,0,1,0,0,0,  /* 1,2 */
+    1,0,0,0,1,0,0,0,  /* 2,4 */
+    1,0,0,0,1,0,0,0,  /* 5,6 */
+    1,0,0,0,1,0,0,0,  /* 7,8 */
+    1,0,0,0,0,0,0,0,  /* 9,10M */
+    0,0,0,0,0,0,0,0    /* 11M,12M */
+  };
   #endif
