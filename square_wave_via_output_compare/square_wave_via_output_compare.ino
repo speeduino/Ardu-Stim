@@ -63,7 +63,7 @@
  
 
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = THIRTY_SIX_MINUS_TWO_TWO_TWO;
+ volatile byte selected_wheel = THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3;
 
  
  /* Stick it in flash as we only have 1K of RAM */
@@ -83,6 +83,8 @@
    optispark_lt1, \
    twelve_minus_three, \
    thirty_six_minus_two_two_two, \
+   fourty_two_hundred_wheel, \
+   thirty_six_minus_one_with_cam_fe3, \
  };
  
   
