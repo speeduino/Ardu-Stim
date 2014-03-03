@@ -35,7 +35,7 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
- unsigned int wanted_rpm = 1000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ unsigned int wanted_rpm = 11000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
  volatile uint16_t edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
