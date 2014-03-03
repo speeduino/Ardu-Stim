@@ -1,10 +1,81 @@
-
 /*
- * Wheel definitions
+ * Arbritrary wheel pattern generator wheel definitions
+ *
+ * copyright 2014 David J. Andruczyk
+ * 
+ * Ardu-Stim software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ArduStim software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with any FreeEMS software.  If not, see http://www.gnu.org/licenses/
+ *
  */
+ #ifndef __WHEEL_DEFS_H__
+ #define __WHEEL_DEFS_H__
  
  #include <avr/pgmspace.h>
  
+ /* Wheel patterns! 
+  *
+  * Wheel patterns define the pin states and specific times. The ISR runs at a constant speed related to the requested RPM.
+  * The request RPM is scaled based on the LENGTH of each wheel's array.  The reference is the 60-2 which was the first decoder
+  * designed which has 120 "edges" (transitions" for each revolution of the wheel. Any other wheel that also has 120 edges has
+  * and RPM scaling factor of 1.0. IF a wheel has less edges needed to "describe" it, it's number of edges are divided by 120 to
+  * get the scaling factor which is applied to the RPM calculation.
+  * There is an enumeration (below) that lists the defined wheel types, as well as an array listing the rpm_scaling factors
+  * with regards to each pattern.
+  * 
+  * NOTE: There is MORE THAN ONE WAY to define a wheel pattern.  You can use more edges to get to 1 deg accuracy but the side effect
+  * is that your maximum RPM is capped because of that. Currently 60-2 can run up to about 60,000 RPM, 360and8 can only do about 
+  * 10,000 RPM becasue it has 6x the number of edges...  The less edges, the faster it can go... :)
+  * Using more edges allows you to do things like vary the dutycycle,  i.e. a simple non-missing tooth 50% duty cycle wheel can be
+  * defined with only 2 entries if you really want, but I didn't do it that way for some ofhte simple ones as it made it someone confusing
+  * to look at as it required you to keep the rpm_scaler factor in mind.  Most/all patterns show the pulses you're receive for one revolution
+  * of a REAL wheel on a real engine.
+  */
+  
+  /* Wheel types we know about */
+ typedef enum { 
+   DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
+   DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
+   DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
+   SIXTY_MINUS_TWO,      /* 60-2 crank only */
+   THIRTY_SIX_MINUS_ONE, /* 36-1 crank only */
+   FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
+   EIGHT_MINUS_ONE,       /* 8-1 crank only */
+   SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
+   TWELVE_MINUS_ONE_WITH_CAM, /* 12-1 crank + cam */
+   FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank only */
+   DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
+   ODDFIRE_VR,            /* Oddfire V-twin */
+   OPTISPARK_LT1,         /* Optispark 360 and 8 */
+   MAX_WHEELS,
+ }WheelType;
+ 
+ 
+ const float rpm_scaler[MAX_WHEELS] = {
+   0.03333, /* dizzy 4 */
+   0.05, /* dizzy 6 */
+   0.06667, /* dizzy 8 */
+   1.0, /* 60-2 */
+   0.6, /* 36-1 */
+   0.13333, /* 4-1 with cam */
+   0.13333, /* 8-1 */
+   0.3,     /* 6-1 with cam */
+   1.2,     /* 12-1 with cam */
+   0.66667, /* 40-1 */
+   0.075,   /* dizzy trigger return */
+   0.2,     /* Oddfire VR */
+   6.0,     /* Optispark LTA (360 and 8) */ 
+ }; 
+  
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_four_cylinder[] = \
    { /* dizzy 4 cylinder */
@@ -140,3 +211,6 @@
     1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 301-330 */
     1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 331-360 */
   };
+  
+  
+  #endif

@@ -1,7 +1,21 @@
 
 /*
- * Arbritrary wheel pattern generator (60-2 and 36-1 so far... )
+ * Arbritrary wheel pattern generator
+ *
  * copyright 2014 David J. Andruczyk
+ * 
+ * Ardu-Stim software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ArduStim software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with any FreeEMS software.  If not, see http://www.gnu.org/licenses/
  *
  */
  
@@ -47,42 +61,9 @@
 
  volatile uint16_t new_OCR1A = 5000; /* sane default */
  
- /* Wheel types we know about */
- typedef enum { 
-   DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
-   DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
-   DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
-   SIXTY_MINUS_TWO,      /* 60-2 crank only */
-   THIRTY_SIX_MINUS_ONE, /* 36-1 crank only */
-   FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
-   EIGHT_MINUS_ONE,       /* 8-1 */
-   SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
-   TWELVE_MINUS_ONE_WITH_CAM, /* 12-1 crank + cam */
-   FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank */
-   DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
-   ODDFIRE_VR,            /* Oddfire VR (from jimstim) */
-   OPTISPARK_LT1,         /* Optispark 360 and 8 */
-   MAX_WHEELS,
- }WheelType;
- 
+
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
  volatile byte selected_wheel = OPTISPARK_LT1;
- const float rpm_scaler[MAX_WHEELS] = {
-   0.03333, /* dizzy 4 */
-   0.05, /* dizzy 6 */
-   0.06667, /* dizzy 8 */
-   1.0, /* 60-2 */
-   0.6, /* 36-1  (72 edges/120) */
-   0.13333, /* 4-1 with cam */
-   0.13333, /* 8-1 */
-   0.3,     /* 6-1 with cam */
-   1.2,     /* 12-1 with cam */
-   0.66667, /* 40-1 */
-   0.075,   /* dizzy trigger return */
-   0.2,     /* Oddfire VR */
-   6.0,     /* Optispark LTA (360 and 8) */ 
- };
-
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
    4,   /* dizzy 4 */
    6,   /* dizzy 6 */
