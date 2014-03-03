@@ -24,20 +24,30 @@
  
  /* Wheel patterns! 
   *
-  * Wheel patterns define the pin states and specific times. The ISR runs at a constant speed related to the requested RPM.
-  * The request RPM is scaled based on the LENGTH of each wheel's array.  The reference is the 60-2 which was the first decoder
-  * designed which has 120 "edges" (transitions" for each revolution of the wheel. Any other wheel that also has 120 edges has
-  * and RPM scaling factor of 1.0. IF a wheel has less edges needed to "describe" it, it's number of edges are divided by 120 to
+  * Wheel patterns define the pin states and specific times. The ISR runs 
+  * at a constant speed related to the requested RPM. The request RPM is 
+  * scaled based on the LENGTH of each wheel's array.  The reference is 
+  * the 60-2 which was the first decoder designed which has 120 "edges" 
+  * (transitions" for each revolution of the wheel. Any other wheel that 
+  * also has 120 edges has and RPM scaling factor of 1.0. IF a wheel has 
+  * less edges needed to "describe" it, it's number of edges are divided by 120 to
   * get the scaling factor which is applied to the RPM calculation.
-  * There is an enumeration (below) that lists the defined wheel types, as well as an array listing the rpm_scaling factors
-  * with regards to each pattern.
+  * There is an enumeration (below) that lists the defined wheel types, 
+  * as well as an array listing the rpm_scaling factors with regards to 
+  * each pattern.
   * 
-  * NOTE: There is MORE THAN ONE WAY to define a wheel pattern.  You can use more edges to get to 1 deg accuracy but the side effect
-  * is that your maximum RPM is capped because of that. Currently 60-2 can run up to about 60,000 RPM, 360and8 can only do about 
-  * 10,000 RPM becasue it has 6x the number of edges...  The less edges, the faster it can go... :)
-  * Using more edges allows you to do things like vary the dutycycle,  i.e. a simple non-missing tooth 50% duty cycle wheel can be
-  * defined with only 2 entries if you really want, but I didn't do it that way for some ofhte simple ones as it made it someone confusing
-  * to look at as it required you to keep the rpm_scaler factor in mind.  Most/all patterns show the pulses you're receive for one revolution
+  * NOTE: There is MORE THAN ONE WAY to define a wheel pattern.  You can 
+  * use more edges to get to 1 deg accuracy but the side effect is that 
+  * your maximum RPM is capped because of that. Currently 60-2 can run 
+  * up to about 60,000 RPM, 360and8 can only do about 10,000 RPM becasue 
+  * it has 6x the number of edges...  The less edges, the faster it can go... :)
+  * 
+  * Using more edges allows you to do things like vary the dutycycle,  
+  * i.e. a simple non-missing tooth 50% duty cycle wheel can be defined 
+  * with only 2 entries if you really want, but I didn't do it that way 
+  * for some of the simple ones as it made it seem somewhat confusing
+  * to look at as it required you to keep the rpm_scaler factor in mind.  
+  * Most/all patterns show the pulses you're receive for one revolution
   * of a REAL wheel on a real engine.
   */
   
@@ -58,6 +68,7 @@
    OPTISPARK_LT1,         /* Optispark 360 and 8 */
    TWELVE_MINUS_THREE,    /* 12-3 */
    THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_CAM, /* 36-2-2-2 crank and cam */
    MAX_WHEELS,
  }WheelType;
  
@@ -78,6 +89,7 @@
    6.0,     /* Optispark LTA (360 and 8) */ 
    0.4,     /* 12-3 */
    0.6,     /* 36-2-2-2  crank only */
+   0.6,     /* 36-2-2-2  crank and cam */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -96,6 +108,7 @@
    720, /* Optispark LT1 (360 and 8) */
    48,  /* 12-3 */
    72,  /* 36-2-2-2 crank only */
+   72,  /* 36-2-2-2 crank and cam */
  };
  
  /* Very simple 50% duty cycle */
@@ -251,6 +264,18 @@
     1,0,1,0,1,0,1,0,1,0, \
     1,0,1,0,1,0,1,0,1,0, \
     1,0,1,0,0,0,0,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, 
+    1,0
+  };
+  
+  PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = \
+  { /* 36-2-2-2 with cam  */
+    1,2,2,2,2,2,1,0,0,0, \
+    0,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, \
+    1,0,1,2,2,2,2,2,1,0, \
     1,0,1,0,1,0,1,0,1,0, \
     1,0,1,0,1,0,1,0,1,0, 
     1,0
