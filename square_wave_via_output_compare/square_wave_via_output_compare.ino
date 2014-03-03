@@ -89,6 +89,7 @@
    buell_oddfire_cam, \
    gm_ls1_crank_and_cam, \
    lotus_thirty_six_minus_one_one_one_one, \
+   honda_rc51_with_cam, \
  };
  
   

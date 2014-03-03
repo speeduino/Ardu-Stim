@@ -75,6 +75,7 @@
    BUELL_ODDFIRE_CAM,     /* Buell 45 deg cam wheel */
    GM_LS1_CRANK_AND_CAM,  /* GM LS1 24 tooth with cam */
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
+   HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    MAX_WHEELS,
  }WheelType;
  
@@ -102,6 +103,7 @@
    0.33333, /* Buell Oddfire cam */
    6.0,     /* GM LS1 crank and cam */
    0.6,     /* Lotus crank wheel 36-1-1-1-1 */
+   0.4,     /* Honda RC51 90 deg oddfire vtwin with cam */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -127,6 +129,7 @@
    80,  /* Buell Oddfire cam wheel */
    720, /* GM LS1 crank and cam */
    72,  /* Lotus 36-1-1-1-1 */
+   48,  /* Honda RC 51 */
  };
  
  /* Very simple 50% duty cycle */
@@ -418,4 +421,12 @@
      0,0
    }; 
    
+ PROGMEM prog_uchar honda_rc51_with_cam[] = \
+   { /* Honda RC51 oddfire 90deg Vtwin with cam */
+	 0,1,0,1,0,1,0,1,0,3, \
+	 0,1,0,1,0,1,0,1,0,1, \
+	 0,1,0,1,0,3,0,1,0,3, \
+	 0,1,0,1,0,1,0,1,0,1, \
+	 0,1,0,1,0,1,0,1
+   };
   #endif
