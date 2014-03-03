@@ -71,7 +71,8 @@
    THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_CAM, /* 36-2-2-2 crank and cam */
    FOURTY_TWO_HUNDRED_WHEEL, /* 4200 wheel */
    THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3, /* Mazda F3 36-1 crank and cam */
-   SIX_G_SEVENTY_TWO,     /* Mitsubishi DOHC CAS and TCDS 6G72 */
+   SIX_G_SEVENTY_TWO_WITH_CAM, /* Mitsubishi DOHC CAS and TCDS 6G72 */
+   BUELL_ODDFIRE_CAM,     /* Buell 45 deg cam wheel */
    MAX_WHEELS,
  }WheelType;
  
@@ -95,7 +96,8 @@
    0.6,     /* 36-2-2-2  crank and cam */
    3.0,     /* 4200 crank wheel */
    1.2,     /* 36-1 with cam, mazda f3 */
-   0.6,     /* 6G72 mitsubishi */
+   1.2,     /* 6G72 mitsubishi */
+   0.33333, /* Buell Oddfire cam */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -117,7 +119,8 @@
    72,  /* 36-2-2-2 crank and cam */
    360, /* 4200 wheel */
    144, /* 36-1 with cam, mazda fe3 */
-   72,  /* 6G72 mitsubishi */
+   144, /* 6G72 mitsubishi */
+   80,  /* Buell Oddfire cam wheel */
  };
  
  /* Very simple 50% duty cycle */
@@ -342,4 +345,15 @@
     0,2,2,3
   };
    
+  PROGMEM prog_uchar buell_oddfire_cam[] = \
+  { /* Buell oddfire cam wheel */
+    0,0,0,0,0,0,0,0,0,0,
+    0,1,1,1,1,0,0,0,0,0,
+    0,1,1,1,1,0,0,0,0,0,
+    0,1,1,1,1,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,1,
+    0,0,0,0,0,0,1,1,1,1,
+    0,0,0,0,0,0,1,1,1,1
+  };
   #endif

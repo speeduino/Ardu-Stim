@@ -85,6 +85,8 @@
    thirty_six_minus_two_two_two, \
    fourty_two_hundred_wheel, \
    thirty_six_minus_one_with_cam_fe3, \
+   six_g_seventy_two_with_cam, \
+   buell_oddfire_cam, \
  };
  
   
