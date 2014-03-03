@@ -87,6 +87,7 @@
    thirty_six_minus_one_with_cam_fe3, \
    six_g_seventy_two_with_cam, \
    buell_oddfire_cam, \
+   gm_ls1_crank_and_cam, \
  };
  
   
