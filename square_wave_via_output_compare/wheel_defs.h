@@ -57,6 +57,7 @@
    ODDFIRE_VR,            /* Oddfire V-twin */
    OPTISPARK_LT1,         /* Optispark 360 and 8 */
    TWELVE_MINUS_THREE,    /* 12-3 */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only */
    MAX_WHEELS,
  }WheelType;
  
@@ -76,6 +77,7 @@
    0.2,     /* Oddfire VR */
    6.0,     /* Optispark LTA (360 and 8) */ 
    0.4,     /* 12-3 */
+   0.6,     /* 36-2-2-2  crank only */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -93,6 +95,7 @@
    24,  /* Oddfire VR */
    720, /* Optispark LT1 (360 and 8) */
    48,  /* 12-3 */
+   72,  /* 36-2-2-2 crank only */
  };
  
  /* Very simple 50% duty cycle */
@@ -240,4 +243,17 @@
     1,0,0,0,0,0,0,0,  /* 9,10M */
     0,0,0,0,0,0,0,0    /* 11M,12M */
   };
+  
+  PROGMEM prog_uchar thirty_six_minus_two_two_two[] = \
+  { /* 36-2-2-2  */
+    1,0,0,0,0,0,1,0,0,0, \
+    0,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,0,0,0,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, \
+    1,0,1,0,1,0,1,0,1,0, 
+    1,0
+  };
+  
   #endif
