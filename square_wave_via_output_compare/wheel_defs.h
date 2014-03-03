@@ -70,7 +70,8 @@
    THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only */
    THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_CAM, /* 36-2-2-2 crank and cam */
    FOURTY_TWO_HUNDRED_WHEEL, /* 4200 wheel */
-   THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3. /* Mazda F3 36-1 crank and cam */
+   THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3, /* Mazda F3 36-1 crank and cam */
+   SIX_G_SEVENTY_TWO,     /* Mitsubishi DOHC CAS and TCDS 6G72 */
    MAX_WHEELS,
  }WheelType;
  
@@ -93,7 +94,8 @@
    0.6,     /* 36-2-2-2  crank only */
    0.6,     /* 36-2-2-2  crank and cam */
    3.0,     /* 4200 crank wheel */
-   1.2,      /* 36-1 with cam, mazda f3 */
+   1.2,     /* 36-1 with cam, mazda f3 */
+   0.6,     /* 6G72 mitsubishi */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -115,6 +117,7 @@
    72,  /* 36-2-2-2 crank and cam */
    360, /* 4200 wheel */
    144, /* 36-1 with cam, mazda fe3 */
+   72,  /* 6G72 mitsubishi */
  };
  
  /* Very simple 50% duty cycle */
@@ -304,19 +307,39 @@
 
  /* Mazda F3 36-1 with cam */
  PROGMEM prog_uchar thirty_six_minus_one_with_cam_fe3[] = \
-   { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0,1,0, /* 0-55 deg */
-     1,0,1,0,1,0,3,2,1,0,1,0, /* 60-115 deg  cam tooth at 90 deg crank */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 120-175 deg */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 180-235 deg */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 240-295 deg */
-	 1,0,1,0,1,0,1,0,1,0,0,0, /* 300-355 deg Crank missing tooth at end */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 360-415 deg */
-	 3,2,1,0,1,0,3,2,1,0,1,0, /* 420-475 deg 2 more cam teeth at 420 and 450 deg */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 480-535 deg */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 540-595 deg */
-	 1,0,1,0,1,0,1,0,1,0,1,0, /* 600-655 deg */
-	 1,0,1,0,1,0,1,0,1,0,1,0  /* 660-715 deg */
-   }; 
+ { /* 36-1 */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 0-55 deg */
+   1,0,1,0,1,0,3,2,3,0,1,0, /* 60-115 deg  cam tooth at 90 deg crank for 15 crank degrees */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 120-175 deg */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 180-235 deg */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 240-295 deg */
+   1,0,1,0,1,0,1,0,1,0,0,0, /* 300-355 deg Crank missing tooth at end */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 360-415 deg */
+   3,2,3,0,1,0,3,2,3,0,1,0, /* 420-475 deg 2 more cam teeth at 420 and 450 deg, 15 crank degrees each */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 480-535 deg */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 540-595 deg */
+   1,0,1,0,1,0,1,0,1,0,1,0, /* 600-655 deg */
+   1,0,1,0,1,0,1,0,1,0,1,0  /* 660-715 deg */
+  }; 
+  
+  /* Mitsubishi 6g72 crank/cam */
+  PROGMEM prog_uchar six_g_seventy_two_with_cam[] = \
+  { /* Mitsubishi 6g72 */
+    3,3,3,3,3,3,3,3,3,2,
+    2,2,2,2,0,0,0,0,0,0,
+    0,0,0,1,1,1,1,1,1,1,
+    3,3,3,2,2,2,2,2,0,0,
+    0,0,0,0,0,0,0,1,1,1,
+    1,1,1,1,1,1,1,0,0,0,
+    0,0,0,0,0,0,0,0,2,2,
+    2,3,3,3,3,3,1,1,1,1,
+    1,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,1,1,1,1,1,
+    1,1,3,3,3,2,2,2,2,2,
+    0,0,0,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,1,1,1,0,
+    0,0,0,0,0,0,0,0,0,0,
+    0,2,2,3
+  };
    
   #endif
