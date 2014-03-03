@@ -74,6 +74,7 @@
    SIX_G_SEVENTY_TWO_WITH_CAM, /* Mitsubishi DOHC CAS and TCDS 6G72 */
    BUELL_ODDFIRE_CAM,     /* Buell 45 deg cam wheel */
    GM_LS1_CRANK_AND_CAM,  /* GM LS1 24 tooth with cam */
+   LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    MAX_WHEELS,
  }WheelType;
  
@@ -100,6 +101,7 @@
    1.2,     /* 6G72 mitsubishi */
    0.33333, /* Buell Oddfire cam */
    6.0,     /* GM LS1 crank and cam */
+   0.6,     /* Lotus crank wheel 36-1-1-1-1 */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -124,6 +126,7 @@
    144, /* 6G72 mitsubishi */
    80,  /* Buell Oddfire cam wheel */
    720, /* GM LS1 crank and cam */
+   72,  /* Lotus 36-1-1-1-1 */
  };
  
  /* Very simple 50% duty cycle */
@@ -189,7 +192,7 @@
    };
   
   /* 40deg low, 20 deg high per tooth, cam signal on second rotation during 40deg low portion of 3rd tooth */
-  PROGMEM prog_uchar six_minus_one_with_cam[] = \
+ PROGMEM prog_uchar six_minus_one_with_cam[] = \
    { /* 6-1 with cam */
      0,0,1,0,0,1,0,0,1,0, \
      0,1,0,0,1,0,0,0,0,0, \
@@ -198,7 +201,7 @@
    };
   
   /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 9 */
-  PROGMEM prog_uchar twelve_minus_one_with_cam[] = \
+ PROGMEM prog_uchar twelve_minus_one_with_cam[] = \
    { /* 12-1 with cam */
      0,0,0,0,0,1,0,0,0,0, \
      0,1,0,0,0,0,0,1,0,0, \
@@ -218,7 +221,7 @@
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
-  PROGMEM prog_uchar fourty_minus_one[] = \
+ PROGMEM prog_uchar fourty_minus_one[] = \
    { /* 40-1 */
      0,1,0,1,0,1,0,1,0,1, \
      0,1,0,1,0,1,0,1,0,1, \
@@ -400,4 +403,19 @@
     2,2,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,
   };
   
+ /* Lotus 36-1-1-1-1 wheel, missing teeth at
+  * 36,32,17 and 14
+  */
+ PROGMEM prog_uchar lotus_thirty_six_minus_one_one_one_one[] = \
+   { /* 36-1 */
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,0,0,1,0, \
+     1,0,0,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, \
+     1,0,0,0,1,0,1,0,1,0, \
+     0,0
+   }; 
+   
   #endif
