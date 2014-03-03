@@ -21,8 +21,8 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
- unsigned int wanted_rpm = 1000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
- volatile unsigned char edge_counter = 0;
+ unsigned int wanted_rpm = 12000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ volatile uint16_t edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
  volatile byte reset_prescaler = 0;
@@ -61,11 +61,12 @@
    FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank */
    DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
    ODDFIRE_VR,            /* Oddfire VR (from jimstim) */
+   OPTISPARK_LT1,         /* Optispark 360 and 8 */
    MAX_WHEELS,
  }WheelType;
  
  //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = ODDFIRE_VR;
+ volatile byte selected_wheel = OPTISPARK_LT1;
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
    0.05, /* dizzy 6 */
@@ -79,6 +80,7 @@
    0.66667, /* 40-1 */
    0.075,   /* dizzy trigger return */
    0.2,     /* Oddfire VR */
+   6.0,     /* Optispark LTA (360 and 8) */ 
  };
 
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -94,6 +96,7 @@
    80,  /* 40-1 */
    9,   /* dizzy trigger return */
    24,  /* Oddfire VR */
+   720, /* Optispark LT1 (360 and 8) */
  };
  
  /* Stick it in flash as we only have 1K of RAM */
@@ -110,6 +113,7 @@
    fourty_minus_one, \
    dizzy_trigger_return, \
    oddfire_vr, \
+   optispark_lt1, \
  };
  
   
