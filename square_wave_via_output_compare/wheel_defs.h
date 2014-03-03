@@ -5,21 +5,25 @@
  
  #include <avr/pgmspace.h>
  
+ /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_four_cylinder[] = \
    { /* dizzy 4 cylinder */
      1,0,1,0
    };
    
+ /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_six_cylinder[] = \
    { /* dizzy 6 cylinder */
      1,0,1,0,1,0
    };
    
+ /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_eight_cylinder[] = \
    { /* dizzy 8 cyl */
      1,0,1,0,1,0,1,0
    };
    
+ /* Standard bosch 60-2 pattern, 50% duty cyctle during normal teeth */
  PROGMEM prog_uchar sixty_minus_two[] = \
    { /* 60-2 */
      1,0,1,0,1,0,1,0,1,0, \
@@ -35,7 +39,8 @@
      1,0,1,0,1,0,1,0,1,0, \
      1,0,1,0,1,0,0,0,0,0
    };
-   
+ 
+ /* Standard ford/mazda and aftermarket 36-1 pattern, 50% duty cyctle during normal teeth */  
  PROGMEM prog_uchar thirty_six_minus_one[] = \
    { /* 36-1 */
      1,0,1,0,1,0,1,0,1,0, \
@@ -48,18 +53,21 @@
      0,0
    }; 
    
+ /* 4-1 crank signal 50% duty cycle with Cam tooth enabled during the second rotation prior to tooth 2 */
  PROGMEM prog_uchar four_minus_one_with_cam[] = \
    { /* 4-1 with cam */
      0,1,0,1,0,1,0,0,0,1, \
      2,1,0,1,0,0
    };
    
+ /* Yamaha R6 crank trigger 8 teeth missing one, (22.5deg low, 22.5deg high) 50% duty cycle during normal teeth */
  PROGMEM prog_uchar eight_minus_one[] = \
    { /* 8-1 */
      0,1,0,1,0,1,0,1,0,1, \
      0,1,0,1,0,0
    };
   
+  /* 40deg low, 20 deg high per tooth, cam signal on second rotation during 40deg low portion of 3rd tooth */
   PROGMEM prog_uchar six_minus_one_with_cam[] = \
    { /* 6-1 with cam */
      0,0,1,0,0,1,0,0,1,0, \
@@ -67,7 +75,8 @@
      1,0,0,1,2,2,1,0,0,1, \
      0,0,1,0,0,0
    };
-   
+  
+  /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 9 */
   PROGMEM prog_uchar twelve_minus_one_with_cam[] = \
    { /* 12-1 with cam */
      0,0,0,0,0,1,0,0,0,0, \
@@ -87,6 +96,7 @@
      0,0,0,0
    };
    
+  /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
   PROGMEM prog_uchar fourty_minus_one[] = \
    { /* 40-1 */
      0,1,0,1,0,1,0,1,0,1, \
@@ -98,19 +108,22 @@
      0,1,0,1,0,1,0,1,0,1, \
      0,1,0,1,0,1,0,1,0,0 
    };
-   
+  
+  /* 50deg off, 40 deg on dissy style signal */
   PROGMEM prog_uchar dizzy_trigger_return[] = \
    { /* dizzy trigger return */
      0,0,0,0,0,1,1,1,1
    };
    
+  /* Oddfire V twin, 15 deg on, 120deg off, 15 deg on, 210 deg off */
   PROGMEM prog_uchar oddfire_vr[] = \
    { /* Oddfire VR */
      1,0,0,0,0,0,0,0,0,1, \
      0,0,0,0,0,0,0,0,0,0, \
      0,0,0,0
    };
-   
+  
+  /* GM LT1 360 and 8 wheel, see http://powerefi.com/files/opti-LT1-count.JPG */
   PROGMEM prog_uchar optispark_lt1[] = \
   { /* Optispark 360 outside teeth, 8 varying inside teeth */
   /* 1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 */
