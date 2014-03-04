@@ -313,20 +313,10 @@
   
   PROGMEM prog_uchar fourty_two_hundred_wheel[] = 
     { /* 4200 wheel http://msextra.com/doc/triggers/4200_timing.pdf */
-		/* 55 deg high, 
-		 * 5 deg low, 
-		 * 55 deg high, 
-		 * 5 deg low, 
-		 * 5 deg high, 
-		 * 5 deg low,
-		 * 45 deg high,
-		 * 5 deg low,
-		 * 55 deg high,
-		 * 5 deg low,
-		 * 65 deg high,
-		 * 5 deg low,
-		 * 45 deg high
-		 * 5 deg low, (360 degreees ) */
+		/* 55 deg high, 5 deg low, 55 deg high, 5 deg low,
+		 * 5 deg high, 5 deg low, 45 deg high, 5 deg low,
+		 * 55 deg high, 5 deg low, 65 deg high, 5 deg low,
+		 * 45 deg high, 5 deg low, (360 degreees ) */
       1,1,1,1,1,1,1,1,1,1, 
 	  1,0,1,1,1,1,1,1,1,1, 
 	  1,1,1,0,1,0,1,1,1,1, 
@@ -357,6 +347,13 @@
   /* Mitsubishi 6g72 crank/cam */
   PROGMEM prog_uchar six_g_seventy_two_with_cam[] = 
     { /* Mitsubishi 6g72 */
+	  /* Crank signal's are 50 deg wide, and one per cylinder
+	   * Cam signals have 3 40 deg wide teeh and one 85 deg wide tooth
+	   * Counting both From TDC#1
+	   * Crank: 40 deg high, 70 deg low (repeats whole cycle)
+	   * Cam: 70 deg high, 80 deg low, 40 deg high, 150 deg low,
+	   * 40 deg high, 130 deg low, 40 deg high, 155 deg low 
+	   */
       3,3,3,3,3,3,3,3,3,2,
       2,2,2,2,0,0,0,0,0,0,
       0,0,0,1,1,1,1,1,1,1,
@@ -376,18 +373,46 @@
    
   PROGMEM prog_uchar buell_oddfire_cam[] = 
     { /* Buell oddfire cam wheel */
-      0,0,0,0,0,0,0,0,0,0,
-      0,1,1,1,1,0,0,0,0,0,
-      0,1,1,1,1,0,0,0,0,0,
-      0,1,1,1,1,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,1,1,1,1,
-      0,0,0,0,0,0,1,1,1,1,
-      0,0,0,0,0,0,1,1,1,1
+	  /* Wheel is a cam wheel (degress are in crank degrees 
+	   * 36 deg high, 54 deg low,
+	   * 36 deg high, 54 deg low,
+	   * (Rear at TDC) 36 deg high,
+	   * 1889 deg low, 36 deg high
+	   * 54 deg low, 36 deg high,
+	   * 54 deg low, (Front at TDC),
+	   * 36 deg high, 99 deg low
+	   */
+	  1,1,1,1,0,0,0,0,0,0, /* Tooth 1 (36 deg) and 54 deg space */
+	  1,1,1,1,0,0,0,0,0,0, /* Tooth 2 (36 deg) and 54 deg space */
+	  1,1,1,1,0,0,0,0,0,0, /* Tooth 3 (36 deg) and begin of 189 deg space */
+	  0,0,0,0,0,0,0,0,0,0, /* Part of 189 deg space */
+	  0,0,0,0,0,1,1,1,1,0, /* Tail of 189 deg space, 36 deg tooth, begin of 54 deg space */
+	  0,0,0,0,0,1,1,1,1,0, /* Tail of 54 deg space, 36 deg tooth, begin of 54 deg space */
+	  0,0,0,0,0,1,1,1,1,0, /* Tail of 54 deg space, last 36 deg tooth, begin of 99 deg space */
+	  0.0.0,0.0.0.0.0.0.0  /* Tail of 99 deg space */
     };
   
   PROGMEM prog_uchar gm_ls1_crank_and_cam[] = 
     { /* GM LS1 24 tooth crank snd 1 tooth cam */
+	  /* 12 deg low, 3 deg high, 3 deg low,
+	   * 12 deg high, 3deg low, 12 deg high,
+	   * 3 deg low, 12 deg high, 3 deg low,
+	   * 12 deg high, 3 deg low, 12 deg high,
+	   * 12 deg low, 3 deg high, 3 deg low,
+	   * 12 deg high, 3 deg low, 12 deg high,
+	   * 3 deg low, 12 deg high, 12 deg low,
+	   * 3 deg high, 12 deg low, 3 deg high,
+	   * 3 deg low, 12 deg high, 3 deg low,
+	   * 12 deg high, 12 deg low, 3 deg high,
+	   * 12 deg low, 3 deg high, 12 deg low,
+	   * 3 deg high, 12 deg low, 3 deg high,
+	   * 3 deg low, 12 deg high, 12 deg low,
+	   * 3 deg high, 3 deg low, 12 deg high,
+	   * 12 deg low, 3 deg high, 12 deg low,
+	   * 3 deg high, 12 deg low, 3 deg high
+	   * Second rotation is the SAME pattern
+	   * with cam signal held hight for 360 
+	   * crank degrees */
       0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,
       1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,
       1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -431,22 +456,23 @@
   */
  PROGMEM prog_uchar lotus_thirty_six_minus_one_one_one_one[] = 
    { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,0,0,1,0, 
-     1,0,0,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,0,0,1,0,1,0,1,0, 
-     0,0
+     1,0,1,0,1,0,1,0,1,0, /* teeth 1-5 */
+     1,0,1,0,1,0,1,0,1,0, /* teeth 6-10 */
+     1,0,1,0,1,0,0,0,1,0, /* teeth 11-15 */
+     1,0,0,0,1,0,1,0,1,0, /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* teeth 26-30 */
+     1,0,0,0,1,0,1,0,1,0, /* teeth 31-35 */
+     0,0                  /* MISSING 36th tooth */
    }; 
  PROGMEM prog_uchar honda_rc51_with_cam[] = 
    { /* Honda RC51 oddfire 90deg Vtwin with cam */
-      0,1,0,1,0,1,0,1,0,3, 
-      0,1,0,1,0,1,0,1,0,1, 
-      0,1,0,1,0,3,0,1,0,3, 
-      0,1,0,1,0,1,0,1,0,1, 
-      0,1,0,1,0,1,0,1
+      0,1,0,1,0,1,0,1,0,3, /* teeth 1-5, cam trigges on tooth 5 */
+      0,1,0,1,0,1,0,1,0,1, /* teeth 6-10 */
+      0,1,0,1,             /* Teeth 11-12 */
+	  0,3,0,1,0,3,0,1,0,1, /* 2nd rotation, teeth 1-5 (13-17), cam trigger on tooth 1(13) and 3(15) */
+      0,1,0,1,0,1,0,1,0,1, /* teeth 6-10 (18-22) */
+      0,1,0,1              /* teeth 11-12, (23-24) */
    };
 
  /* 36-1 with second trigger pulse across teeth 33-34 on first rotation */
