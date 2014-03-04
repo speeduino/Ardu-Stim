@@ -73,6 +73,7 @@
    { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
    { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
    { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
+   { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 2.0, 240 },
    { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 },
    { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.13333, 16 },
    { eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 },

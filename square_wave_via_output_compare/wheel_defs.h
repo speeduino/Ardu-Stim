@@ -64,6 +64,7 @@
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
    DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
    SIXTY_MINUS_TWO,      /* 60-2 crank only */
+   SIXTY_MINUS_TWO_WITH_CAM, /* 60-2 with 2nd trigger on cam */
    THIRTY_SIX_MINUS_ONE, /* 36-1 crank only */
    FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
    EIGHT_MINUS_ONE,       /* 8-1 crank only */
@@ -92,6 +93,7 @@
  PROGMEM prog_char dizzy_six_cylinder_friendly_name[] = "6 cylinder dizzy";
  PROGMEM prog_char dizzy_eight_cylinder_friendly_name[] = "8 cylinder dizzy";
  PROGMEM prog_char sixty_minus_two_friendly_name[] = "60-2 crank only";
+ PROGMEM prog_char sixty_minus_two_with_cam_friendly_name[] = "60-2 crank and cam";
  PROGMEM prog_char thirty_six_minus_one_friendly_name[] = "36-1 crank only";
  PROGMEM prog_char four_minus_one_with_cam_friendly_name[] = "4-1 crank wheel with cam";
  PROGMEM prog_char eight_minus_one_friendly_name[] = "8-1 crank only (R6)";
@@ -142,6 +144,36 @@
      1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
+     1,0,1,0,1,0,0,0,0,0   /* teeth 56-58 and 59-60 MISSING */
+   };
+ 
+ /* Bosch 60-2 pattern with 2nd trigger on rotation 2, 
+  * 50% duty cyctle during normal teeth */
+ PROGMEM prog_uchar sixty_minus_two_with_cam[] = 
+   { /* 60-2 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
+     1,0,1,0,1,0,0,0,0,0,  /* teeth 56-58 and 59-60 MISSING */
+     1,0,1,0,1,0,1,0,1,0,  /* Second revolution teeth 1-5 */ 
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+     1,2,1,0,1,0,1,0,1,0,  /* teeth 36-40, Cam trigger on latter half of 36th */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
@@ -420,22 +452,22 @@
  /* 36-1 with second trigger pulse across teeth 33-34 on first rotation */
  PROGMEM prog_uchar thirty_six_minus_one_with_second_trigger[] = 
    { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,3,2,3,2,1,0,  /* Second trigger on 33-34 */
-     0,0, 
-     1,0,1,0,1,0,1,0,1,0,  /* Revolution 2 */
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     0,0
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 1-5 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 6-10  */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+     1,0,1,0,3,2,3,2,1,0, /* Teeth 31-35, second trigger during 33-34 */
+     0,0,                 /* 36th tooth MISSING */
+     1,0,1,0,1,0,1,0,1,0, /* Revolution 2  Teeth 1-5 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
+     0,0                  /* 36th MISSING tooth
    }; 
    
   #endif
