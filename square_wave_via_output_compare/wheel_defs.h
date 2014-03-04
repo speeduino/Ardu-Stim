@@ -116,119 +116,115 @@
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_four_cylinder[] = 
    { /* dizzy 4 cylinder */
-     1,0,1,0
+     1,0,1,0 /* two pulses per crank revolution (one per cylinder) */
    };
    
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_six_cylinder[] = 
    { /* dizzy 6 cylinder */
-     1,0,1,0,1,0
+     1,0,1,0,1,0 /* three pulses per crank revolution (one per cylinder) */
    };
    
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_eight_cylinder[] = 
    { /* dizzy 8 cyl */
-     1,0,1,0,1,0,1,0
+     1,0,1,0,1,0,1,0 /* four pulses per crank revolution (one per cylinder) */
    };
    
  /* Standard bosch 60-2 pattern, 50% duty cyctle during normal teeth */
  PROGMEM prog_uchar sixty_minus_two[] = 
    { /* 60-2 */
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,0,0,0,0
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
+     1,0,1,0,1,0,0,0,0,0   /* teeth 56-58 and 59-60 MISSING */
    };
  
  /* Standard ford/mazda and aftermarket 36-1 pattern, 50% duty cyctle during normal teeth */  
  PROGMEM prog_uchar thirty_six_minus_one[] = 
    { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     1,0,1,0,1,0,1,0,1,0, 
-     0,0
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+     0,0                   /* MISSING 36th tooth  */
    }; 
    
  /* 4-1 crank signal 50% duty cycle with Cam tooth enabled during the second rotation prior to tooth 2 */
  PROGMEM prog_uchar four_minus_one_with_cam[] = 
    { /* 4-1 with cam */
-     0,1,0,1,0,1,0,0,0,1, 
-     2,1,0,1,0,0
+     0,1,0,1,0,1,0,0,  /* Teeth 1-3, then MISSING */
+     0,1,2,1,0,1,0,0   /* Tooth 5, 2nd trigger on cam between 5 and 6m then 6 and 7 and MISSING 8th */
    };
    
  /* Yamaha R6 crank trigger 8 teeth missing one, (22.5deg low, 22.5deg high) 50% duty cycle during normal teeth */
  PROGMEM prog_uchar eight_minus_one[] = 
    { /* 8-1 */
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,0
+     0,1,0,1,0,1,0,1,  /* Teeth 1-4 */
+     0,1,0,1,0,1,0,0   /* Teeth 5-7, then MISSING */
    };
   
   /* 40deg low, 20 deg high per tooth, cam signal on second rotation during 40deg low portion of 3rd tooth */
  PROGMEM prog_uchar six_minus_one_with_cam[] = 
    { /* 6-1 with cam */
-     0,0,1,0,0,1,0,0,1,0, 
-     0,1,0,0,1,0,0,0,0,0, 
-     1,0,0,1,2,2,1,0,0,1, 
-     0,0,1,0,0,0
+     0,0,1,0,0,1,0,0,1,  /* Teeth 1-3 */
+     0,0,1,0,0,1,0,0,0,  /* Teeth 4 and 5 and MISSING 6th */
+     0,0,1,0,0,1,2,2,1,  /* 2nd rev teeth 7 and 8, then 2nd trigger on cam between 8 and 9 */
+     0,0,1,0,0,1,0,0,0   /* teeth 10 and 11 then missing 12th */
    };
   
-  /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 9 */
+  /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 21 (9) */
  PROGMEM prog_uchar twelve_minus_one_with_cam[] = 
    { /* 12-1 with cam */
-     0,0,0,0,0,1,0,0,0,0, 
-     0,1,0,0,0,0,0,1,0,0, 
-     0,0,0,1,0,0,0,0,0,1, 
-     0,0,0,0,0,1,0,0,0,0, 
-     0,1,0,0,0,0,0,1,0,0, 
-     0,0,0,1,0,0,0,0,0,1, 
-     0,0,0,0,0,1,0,0,0,0, 
-     0,0,0,0,0,0,0,1,0,0, 
-     0,0,0,1,0,0,0,0,0,1, 
-     0,0,0,0,0,1,0,0,0,0, 
-     0,1,0,0,0,0,0,1,0,0, 
-     0,0,0,1,0,0,0,0,0,1, 
-     0,0,0,0,0,1,2,2,2,2, 
-     2,1,0,0,0,0,0,1,0,0, 
-     0,0,0,0
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 1 and 2 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 3 and 4 */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 5 and 6 */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 7 and 8 */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 9 and 10 */
+	 0,0,0,0,0,1,0,0,0,0,0,0, /* Tooth 11 and MISSING twelth */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* 2nd rotation: Teeth 13 and 14 */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 15 and 16 */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 17 and 18 */
+	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 19 and 20 */
+	 0,0,0,0,0,1,2,2,2,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
+	 0,0,0,0,0,1,0,0,0,0,0,0  /* Totth 23 and MISSING 24th */
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
  PROGMEM prog_uchar fourty_minus_one[] = 
    { /* 40-1 */
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,1, 
-     0,1,0,1,0,1,0,1,0,0 
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 1-5 */
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 6-10 */ 
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 11-15 */ 
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 16-20 */ 
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 21-25 */ 
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 26-30 */ 
+     0,1,0,1,0,1,0,1,0,1,  /* Teeth 31-35 */ 
+     0,1,0,1,0,1,0,1,0,0   /* Teeth 36-39 and MISSING 40th tooth */ 
    };
   
   /* 50deg off, 40 deg on dissy style signal */
   PROGMEM prog_uchar dizzy_trigger_return[] = 
     { /* dizzy trigger return */
-      0,0,0,0,0,1,1,1,1
+      0,0,0,0,0,1,1,1,1l  /* Simple off/on signal, 50deg off, 40 deg on */
     };
    
-  /* Oddfire V twin, 15 deg on, 120deg off, 15 deg on, 210 deg off */
+  /* Oddfire V twin  135/225 split */
   PROGMEM prog_uchar oddfire_vr[] = 
     { /* Oddfire VR */
-      1,0,0,0,0,0,0,0,0,1, 
-      0,0,0,0,0,0,0,0,0,0, 
-      0,0,0,0
+      1,0,0,0,0,0,0,0,0,1,0,0  /* Tooth 1 and 2 at 0 deg and 135 deg, then 225 off */
+      0,0,0,0,0,0,0,0,0,0,0,0 
     };
   
   /* GM LT1 360 and 8 wheel, see http://powerefi.com/files/opti-LT1-count.JPG */
@@ -251,51 +247,62 @@
   
   PROGMEM prog_uchar twelve_minus_three[] = 
     { /* 12-3, http://www.msextra.com/doc/triggers/12_3_wheel_133.jpg */
-      1,0,0,0,1,0,0,0,  /* 1,2 */
-      1,0,0,0,1,0,0,0,  /* 2,4 */
-      1,0,0,0,1,0,0,0,  /* 5,6 */
-      1,0,0,0,1,0,0,0,  /* 7,8 */
-      1,0,0,0,0,0,0,0,  /* 9,10M */
-      0,0,0,0,0,0,0,0    /* 11M,12M */
+      1,0,0,0,1,0,0,0,  /* Teeth 1-2 */
+      1,0,0,0,1,0,0,0,  /* Teeth 3-4 */
+      1,0,0,0,1,0,0,0,  /* Teeth 5-6 */
+      1,0,0,0,1,0,0,0,  /* Teeth 7-8 */
+      1,0,0,0,0,0,0,0,  /* Tooth 9 and MISSING 10th */
+      0,0,0,0,0,0,0,0   /* MISSING Teeth 11-12 */
     };
   
   PROGMEM prog_uchar thirty_six_minus_two_two_two[] = 
     { /* 36-2-2-2  */
-      1,0,0,0,0,0,1,0,0,0, 
-      0,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,0,0,0,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0
+      1,0,0,0,0,0,1,0,0,0, /* Tooth 1, then MISSING 2 and 3, then 4 and MISSING 5 */
+      0,0,1,0,1,0,1,0,1,0, /* Missing Tooth 6, then 7-10 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */ 
+      1,0,1,0,0,0,0,0,1,0, /* Teeth 21-25 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
+      1,0                  /* 36th Tooth
     };
   
   PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = 
     { /* 36-2-2-2 with cam  */
-      1,2,2,2,2,2,1,0,0,0, 
-      0,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0,1,2,2,2,2,2,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0,1,0,1,0,1,0,1,0, 
-      1,0
+      1,2,2,2,2,2,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
+      0,0,1,0,1,0,1,0,1,0, /* Missing tooth 6, then 7-10 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */ 
+      1,0,1,2,2,2,2,2,1,0, /* Teeth 21-2sing 23-24, then 25, 2nd trigger during teeth 23 and 24 */ 
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */ 
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */ 
+      1,0                  /* 36th Tooth */
     };
   
   PROGMEM prog_uchar fourty_two_hundred_wheel[] = 
     { /* 4200 wheel http://msextra.com/doc/triggers/4200_timing.pdf */
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1, 
-      1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1
-   
+		/* 55 deg high, 
+		 * 5 deg low, 
+		 * 55 deg high, 
+		 * 5 deg low, 
+		 * 5 deg high, 
+		 * 5 deg low,
+		 * 45 deg high,
+		 * 5 deg low,
+		 * 55 deg high,
+		 * 5 deg low,
+		 * 65 deg high,
+		 * 5 deg low,
+		 * 45 deg high
+		 * 5 deg low, (360 degreees ) */
+      1,1,1,1,1,1,1,1,1,1, 
+	  1,0,1,1,1,1,1,1,1,1, 
+	  1,1,1,0,1,0,1,1,1,1, 
+	  1,1,1,1,1,0,1,1,1,1,
+	  1,1,1,1,1,1,1,0,1,1,
+	  1,1,1,1,1,1,1,1,1,1,
+	  1,0,1,1,1,1,1,1,1,1,
+	  1,0
   };
 
  /* Mazda F3 36-1 with cam */

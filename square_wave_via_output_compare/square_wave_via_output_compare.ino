@@ -85,7 +85,7 @@
    { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
    { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72},
    { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 72 },
-   { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 3.0, 360 },
+   { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
    { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 1.2, 144 },
    { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 1.2, 144 },
    { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 },
