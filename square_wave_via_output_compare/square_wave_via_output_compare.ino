@@ -35,7 +35,7 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
- unsigned int wanted_rpm = 1000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ unsigned int wanted_rpm = 2000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
  volatile uint16_t edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -62,10 +62,38 @@
  volatile uint16_t new_OCR1A = 5000; /* sane default */
  
 
- //volatile byte selected_wheel = SIXTY_MINUS_TWO;
- volatile byte selected_wheel = THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3;
+ volatile byte selected_wheel = THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER;
+ //volatile byte selected_wheel = THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER;
 
- 
+ /* Stick it in flash as we only have 1K of RAM */
+/* Array of pointers to string buffers of each decoder's name */
+ prog_char *decoder_names[MAX_WHEELS] = {
+   dizzy_four_cylinder_friendly_name, \
+   dizzy_six_cylinder_friendly_name, \
+   dizzy_eight_cylinder_friendly_name, \
+   sixty_minus_two_friendly_name, \
+   thirty_six_minus_one_friendly_name, \
+   four_minus_one_with_cam_friendly_name, \
+   eight_minus_one_friendly_name, \
+   six_minus_one_with_cam_friendly_name, \
+   twelve_minus_one_with_cam_friendly_name, \
+   fourty_minus_one_friendly_name, \
+   dizzy_trigger_return_friendly_name, \
+   oddfire_vr_friendly_name, \
+   optispark_lt1_friendly_name, \
+   twelve_minus_three_friendly_name, \
+   thirty_six_minus_two_two_two_friendly_name, \
+   thirty_six_minus_two_two_two_with_cam_friendly_name, \
+   fourty_two_hundred_wheel_friendly_name, \
+   thirty_six_minus_one_with_cam_fe3_friendly_name, \
+   six_g_seventy_two_with_cam_friendly_name, \
+   buell_oddfire_cam_friendly_name, \
+   gm_ls1_crank_and_cam_friendly_name, \
+   lotus_thirty_six_minus_one_one_one_one_friendly_name, \
+   honda_rc51_with_cam_friendly_name, \
+   thirty_six_minus_one_with_second_trigger_friendly_name, \
+ };
+
  /* Stick it in flash as we only have 1K of RAM */
  prog_uchar *edge_states_ptr[MAX_WHEELS] = {
    dizzy_four_cylinder, \
@@ -83,6 +111,7 @@
    optispark_lt1, \
    twelve_minus_three, \
    thirty_six_minus_two_two_two, \
+   thirty_six_minus_two_two_two_with_cam, \
    fourty_two_hundred_wheel, \
    thirty_six_minus_one_with_cam_fe3, \
    six_g_seventy_two_with_cam, \
@@ -90,6 +119,7 @@
    gm_ls1_crank_and_cam, \
    lotus_thirty_six_minus_one_one_one_one, \
    honda_rc51_with_cam, \
+   thirty_six_minus_one_with_second_trigger, \
  };
  
   

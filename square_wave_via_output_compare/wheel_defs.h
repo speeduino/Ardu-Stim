@@ -76,9 +76,36 @@
    GM_LS1_CRANK_AND_CAM,  /* GM LS1 24 tooth with cam */
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
+   THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
    MAX_WHEELS,
  }WheelType;
  
+ PROGMEM prog_char dizzy_four_cylinder_friendly_name[] = "4 cylinder dizzy";
+ PROGMEM prog_char dizzy_six_cylinder_friendly_name[] = "6 cylinder dizzy";
+ PROGMEM prog_char dizzy_eight_cylinder_friendly_name[] = "8 cylinder dizzy";
+ PROGMEM prog_char sixty_minus_two_friendly_name[] = "60-2 crank only";
+ PROGMEM prog_char thirty_six_minus_one_friendly_name[] = "36-1 crank only";
+ PROGMEM prog_char four_minus_one_with_cam_friendly_name[] = "4-1 crank wheel with cam";
+ PROGMEM prog_char eight_minus_one_friendly_name[] = "8-1 crank only (R6)";
+ PROGMEM prog_char six_minus_one_with_cam_friendly_name[] = "6-1 crank with cam";
+ PROGMEM prog_char twelve_minus_one_with_cam_friendly_name[] = "12-1 crank with cam";
+ PROGMEM prog_char fourty_minus_one_friendly_name[] = "40-1 crank only (Ford V10)";
+ PROGMEM prog_char dizzy_trigger_return_friendly_name[] = "Distributor style 50deg off, 40 deg on";
+ PROGMEM prog_char oddfire_vr_friendly_name[] = "odd fire 90 deg pattern 0 and 135 pulses";
+ PROGMEM prog_char optispark_lt1_friendly_name[] = "GM OptiSpark LT1 360 and 8";
+ PROGMEM prog_char twelve_minus_three_friendly_name[] = "12-3 oddball";
+ PROGMEM prog_char thirty_six_minus_two_two_two_friendly_name[] = "36-2-2-2 Crank only";
+ PROGMEM prog_char thirty_six_minus_two_two_two_with_cam_friendly_name[] = "36-2-2-2 Crank and cam";
+ PROGMEM prog_char fourty_two_hundred_wheel_friendly_name[] = "GM 4200 crank wheel";
+ PROGMEM prog_char thirty_six_minus_one_with_cam_fe3_friendly_name[] = "Mazda FE3 36-1 with cam";
+ PROGMEM prog_char six_g_seventy_two_with_cam_friendly_name[] = "Mitsubishi 6g72 with cam";
+ PROGMEM prog_char buell_oddfire_cam_friendly_name[] = "Buell Oddfire CAM wheel";
+ PROGMEM prog_char gm_ls1_crank_and_cam_friendly_name[] = "GM LS1 crank and cam";
+ PROGMEM prog_char lotus_thirty_six_minus_one_one_one_one_friendly_name[] = "Odd Lotus 36-1-1-1-1 flywheel";
+ PROGMEM prog_char honda_rc51_with_cam_friendly_name[] = "Honda RC51 with cam";
+ PROGMEM prog_char thirty_six_minus_one_with_second_trigger_friendly_name[] = "36-1 crank with 2nd trigger on teeth 33-34";
+
+
  
  const float rpm_scaler[MAX_WHEELS] = {
    0.03333, /* dizzy 4 */
@@ -104,6 +131,7 @@
    6.0,     /* GM LS1 crank and cam */
    0.6,     /* Lotus crank wheel 36-1-1-1-1 */
    0.4,     /* Honda RC51 90 deg oddfire vtwin with cam */
+   1.2,     /* 36-1 with second trigger on 33-34 */
  }; 
   
  const uint16_t wheel_max_edges[MAX_WHEELS] = {
@@ -130,128 +158,129 @@
    720, /* GM LS1 crank and cam */
    72,  /* Lotus 36-1-1-1-1 */
    48,  /* Honda RC 51 */
+   144, /* 36-1 wiht second trigger on 33-34 */
  };
  
  /* Very simple 50% duty cycle */
- PROGMEM prog_uchar dizzy_four_cylinder[] = \
+ PROGMEM prog_uchar dizzy_four_cylinder[] = 
    { /* dizzy 4 cylinder */
      1,0,1,0
    };
    
  /* Very simple 50% duty cycle */
- PROGMEM prog_uchar dizzy_six_cylinder[] = \
+ PROGMEM prog_uchar dizzy_six_cylinder[] = 
    { /* dizzy 6 cylinder */
      1,0,1,0,1,0
    };
    
  /* Very simple 50% duty cycle */
- PROGMEM prog_uchar dizzy_eight_cylinder[] = \
+ PROGMEM prog_uchar dizzy_eight_cylinder[] = 
    { /* dizzy 8 cyl */
      1,0,1,0,1,0,1,0
    };
    
  /* Standard bosch 60-2 pattern, 50% duty cyctle during normal teeth */
- PROGMEM prog_uchar sixty_minus_two[] = \
+ PROGMEM prog_uchar sixty_minus_two[] = 
    { /* 60-2 */
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
      1,0,1,0,1,0,0,0,0,0
    };
  
  /* Standard ford/mazda and aftermarket 36-1 pattern, 50% duty cyctle during normal teeth */  
- PROGMEM prog_uchar thirty_six_minus_one[] = \
+ PROGMEM prog_uchar thirty_six_minus_one[] = 
    { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
      0,0
    }; 
    
  /* 4-1 crank signal 50% duty cycle with Cam tooth enabled during the second rotation prior to tooth 2 */
- PROGMEM prog_uchar four_minus_one_with_cam[] = \
+ PROGMEM prog_uchar four_minus_one_with_cam[] = 
    { /* 4-1 with cam */
-     0,1,0,1,0,1,0,0,0,1, \
+     0,1,0,1,0,1,0,0,0,1, 
      2,1,0,1,0,0
    };
    
  /* Yamaha R6 crank trigger 8 teeth missing one, (22.5deg low, 22.5deg high) 50% duty cycle during normal teeth */
- PROGMEM prog_uchar eight_minus_one[] = \
+ PROGMEM prog_uchar eight_minus_one[] = 
    { /* 8-1 */
-     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, 
      0,1,0,1,0,0
    };
   
   /* 40deg low, 20 deg high per tooth, cam signal on second rotation during 40deg low portion of 3rd tooth */
- PROGMEM prog_uchar six_minus_one_with_cam[] = \
+ PROGMEM prog_uchar six_minus_one_with_cam[] = 
    { /* 6-1 with cam */
-     0,0,1,0,0,1,0,0,1,0, \
-     0,1,0,0,1,0,0,0,0,0, \
-     1,0,0,1,2,2,1,0,0,1, \
+     0,0,1,0,0,1,0,0,1,0, 
+     0,1,0,0,1,0,0,0,0,0, 
+     1,0,0,1,2,2,1,0,0,1, 
      0,0,1,0,0,0
    };
   
   /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 9 */
- PROGMEM prog_uchar twelve_minus_one_with_cam[] = \
+ PROGMEM prog_uchar twelve_minus_one_with_cam[] = 
    { /* 12-1 with cam */
-     0,0,0,0,0,1,0,0,0,0, \
-     0,1,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,0,0,0,0, \
-     0,1,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,0,0,0,0, \
-     0,0,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,0,0,0,0, \
-     0,1,0,0,0,0,0,1,0,0, \
-     0,0,0,1,0,0,0,0,0,1, \
-     0,0,0,0,0,1,2,2,2,2, \
-     2,1,0,0,0,0,0,1,0,0, \
+     0,0,0,0,0,1,0,0,0,0, 
+     0,1,0,0,0,0,0,1,0,0, 
+     0,0,0,1,0,0,0,0,0,1, 
+     0,0,0,0,0,1,0,0,0,0, 
+     0,1,0,0,0,0,0,1,0,0, 
+     0,0,0,1,0,0,0,0,0,1, 
+     0,0,0,0,0,1,0,0,0,0, 
+     0,0,0,0,0,0,0,1,0,0, 
+     0,0,0,1,0,0,0,0,0,1, 
+     0,0,0,0,0,1,0,0,0,0, 
+     0,1,0,0,0,0,0,1,0,0, 
+     0,0,0,1,0,0,0,0,0,1, 
+     0,0,0,0,0,1,2,2,2,2, 
+     2,1,0,0,0,0,0,1,0,0, 
      0,0,0,0
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
- PROGMEM prog_uchar fourty_minus_one[] = \
+ PROGMEM prog_uchar fourty_minus_one[] = 
    { /* 40-1 */
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
-     0,1,0,1,0,1,0,1,0,1, \
+     0,1,0,1,0,1,0,1,0,1, 
+     0,1,0,1,0,1,0,1,0,1, 
+     0,1,0,1,0,1,0,1,0,1, 
+     0,1,0,1,0,1,0,1,0,1, 
+     0,1,0,1,0,1,0,1,0,1, 
+     0,1,0,1,0,1,0,1,0,1, 
+     0,1,0,1,0,1,0,1,0,1, 
      0,1,0,1,0,1,0,1,0,0 
    };
   
   /* 50deg off, 40 deg on dissy style signal */
-  PROGMEM prog_uchar dizzy_trigger_return[] = \
+  PROGMEM prog_uchar dizzy_trigger_return[] = 
    { /* dizzy trigger return */
      0,0,0,0,0,1,1,1,1
    };
    
   /* Oddfire V twin, 15 deg on, 120deg off, 15 deg on, 210 deg off */
-  PROGMEM prog_uchar oddfire_vr[] = \
+  PROGMEM prog_uchar oddfire_vr[] = 
    { /* Oddfire VR */
-     1,0,0,0,0,0,0,0,0,1, \
-     0,0,0,0,0,0,0,0,0,0, \
+     1,0,0,0,0,0,0,0,0,1, 
+     0,0,0,0,0,0,0,0,0,0, 
      0,0,0,0
    };
   
   /* GM LT1 360 and 8 wheel, see http://powerefi.com/files/opti-LT1-count.JPG */
-  PROGMEM prog_uchar optispark_lt1[] = \
+  PROGMEM prog_uchar optispark_lt1[] = 
   { /* Optispark 360 outside teeth, 8 varying inside teeth */
   /* 1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 */
     3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2, /* 0-30 */
@@ -268,7 +297,7 @@
     1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 331-360 */
   };
   
-  PROGMEM prog_uchar twelve_minus_three[] = \
+  PROGMEM prog_uchar twelve_minus_three[] = 
   { /* 12-3, http://www.msextra.com/doc/triggers/12_3_wheel_133.jpg */
     1,0,0,0,1,0,0,0,  /* 1,2 */
     1,0,0,0,1,0,0,0,  /* 2,4 */
@@ -278,48 +307,48 @@
     0,0,0,0,0,0,0,0    /* 11M,12M */
   };
   
-  PROGMEM prog_uchar thirty_six_minus_two_two_two[] = \
+  PROGMEM prog_uchar thirty_six_minus_two_two_two[] = 
   { /* 36-2-2-2  */
-    1,0,0,0,0,0,1,0,0,0, \
-    0,0,1,0,1,0,1,0,1,0, \
-    1,0,1,0,1,0,1,0,1,0, \
-    1,0,1,0,1,0,1,0,1,0, \
-    1,0,1,0,0,0,0,0,1,0, \
-    1,0,1,0,1,0,1,0,1,0, \
+    1,0,0,0,0,0,1,0,0,0, 
+    0,0,1,0,1,0,1,0,1,0, 
+    1,0,1,0,1,0,1,0,1,0, 
+    1,0,1,0,1,0,1,0,1,0, 
+    1,0,1,0,0,0,0,0,1,0, 
+    1,0,1,0,1,0,1,0,1,0, 
     1,0,1,0,1,0,1,0,1,0, 
     1,0
   };
   
-  PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = \
+  PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = 
   { /* 36-2-2-2 with cam  */
-    1,2,2,2,2,2,1,0,0,0, \
-    0,0,1,0,1,0,1,0,1,0, \
-    1,0,1,0,1,0,1,0,1,0, \
-    1,0,1,0,1,0,1,0,1,0, \
-    1,0,1,2,2,2,2,2,1,0, \
-    1,0,1,0,1,0,1,0,1,0, \
+    1,2,2,2,2,2,1,0,0,0, 
+    0,0,1,0,1,0,1,0,1,0, 
+    1,0,1,0,1,0,1,0,1,0, 
+    1,0,1,0,1,0,1,0,1,0, 
+    1,0,1,2,2,2,2,2,1,0, 
+    1,0,1,0,1,0,1,0,1,0, 
     1,0,1,0,1,0,1,0,1,0, 
     1,0
   };
   
-  PROGMEM prog_uchar fourty_two_hundred_wheel[] = \
+  PROGMEM prog_uchar fourty_two_hundred_wheel[] = 
   { /* 4200 wheel http://msextra.com/doc/triggers/4200_timing.pdf */
-   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1, \
-   1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
-   1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, \
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1, 
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1
    
   };
 
  /* Mazda F3 36-1 with cam */
- PROGMEM prog_uchar thirty_six_minus_one_with_cam_fe3[] = \
- { /* 36-1 */
+ PROGMEM prog_uchar thirty_six_minus_one_with_cam_fe3[] = 
+ { /* 36-1 with cam, 3 cam teeth, 2 180deg from each other */
    1,0,1,0,1,0,1,0,1,0,1,0, /* 0-55 deg */
    1,0,1,0,1,0,3,2,3,0,1,0, /* 60-115 deg  cam tooth at 90 deg crank for 15 crank degrees */
    1,0,1,0,1,0,1,0,1,0,1,0, /* 120-175 deg */
@@ -331,11 +360,11 @@
    1,0,1,0,1,0,1,0,1,0,1,0, /* 480-535 deg */
    1,0,1,0,1,0,1,0,1,0,1,0, /* 540-595 deg */
    1,0,1,0,1,0,1,0,1,0,1,0, /* 600-655 deg */
-   1,0,1,0,1,0,1,0,1,0,1,0  /* 660-715 deg */
+   1,0,1,0,1,0,1,0,1,0,0,0  /* 660-715 deg Crank missing tooth at end */
   }; 
   
   /* Mitsubishi 6g72 crank/cam */
-  PROGMEM prog_uchar six_g_seventy_two_with_cam[] = \
+  PROGMEM prog_uchar six_g_seventy_two_with_cam[] = 
   { /* Mitsubishi 6g72 */
     3,3,3,3,3,3,3,3,3,2,
     2,2,2,2,0,0,0,0,0,0,
@@ -354,7 +383,7 @@
     0,2,2,3
   };
    
-  PROGMEM prog_uchar buell_oddfire_cam[] = \
+  PROGMEM prog_uchar buell_oddfire_cam[] = 
   { /* Buell oddfire cam wheel */
     0,0,0,0,0,0,0,0,0,0,
     0,1,1,1,1,0,0,0,0,0,
@@ -366,7 +395,7 @@
     0,0,0,0,0,0,1,1,1,1
   };
   
-  PROGMEM prog_uchar gm_ls1_crank_and_cam[] = \
+  PROGMEM prog_uchar gm_ls1_crank_and_cam[] = 
   { /* GM LS1 24 tooth crank snd 1 tooth cam */
     0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,
     1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,
@@ -409,24 +438,46 @@
  /* Lotus 36-1-1-1-1 wheel, missing teeth at
   * 36,32,17 and 14
   */
- PROGMEM prog_uchar lotus_thirty_six_minus_one_one_one_one[] = \
+ PROGMEM prog_uchar lotus_thirty_six_minus_one_one_one_one[] = 
    { /* 36-1 */
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,0,0,1,0, \
-     1,0,0,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,1,0,1,0,1,0,1,0, \
-     1,0,0,0,1,0,1,0,1,0, \
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,0,0,1,0, 
+     1,0,0,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,0,0,1,0,1,0,1,0, 
      0,0
    }; 
    
- PROGMEM prog_uchar honda_rc51_with_cam[] = \
+ PROGMEM prog_uchar honda_rc51_with_cam[] = 
    { /* Honda RC51 oddfire 90deg Vtwin with cam */
-	 0,1,0,1,0,1,0,1,0,3, \
-	 0,1,0,1,0,1,0,1,0,1, \
-	 0,1,0,1,0,3,0,1,0,3, \
-	 0,1,0,1,0,1,0,1,0,1, \
+	 0,1,0,1,0,1,0,1,0,3, 
+	 0,1,0,1,0,1,0,1,0,1, 
+	 0,1,0,1,0,3,0,1,0,3, 
+	 0,1,0,1,0,1,0,1,0,1, 
 	 0,1,0,1,0,1,0,1
    };
+
+ /* 36-1 wiht second trigger pulse across teeth 33-34 on first rotation */
+ PROGMEM prog_uchar thirty_six_minus_one_with_second_trigger[] = 
+   { /* 36-1 */
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,3,2,3,2,1,0,  /* Second trigger on 33-34 */
+     0,0, 
+     1,0,1,0,1,0,1,0,1,0,  /* Revolution 2 */
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     1,0,1,0,1,0,1,0,1,0, 
+     0,0
+   }; 
+   
   #endif
