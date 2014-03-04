@@ -23,7 +23,7 @@
  * so for a 60-2 wheel (120 edges), the time between teeth is
  * 8000000/RPM,  but for lesser teeth wheels this will be different
  * Thus we need a corresponding array to fix that, so that the 
- * requested RPM is actually exported as we want
+ * requested RPM is actually synthesized as we want
  */
  
 #include "wheel_defs.h"
@@ -94,6 +94,7 @@
    { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 },
    { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.4, 48 },
    { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 1.2, 144 },
+   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 6.0, 720},
 };
 
  void setup() {

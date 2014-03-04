@@ -85,6 +85,8 @@
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
+   THIRTY_SIX_MINUS_ONE_PUS_ONE_WITH_CAM_NGC4, /* From jimstim 36-1+1 wheel #5 4 cyl chrysler? */
+
    MAX_WHEELS,
  }WheelType;
 
@@ -114,6 +116,7 @@
  PROGMEM prog_char lotus_thirty_six_minus_one_one_one_one_friendly_name[] = "Odd Lotus 36-1-1-1-1 flywheel";
  PROGMEM prog_char honda_rc51_with_cam_friendly_name[] = "Honda RC51 with cam";
  PROGMEM prog_char thirty_six_minus_one_with_second_trigger_friendly_name[] = "36-1 crank with 2nd trigger on teeth 33-34";
+ PROGMEM prog_char thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name[] = "36-1+1 crank with cam pattern NGC4";
 
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_four_cylinder[] = 
@@ -255,7 +258,7 @@
   /* Oddfire V twin  135/225 split */
   PROGMEM prog_uchar oddfire_vr[] = 
     { /* Oddfire VR */
-      1,0,0,0,0,0,0,0,0,1,0,0  /* Tooth 1 and 2 at 0 deg and 135 deg, then 225 off */
+      1,0,0,0,0,0,0,0,0,1,0,0, /* Tooth 1 and 2 at 0 deg and 135 deg, then 225 off */
       0,0,0,0,0,0,0,0,0,0,0,0 
     };
   
@@ -296,7 +299,7 @@
       1,0,1,0,0,0,0,0,1,0, /* Teeth 21-25 */
       1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
       1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
-      1,0                  /* 36th Tooth
+      1,0                  /* 36th Tooth */
     };
   
   PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = 
@@ -389,7 +392,7 @@
 	  0,0,0,0,0,1,1,1,1,0, /* Tail of 189 deg space, 36 deg tooth, begin of 54 deg space */
 	  0,0,0,0,0,1,1,1,1,0, /* Tail of 54 deg space, 36 deg tooth, begin of 54 deg space */
 	  0,0,0,0,0,1,1,1,1,0, /* Tail of 54 deg space, last 36 deg tooth, begin of 99 deg space */
-	  0.0.0,0.0.0.0.0.0.0  /* Tail of 99 deg space */
+	  0,0,0,0,0,0,0,0,0,0  /* Tail of 99 deg space */
     };
   
   PROGMEM prog_uchar gm_ls1_crank_and_cam[] = 
@@ -493,7 +496,34 @@
      1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
-     0,0                  /* 36th MISSING tooth
+     0,0                  /* 36th MISSING tooth */
    }; 
    
+ PROGMEM prog_uchar thirty_six_minus_one_plus_one_with_cam_ngc4[] = 
+   { /* 36-1+1 NGC-4 needs 1 deg resolution, chrysler 2.0/2.4 engines
+      * cam edges are at 26,62,98,134,170,314,350,368,422,458,494,530,674 and 710 dev
+	  * crank is 36-1 with alarge window at one end 2.5 teeth cycles (25 deg) wide and alosed
+	  * at 180deg apart for 2 teeth cycles (20 deg)
+	  */
+	  /* Crankshaft degrees
+     1   3   5   7   9  11  13  15  17  19  21  23  25  27  29  31  33  35  37  39  41 */
+	 0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* degrees */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 41-80 */
+	 0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 81-120 */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 121-160 */
+	 0,0,0,0,0,1,1,1,1,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, /* 161-200 */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 201-240 */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 241-280 */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,0,0,1,1,1,1,1, /* 281-320 */
+     0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,3,2,2,2,2,2,3,3,3,3,3, /* 321-360 */
+	 2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 361-400 */
+     0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 401-440 */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 441-480 */
+	 0,0,0,0,0,1,1,1,1,1,0,0,0,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 481-520 */
+	 2,2,2,2,2,3,3,3,3,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 521-560 */
+	 0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 561-600 */
+	 0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 601-640 */
+	 0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,2,2,3,3,3,3,3, /* 641-680 */
+	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,1,0,0,0,0,0,1,1,1,1,1  /* 681-720 */
+   };
   #endif
