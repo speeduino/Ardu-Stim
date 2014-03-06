@@ -206,6 +206,12 @@
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
-
-
+   Serial.print("Free RAM is: ");
+   Serial.println(freeRam());
  }
+ 
+int freeRam () {
+  extern int __heap_start, *__brkval; 
+  int v; 
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+}
