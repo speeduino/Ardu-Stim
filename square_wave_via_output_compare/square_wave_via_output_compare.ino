@@ -84,7 +84,7 @@
    { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
    { optispark_lt1_friendly_name, optispark_lt1, 6.0, 720 },
    { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
-   { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72},
+   { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
    { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 72 },
    { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
    { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 1.2, 144 },
@@ -94,8 +94,9 @@
    { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 },
    { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.4, 48 },
    { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 1.2, 144 },
-   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 6.0, 720},
-   { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144},
+   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 6.0, 720 },
+   { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144 },
+   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 6.0, 720 },
 };
 
  void setup() {
@@ -135,8 +136,7 @@
    /* The tables are in flash so we need pgm_read_byte() */
    PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
 
-   /* Reset Prescaler, this is INEFFICIENT to do this on every loop through 
-    * Find a way to ONLY reset it when necessary */
+   /* Reset Prescaler,only if flag set */
    if (reset_prescaler)
    {
      TCCR1B &= ~((1 << BIT_CS10) | (1 << BIT_CS11) | (1 << BIT_CS12)); /* Clear CS10, CS11 and CS12 */
