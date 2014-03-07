@@ -86,7 +86,7 @@
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
    THIRTY_SIX_MINUS_ONE_PUS_ONE_WITH_CAM_NGC4, /* From jimstim 36-1+1 wheel #5 4 cyl chrysler? */
-
+   WEBER_IAW_WITH_CAM, /* From jimstim IAW weber-marelli */
    MAX_WHEELS,
  }WheelType;
 
@@ -117,6 +117,7 @@
  PROGMEM prog_char honda_rc51_with_cam_friendly_name[] = "Honda RC51 with cam";
  PROGMEM prog_char thirty_six_minus_one_with_second_trigger_friendly_name[] = "36-1 crank with 2nd trigger on teeth 33-34";
  PROGMEM prog_char thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name[] = "36-1+1 crank with cam pattern NGC4";
+ PROGMEM prog_char weber_iaw_with_cam_friendly_name[] = "Weber-Marelli 8 crank+2 cam pattern";
 
  /* Very simple 50% duty cycle */
  PROGMEM prog_uchar dizzy_four_cylinder[] = 
@@ -200,7 +201,8 @@
  PROGMEM prog_uchar four_minus_one_with_cam[] = 
    { /* 4-1 with cam */
      0,1,0,1,0,1,0,0,  /* Teeth 1-3, then MISSING */
-     0,1,2,1,0,1,0,0   /* Tooth 5, 2nd trigger on cam between 5 and 6m then 6 and 7 and MISSING 8th */
+     0,1,2,1,0,1,0,0   /* Tooth 5, 2nd trigger on cam between 5 and 6 
+						  then 6 and 7 and MISSING 8th */
    };
    
  /* Yamaha R6 crank trigger 8 teeth missing one, (22.5deg low, 22.5deg high) 50% duty cycle during normal teeth */
@@ -525,5 +527,22 @@
 	 0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 601-640 */
 	 0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,2,2,3,3,3,3,3, /* 641-680 */
 	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,1,0,0,0,0,0,1,1,1,1,1  /* 681-720 */
+   };
+
+
+ PROGMEM prog_uchar weber_iaw_with_cam[] =
+   { /*Weber marelli (Cosworth/Lancia) from jimstim
+	   80 deg low, 10 deg high, Tooth 1
+	   20 deg low, 45 deg cam pulse, 15 deg low, 10 deg high, Cam tooth 1 and crank tooth 2
+	   80 deg low, 10 deg high, Crank tooth 3
+	   20 deg low, 45 deg cam pulse, 15 deg low, 10 deg high, Cam tooth2 and crank tooth 4
+	   80 deg low, 10 deg high, Crank tooth 5
+	   80 deg low, 10 deg high  Crank tooth 6
+	   80 deg low, 10 deg high, Crank tooth 7
+	   80 deg low, 10 deg high  Crank tooth 8 */
+	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,1,1, /* Teeth 1 and 2 & cam1 */
+	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,1,1, /* Teeth 3 and 4 & cam2 */
+	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1, /* Teeth 5 and 6 */
+	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1  /* Teeth 7 and 8 */
    };
   #endif

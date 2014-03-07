@@ -95,6 +95,7 @@
    { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.4, 48 },
    { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 1.2, 144 },
    { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 6.0, 720},
+   { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144},
 };
 
  void setup() {
@@ -206,8 +207,8 @@
    //Serial.print("new_OCR1A var is: ");
    //Serial.println(new_OCR1A);
    delay(RPM_STEP_DELAY);
-   Serial.print("Free RAM is: ");
-   Serial.println(freeRam());
+   //Serial.print("Free RAM is: ");
+   //Serial.println(freeRam());
  }
  
 int freeRam () {
