@@ -97,6 +97,7 @@
    { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 6.0, 720 },
    { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144 },
    { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 6.0, 720 },
+   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 6.0, 720 },
 };
 
  void setup() {
