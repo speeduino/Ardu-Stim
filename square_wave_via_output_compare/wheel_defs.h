@@ -477,11 +477,11 @@
    }; 
  PROGMEM prog_uchar honda_rc51_with_cam[] = 
    { /* Honda RC51 oddfire 90deg Vtwin with cam */
-      0,1,0,1,0,1,0,1,0,3, /* teeth 1-5, cam trigges on tooth 5 */
-      0,1,0,1,0,1,0,1,0,1, /* teeth 6-10 */
+      0,1,0,1,0,1,0,1,0,1, /* teeth 1-5 */
+      0,3,0,1,0,1,0,1,0,1, /* teeth 6-10, cam triggers on tooth 6 */
       0,1,0,1,             /* Teeth 11-12 */
-	  0,3,0,1,0,3,0,1,0,1, /* 2nd rotation, teeth 1-5 (13-17), cam trigger on tooth 1(13) and 3(15) */
-      0,1,0,1,0,1,0,1,0,1, /* teeth 6-10 (18-22) */
+      0,1,0,1,0,1,0,3,0,1, /* 2nd rotation, teeth 1-5 (13-17), cam trigger on tooth 4(16)*/
+      0,3,0,1,0,1,0,1,0,1, /* teeth 6-10 (18-22), cam trigger on tooth 18 */
       0,1,0,1              /* teeth 11-12, (23-24) */
    };
 
