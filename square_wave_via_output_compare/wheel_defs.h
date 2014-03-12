@@ -85,7 +85,7 @@
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
-   THIRTY_SIX_MINUS_ONE_PUS_ONE_WITH_CAM_NGC4, /* From jimstim 36-1+1 wheel #5 4 cyl chrysler? */
+   THIRTY_SIX_MINUS_ONE_PLUS_ONE_WITH_CAM_NGC4, /* From jimstim 36-1+1 wheel #5 4 cyl chrysler? */
    WEBER_IAW_WITH_CAM, /* From jimstim IAW weber-marelli */
    FIAT_ONE_POINT_EIGHT_SIXTEEN_VALVE_WITH_CAM, /* Fiat 1.8 16V from jimstim */
    THREE_SIXTY_NISSAN_CAS, /*from jimstim 360 tooth cas with 6 slots */
@@ -311,11 +311,19 @@
   
   PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = 
     { /* 36-2-2-2 with cam  */
-      1,2,2,2,2,2,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
+      1,0,0,2,0,0,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
       0,0,1,0,1,0,1,0,1,0, /* Missing tooth 6, then 7-10 */
       1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
       1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */ 
-      1,0,1,2,2,2,2,2,1,0, /* Teeth 21-2sing 23-24, then 25, 2nd trigger during teeth 23 and 24 */ 
+      1,0,1,0,0,2,0,0,1,0, /* Teeth 21-2sing 23-24, then 25, 2nd trigger during teeth 23 and 24 */ 
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */ 
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */ 
+      1,0,                  /* 36th Tooth */
+      1,0,0,0,0,0,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5 */
+      0,0,1,0,1,0,1,0,1,0, /* Missing tooth 6, then 7-10 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+      1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */ 
+      1,0,1,0,0,0,0,0,1,0, /* Teeth 21-22 missing 23-24, then 25 */ 
       1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */ 
       1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */ 
       1,0                  /* 36th Tooth */
@@ -545,8 +553,8 @@
 	   80 deg low, 10 deg high  Crank tooth 6
 	   80 deg low, 10 deg high, Crank tooth 7
 	   80 deg low, 10 deg high  Crank tooth 8 */
-	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,1,1, /* Teeth 1 and 2 & cam1 */
-	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,3,3,3,3,3,3,3,3,3,0,0,0,1,1, /* Teeth 3 and 4 & cam2 */
+	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,0,1,1, /* Teeth 1 and 2 & cam1 */
+	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0,0,1,1, /* Teeth 3 and 4 & cam2 */
 	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1, /* Teeth 5 and 6 */
 	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1  /* Teeth 7 and 8 */
    };

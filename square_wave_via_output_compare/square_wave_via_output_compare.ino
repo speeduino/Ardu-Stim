@@ -35,7 +35,7 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
- unsigned int wanted_rpm = 2000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+ unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
  volatile uint16_t edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -59,7 +59,7 @@
  };
  byte sweep_state = ASCENDING;
  volatile uint16_t new_OCR1A = 5000; /* sane default */
- volatile byte selected_wheel = HONDA_RC51_WITH_CAM;
+ volatile byte selected_wheel = SIX_G_SEVENTY_TWO_WITH_CAM;
 
   /* Tie things into one nicer structure ... */
  struct wheels {
@@ -73,31 +73,31 @@
    { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
    { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
    { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
-   { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 2.0, 240 },
+   { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240 },
    { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 },
-   { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.13333, 16 },
+   { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16 },
    { eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 },
-   { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.3, 36 },
-   { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 1.2, 144 },
+   { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 },
+   { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 },
    { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 },
    { dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9 },
    { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
-   { optispark_lt1_friendly_name, optispark_lt1, 6.0, 720 },
+   { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 },
    { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
    { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
-   { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 72 },
+   { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144 },
    { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
-   { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 1.2, 144 },
-   { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 1.2, 144 },
+   { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 },
+   { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 },
    { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 },
    { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720 },
    { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 },
-   { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.4, 48 },
-   { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 1.2, 144 },
-   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 6.0, 720 },
-   { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144 },
-   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 6.0, 720 },
-   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 6.0, 720 },
+   { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 },
+   { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 },
+   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 },
+   { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
+   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
+   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
 };
 
  void setup() {
@@ -108,13 +108,9 @@
    TCCR1A = 0;
    TCCR1B = 0;
    TCNT1 = 0;
-   // Set compare registers 
-   // OCR1A = 8000;  /* 1000 RPM */
-   OCR1A = 4000;  /* 2000  RPM */ 
-   OCR1A = 2000;  /* 4000  RPM */
-   OCR1A = 1000;  /* 8000  RPM */
-   //OCR1A = 500;   /* 16000 RPM */
-   //OCR1A = 250;   /* 32000 RPM */
+   
+   // Set compare register to sane default
+   OCR1A = 1000;  /* 8000 RPM (60-2) */
 
    // Turn on CTC mode
    TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
@@ -124,8 +120,9 @@
    TIMSK1 |= (1 << OCIE1A);
    
    sei(); // Enable interrupts
-   DDRB = B00000011; /* Set pin 8 and 9 as output (crank and cam respectively) */
-   //pinMode(8, OUTPUT);
+   //DDRB = B00000011; /* Set pin 8 and 9 as output (crank and cam respectively) */
+   pinMode(8, OUTPUT);
+   pinMode(9, OUTPUT);
  } // End setup
  
  ISR(TIMER1_COMPA_vect) {
@@ -137,10 +134,10 @@
    /* The tables are in flash so we need pgm_read_byte() */
    PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
 
-   /* Reset Prescaler,only if flag set */
+   /* Reset Prescaler only if flag is set */
    if (reset_prescaler)
    {
-     TCCR1B &= ~((1 << BIT_CS10) | (1 << BIT_CS11) | (1 << BIT_CS12)); /* Clear CS10, CS11 and CS12 */
+     TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); /* Clear CS10, CS11 and CS12 */
      TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11) | (BIT_CS12 << CS12);
      reset_prescaler = 0;
    }
