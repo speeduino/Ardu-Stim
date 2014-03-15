@@ -35,7 +35,13 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
+<<<<<<< Updated upstream
  unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+=======
+ String inputString = "";
+ boolean stringComplete = false;
+ unsigned int wanted_rpm = 2000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+>>>>>>> Stashed changes
  volatile uint16_t edge_counter = 0;
  
  /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -103,6 +109,7 @@
 
  void setup() {
    Serial.begin(9600);
+   inputString.reserve(32);
    cli(); // stop interrupts
    
    // Set timer1 to generate pulses
@@ -208,10 +215,48 @@
    delay(RPM_STEP_DELAY);
    //Serial.print("Free RAM is: ");
    //Serial.println(freeRam());
+   if (stringComplete) {
+     processSerialCmd();
+	 inputString = "";  /* NOT ideal */
+	 stringComplete = false;
+   }
  }
  
 int freeRam () {
   extern int __heap_start, *__brkval; 
   int v; 
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+}
+
+/* SerialEvent occurs when new data comes in over the hardware Serial RX
+ * This runs after each loop() run
+ */
+void serialEvent() {
+  while (Serial.available()) {
+	/* Get new byte */
+	char inChar = (char) Serial.read();
+	/* If inputchar is new line process the buffer */
+	if (inChar == '\n') {
+		stringComplete = true;
+	}
+	else
+		inputString += inChar;
+  }
+}
+
+/* Process the inputString buffer and handle the request
+ * This gets called after any Newline char in the string
+ */
+void processSerialCmd() {
+  static byte wanted_wheel = 0;
+  /* RPM change (r <somenumber>\n */
+  if (inputString.startswith('r')) {
+   wanted_rpm = inputString.toInt();
+  }
+  /* Wheel change (w <somenumber>\n */
+  if (inputString.startswith('w')) {
+
+   wanted_rpm = inputString.toInt();
+  }
+
 }
