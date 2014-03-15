@@ -89,6 +89,7 @@
    WEBER_IAW_WITH_CAM, /* From jimstim IAW weber-marelli */
    FIAT_ONE_POINT_EIGHT_SIXTEEN_VALVE_WITH_CAM, /* Fiat 1.8 16V from jimstim */
    THREE_SIXTY_NISSAN_CAS, /*from jimstim 360 tooth cas with 6 slots */
+   TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER, /* Mazda CAS 24-1 inner ring single pulse outer ring */
    MAX_WHEELS,
  }WheelType;
 
@@ -122,6 +123,7 @@
  PROGMEM prog_char weber_iaw_with_cam_friendly_name[] = "Weber-Marelli 8 crank+2 cam pattern";
  PROGMEM prog_char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] = "Fiat 1.8 16V crank and cam";
  PROGMEM prog_char three_sixty_nissan_cas_friendly_name[] = "Nissan 360 CAS with 6 slots";
+ PROGMEM prog_char twenty_four_minus_two_with_second_trigger_friendly_name[] = "Mazda CAS 24-2 with single pulse outer ring";
 
 
  /* Very simple 50% duty cycle */
@@ -615,5 +617,12 @@
      1,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2, /* 601-640 deg */
      0,2,0,2,0,2,0,2,0,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3, /* 641-680 deg */
      1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3, /* 681-720 deg */
+   };
+
+ PROGMEM prog_uchar twenty_four_minus_two_with_second_trigger[] = 
+   {
+	 /* See http://postimg.org/image/pcwkrxktx/, 24-2 inner ring, single outer pulse */
+	 1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,3,2,2,2,2,2, /* 11 teeth then outer and missing */
+	 3,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0, /* 11 more teeth then missing */
    };
   #endif

@@ -59,7 +59,7 @@
  };
  byte sweep_state = ASCENDING;
  volatile uint16_t new_OCR1A = 5000; /* sane default */
- volatile byte selected_wheel = SIX_G_SEVENTY_TWO_WITH_CAM;
+ volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
 
   /* Tie things into one nicer structure ... */
  struct wheels {
@@ -98,6 +98,7 @@
    { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
    { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
    { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
+   { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
 };
 
  void setup() {
