@@ -38,6 +38,7 @@ uint16_t rpm_max = 3000;
 uint16_t rpm_step = 5;
 uint16_t rpm_step_delay = 2;
 volatile unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+long previousMillis = 0;
 
 SUI::SerialUI mySUI = SUI::SerialUI(greeting);
 
@@ -237,8 +238,6 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void loop() {
-
-
   /* We could do one of the following:
    * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
    * read a pot and modify it
@@ -254,11 +253,28 @@ void loop() {
     {
       mySUI.handleRequests();
 
-      run_ardustim();
+      check_to_run_ardustim();
+    }
+    check_to_run_ardustim();
+  }
+  check_to_run_ardustim();
+}
+
+void check_to_run_ardustim()
+{
+  unsigned long currentMillis = millis();
+  if (mode == SWEEPING_RPM)
+  {
+    if (currentMillis - previousMillis > rpm_step_delay)
+    {
+	  previousMillis = currentMillis;
+	  run_ardustim();
     }
   }
-  run_ardustim();
+  else
+    run_ardustim();
 }
+
 
 void run_ardustim()
 {
@@ -312,8 +328,6 @@ void run_ardustim()
     reset_prescaler = 1;
   }
   last_prescale = new_prescale; 
-
-  delay(rpm_step_delay); 
 }
 
 int freeRam () {
@@ -325,27 +339,26 @@ int freeRam () {
 /* SerialUI Callbacks */
 void show_info()
 {
-  mySUI.println(F("Welcome to ArduStim"));
+  mySUI.println(F("Welcome to ArduStim, written by David J. Andruczyk"));
   mySUI.print(F("Free RAM: "));
-  mySUI.println(freeRam());
+  mySUI.print(freeRam());
+  mySUI.println(F(" bytes"));
   mySUI.print(F("Currently selected Wheel pattern: "));
   mySUI.print(selected_wheel+1);
   mySUI.print(" ");
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
-  mySUI.println(F(""));
   if (mode == FIXED_RPM) {
-    mySUI.print(F("Fixed RPM mode\nCurrent RPM: "));
+    mySUI.print(F("Fixed RPM mode, Current RPM: "));
     mySUI.println(wanted_rpm);
   } 
   else {
-    mySUI.println(F("Swept RPM mode:"));
-    mySUI.print(F("Low RPM Setpoint: "));
-    mySUI.println(rpm_min);    
-    mySUI.print(F("High RPM Setpoint: "));
+    mySUI.print(F("Linear Sweep RPM mode, Low RPM Setpoint: "));
+    mySUI.print(rpm_min);    
+    mySUI.print(F(" High RPM Setpoint: "));
     mySUI.println(rpm_max);    
     mySUI.print(F("RPM Step: "));
-    mySUI.println(rpm_step);    
-    mySUI.print(F("Delay between steps (ms): "));
+    mySUI.print(rpm_step);    
+    mySUI.print(F(" Delay between steps (ms): "));
     mySUI.println(rpm_step_delay);
     mySUI.print(F("Current RPM: "));
     mySUI.println(wanted_rpm);
