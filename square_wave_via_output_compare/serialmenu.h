@@ -28,13 +28,20 @@ SUI_DeclareString(top_menu_title,
 		"ArduStim Main Menu");
 SUI_DeclareString(info_key, "information");
 SUI_DeclareString(info_help, "Retrieve data and current settings");
-SUI_DeclareString(wheel_key, "wheel");
-SUI_DeclareString(wheel_help, "Select the wheel pattern...");
-SUI_DeclareString(wheel_entry, "select");
+SUI_DeclareString(next_key, "next");
+SUI_DeclareString(next_help, "Pick the next wheel pattern");
+SUI_DeclareString(previous_key, "previous");
+SUI_DeclareString(previous_help, "Pick the previous wheel pattern");
+SUI_DeclareString(list_key, "list");
+SUI_DeclareString(list_help, "List all wheel patterns");
+SUI_DeclareString(choose_key, "choose");
+SUI_DeclareString(choose_help, "Choose a specific wheel pattern by number");
 SUI_DeclareString(wheel_list, "list");
-SUI_DeclareString(wheel_list_help, "Give me a listing of all wheel patterns");
+SUI_DeclareString(wheel_list_help, "List all wheel patterns");
 SUI_DeclareString(rpm_key, "rpm");
-SUI_DeclareString(rpm_help, "Set the RPM parameters");
-SUI_DeclareString(rpm_entry, "set");
+SUI_DeclareString(rpm_help, "Set the RPM");
+SUI_DeclareString(sweep_key, "sweep");
+SUI_DeclareString(sweep_help, "Sweep the RPM (min,max,step,delay (in ms)");
 
+SUI_DeclareString(colon_space, ": ");
 #endif
