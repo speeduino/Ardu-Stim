@@ -401,7 +401,7 @@ void select_next_wheel()
     selected_wheel++;
 
   mySUI.print("New wheel is ");
-  mySUI.print(selected_wheel);
+  mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
   mySUI.returnOK();
@@ -415,7 +415,7 @@ void select_previous_wheel()
     selected_wheel--;
 
   mySUI.print(F("New wheel is "));
-  mySUI.print(selected_wheel);
+  mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
   mySUI.returnOK();
