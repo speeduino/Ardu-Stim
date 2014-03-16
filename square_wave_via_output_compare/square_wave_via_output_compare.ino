@@ -67,6 +67,10 @@ enum {
   SWEEPING_RPM,
   FIXED_RPM,
 };
+
+/* Prototypes */
+void run_ardustim(void);
+
 byte mode = FIXED_RPM;
 
 byte sweep_state = ASCENDING;
@@ -84,94 +88,94 @@ Wheels[MAX_WHEELS] = {
 
   /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
   { 
-    dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4   }
+    dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4     }
   ,
   { 
-    dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6   }
+    dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6     }
   ,
   { 
-    dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8   }
+    dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8     }
   ,
   { 
-    sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120   }
+    sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120     }
   ,
   { 
-    sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240   }
+    sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240     }
   ,
   { 
-    thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72   }
+    thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72     }
   ,
   { 
-    four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16   }
+    four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16     }
   ,
   { 
-    eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16   }
+    eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16     }
   ,
   { 
-    six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36   }
+    six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36     }
   ,
   { 
-    twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144   }
+    twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144     }
   ,
   { 
-    fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80   }
+    fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80     }
   ,
   { 
-    dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9   }
+    dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9     }
   ,
   { 
-    oddfire_vr_friendly_name, oddfire_vr, 0.2, 24   }
+    oddfire_vr_friendly_name, oddfire_vr, 0.2, 24     }
   ,
   { 
-    optispark_lt1_friendly_name, optispark_lt1, 3.0, 720   }
+    optispark_lt1_friendly_name, optispark_lt1, 3.0, 720     }
   ,
   { 
-    twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48   }
+    twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48     }
   ,
   { 
-    thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72   }
+    thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72     }
   ,
   { 
-    thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144   }
+    thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144     }
   ,
   { 
-    fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72   }
+    fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72     }
   ,
   { 
-    thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144   }
+    thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144     }
   ,
   { 
-    six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144   }
+    six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144     }
   ,
   { 
-    buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80   }
+    buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80     }
   ,
   { 
-    gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720   }
+    gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720     }
   ,
   { 
-    lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72   }
+    lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72     }
   ,
   { 
-    honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48   }
+    honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48     }
   ,
   { 
-    thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144   }
+    thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144     }
   ,
   { 
-    thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720   }
+    thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720     }
   ,
   { 
-    weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144   }
+    weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144     }
   ,
   { 
-    fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720   }
+    fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720     }
   ,
   { 
-    three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720   }
+    three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720     }
   ,
   { 
-    twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72   }
+    twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72     }
   ,
 };
 
@@ -233,7 +237,7 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void loop() {
-  uint32_t tmp = 0;
+
 
   /* We could do one of the following:
    * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
@@ -249,58 +253,67 @@ void loop() {
     while (mySUI.userPresent()) 
     {
       mySUI.handleRequests();
-      
-      switch (mode) {
-      case SWEEPING_RPM: 
-        switch (sweep_state) {
-        case DESCENDING:
-          wanted_rpm -= rpm_step;
-          if (wanted_rpm <= rpm_min) {
-            sweep_state = ASCENDING;
-          }
-          break;
-        case ASCENDING:
-          wanted_rpm += rpm_step;
-          if (wanted_rpm >= rpm_max) {
-            sweep_state = DESCENDING;
-          }
-          break;
-        }
-        case FIXED_RPM:
-        break;
-      }
-      tmp=8000000/(wanted_rpm*Wheels[selected_wheel].rpm_scaler);
-      BIT_CS10 = 1;
-      BIT_CS11 = 0;
-      BIT_CS12 = 0;
-      if (tmp > 16776960) {
-        /* Need to set prescaler to x256 */
-        BIT_CS12 = 1;
-        new_OCR1A = tmp/256;
-        new_prescale = PRESCALE_256; 
-      } 
-      else if (tmp > 524288 ) {
-        /* Need to reset prescaler to 64 to prevent overflow */
-        BIT_CS11=1;
-        new_OCR1A = tmp/64;
-        new_prescale = PRESCALE_64;
-      } 
-      else if (tmp > 65536) {
-        BIT_CS10=0;
-        BIT_CS11=1;
-        new_OCR1A = tmp/8;
-        new_prescale = PRESCALE_8;
-      }
-      else {
-        new_OCR1A = (uint16_t)tmp;
-        new_prescale = PRESCALE_1;
-      }
-      if (new_prescale != last_prescale) {
-        reset_prescaler = 1;
-      }
-      last_prescale = new_prescale; 
+
+      run_ardustim();
     }
-  } //delay(RPM_STEP_DELAY); 
+  }
+  run_ardustim();
+}
+
+void run_ardustim()
+{
+  uint32_t tmp = 0;
+  switch (mode) {
+  case SWEEPING_RPM: 
+    switch (sweep_state) {
+    case DESCENDING:
+      wanted_rpm -= rpm_step;
+      if (wanted_rpm <= rpm_min) {
+        sweep_state = ASCENDING;
+      }
+      break;
+    case ASCENDING:
+      wanted_rpm += rpm_step;
+      if (wanted_rpm >= rpm_max) {
+        sweep_state = DESCENDING;
+      }
+      break;
+    }
+  case FIXED_RPM:
+    break;
+  }
+  tmp=8000000/(wanted_rpm*Wheels[selected_wheel].rpm_scaler);
+  BIT_CS10 = 1;
+  BIT_CS11 = 0;
+  BIT_CS12 = 0;
+  if (tmp > 16776960) {
+    /* Need to set prescaler to x256 */
+    BIT_CS12 = 1;
+    new_OCR1A = tmp/256;
+    new_prescale = PRESCALE_256; 
+  } 
+  else if (tmp > 524288 ) {
+    /* Need to reset prescaler to 64 to prevent overflow */
+    BIT_CS11=1;
+    new_OCR1A = tmp/64;
+    new_prescale = PRESCALE_64;
+  } 
+  else if (tmp > 65536) {
+    BIT_CS10=0;
+    BIT_CS11=1;
+    new_OCR1A = tmp/8;
+    new_prescale = PRESCALE_8;
+  }
+  else {
+    new_OCR1A = (uint16_t)tmp;
+    new_prescale = PRESCALE_1;
+  }
+  if (new_prescale != last_prescale) {
+    reset_prescaler = 1;
+  }
+  last_prescale = new_prescale; 
+
+  delay(rpm_step_delay); 
 }
 
 int freeRam () {
@@ -323,7 +336,8 @@ void show_info()
   if (mode == FIXED_RPM) {
     mySUI.print(F("Fixed RPM mode\nCurrent RPM: "));
     mySUI.println(wanted_rpm);
-  } else {
+  } 
+  else {
     mySUI.println(F("Swept RPM mode:"));
     mySUI.print(F("Low RPM Setpoint: "));
     mySUI.println(rpm_min);    
@@ -433,11 +447,11 @@ void sweep_rpm()
   mySUI.print(F("delay: "));
   mySUI.println(tmp_delay);
   if ((count == 4) && 
-  (tmp_min > 10) &&
-  (tmp_max < 65535) &&
-  (tmp_step > 0) &&
-  (tmp_delay > 0) &&
-  (tmp_min < tmp_max))
+    (tmp_min > 10) &&
+    (tmp_max < 65535) &&
+    (tmp_step > 0) &&
+    (tmp_delay > 0) &&
+    (tmp_min < tmp_max))
   {
     rpm_min = tmp_min;
     rpm_max = tmp_max;
@@ -452,4 +466,5 @@ void sweep_rpm()
   } 
   mySUI.returnOK();
 }
+
 
