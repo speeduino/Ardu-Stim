@@ -28,6 +28,8 @@
  
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
+#include <SerialUI.h>
+#include "serialmenu.h"
 
 /* Setting RPM_STEP to any value over 0 will enabled sweeping */
 #define RPM_STEP 0
@@ -35,126 +37,132 @@
 #define RPM_MAX 3000
 #define RPM_STEP_DELAY 2
  
-<<<<<<< Updated upstream
- unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
-=======
- String inputString = "";
- boolean stringComplete = false;
- unsigned int wanted_rpm = 2000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
->>>>>>> Stashed changes
- volatile uint16_t edge_counter = 0;
- 
- /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
- volatile byte reset_prescaler = 0;
- volatile byte BIT_CS10 = 0;
- volatile byte BIT_CS11 = 0;
- volatile byte BIT_CS12 = 0;
- 
- enum { 
-   PRESCALE_1, 
-   PRESCALE_8,
-   PRESCALE_64, 
-   PRESCALE_256 
- };
- byte last_prescale = PRESCALE_1;
- byte new_prescale = PRESCALE_1;
- 
- enum { 
-   DESCENDING, 
-   ASCENDING 
- };
- byte sweep_state = ASCENDING;
- volatile uint16_t new_OCR1A = 5000; /* sane default */
- volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
+SUI::SerialUI mySUI = SUI::SerialUI(greeting);
 
-  /* Tie things into one nicer structure ... */
- struct wheels {
-   prog_char *decoder_name;
-   prog_uchar *edge_states_ptr;
-   const float rpm_scaler;
-   const uint16_t wheel_max_edges;
- } Wheels[MAX_WHEELS] = {
-   /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
-   { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 },
-   { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
-   { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
-   { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
-   { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240 },
-   { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 },
-   { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16 },
-   { eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 },
-   { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 },
-   { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 },
-   { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 },
-   { dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9 },
-   { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
-   { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 },
-   { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
-   { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
-   { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144 },
-   { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
-   { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 },
-   { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 },
-   { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 },
-   { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720 },
-   { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 },
-   { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 },
-   { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 },
-   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 },
-   { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
-   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
-   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
-   { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
+volatile unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
+volatile uint16_t edge_counter = 0;
+ 
+/* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
+volatile byte reset_prescaler = 0;
+volatile byte BIT_CS10 = 0;
+volatile byte BIT_CS11 = 0;
+volatile byte BIT_CS12 = 0;
+ 
+enum { 
+  PRESCALE_1, 
+  PRESCALE_8,
+  PRESCALE_64, 
+  PRESCALE_256 
+};
+byte last_prescale = PRESCALE_1;
+byte new_prescale = PRESCALE_1;
+ 
+enum { 
+  DESCENDING, 
+  ASCENDING 
+};
+byte sweep_state = ASCENDING;
+volatile uint16_t new_OCR1A = 5000; /* sane default */
+volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
+
+/* Tie things into one nicer structure ... */
+struct wheels {
+  prog_char *decoder_name;
+  prog_uchar *edge_states_ptr;
+  const float rpm_scaler;
+  const uint16_t wheel_max_edges;
+} Wheels[MAX_WHEELS] = {
+
+  /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
+  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 },
+  { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
+  { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
+  { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
+  { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240 },
+  { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 },
+  { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16 },
+  { eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 },
+  { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 },
+  { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 },
+  { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 },
+  { dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9 },
+  { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
+  { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 },
+  { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
+  { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
+  { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144 },
+  { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
+  { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 },
+  { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 },
+  { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 },
+  { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720 },
+  { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 },
+  { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 },
+  { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 },
+  { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 },
+  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
+  { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
+  { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
+  { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
 };
 
- void setup() {
-   Serial.begin(9600);
-   inputString.reserve(32);
-   cli(); // stop interrupts
-   
-   // Set timer1 to generate pulses
-   TCCR1A = 0;
-   TCCR1B = 0;
-   TCNT1 = 0;
-   
-   // Set compare register to sane default
-   OCR1A = 1000;  /* 8000 RPM (60-2) */
+void setup() {
+  mySUI.begin(9600);
+  mySUI.setTimeout(20000);
+  mySUI.setMaxIdleMs(30000);
+  SUI::Menu *mainMenu = mySUI.topLevelMenu();
+  mainMenu->setName(top_menu_title);
+  mainMenu->addCommand(info_key,show_info,info_help);
+  SUI::Menu *wheelMenu = mainMenu->subMenu(wheel_key,wheel_help);
+  wheelMenu->addCommand(wheel_list,list_wheels,wheel_list_help);
+  wheelMenu->addCommand(wheel_entry,set_wheel_id,wheel_help);
+  SUI::Menu *rpmMenu = mainMenu->subMenu(rpm_key,rpm_help);
+  rpmMenu->addCommand(rpm_entry,set_rpm,rpm_help);
 
-   // Turn on CTC mode
-   TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
-   // Set prescaler to 1
-   TCCR1B |= (1 << CS10); /* Prescaler of 1 */
-   // Enable output compare interrupt
-   TIMSK1 |= (1 << OCIE1A);
-   
-   sei(); // Enable interrupts
-   //DDRB = B00000011; /* Set pin 8 and 9 as output (crank and cam respectively) */
-   pinMode(8, OUTPUT);
-   pinMode(9, OUTPUT);
- } // End setup
- 
- ISR(TIMER1_COMPA_vect) {
-   /* This is VERY simple, just walk the array and wrap when we hit the limit */
-   edge_counter++;
-   if (edge_counter >= Wheels[selected_wheel].wheel_max_edges) {
-     edge_counter = 0;
-   }
-   /* The tables are in flash so we need pgm_read_byte() */
-   PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+  cli(); // stop interrupts
+  
+  // Set timer1 to generate pulses
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1 = 0;
+  
+  // Set compare register to sane default
+  OCR1A = 1000;  /* 8000 RPM (60-2) */
 
-   /* Reset Prescaler only if flag is set */
-   if (reset_prescaler)
-   {
-     TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); /* Clear CS10, CS11 and CS12 */
-     TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11) | (BIT_CS12 << CS12);
-     reset_prescaler = 0;
-   }
-   /* Reset next compare value for RPM changes */
-   OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
- }
+  // Turn on CTC mode
+  TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
+  // Set prescaler to 1
+  TCCR1B |= (1 << CS10); /* Prescaler of 1 */
+  // Enable output compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
+  
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  sei(); // Enable interrupts
+} // End setup
  
- void loop() {
-   uint32_t tmp = 0;
+ISR(TIMER1_COMPA_vect) {
+  /* This is VERY simple, just walk the array and wrap when we hit the limit */
+  edge_counter++;
+  if (edge_counter >= Wheels[selected_wheel].wheel_max_edges) {
+    edge_counter = 0;
+  }
+  /* The tables are in flash so we need pgm_read_byte() */
+  PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+
+  /* Reset Prescaler only if flag is set */
+  if (reset_prescaler)
+  {
+    TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); /* Clear CS10, CS11 and CS12 */
+    TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11) | (BIT_CS12 << CS12);
+    reset_prescaler = 0;
+  }
+  /* Reset next compare value for RPM changes */
+  OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
+}
+ 
+void loop() {
+  uint32_t tmp = 0;
 
 /* We could do one of the following:
  * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
@@ -162,65 +170,67 @@
  * read the serial port and modify it
  * read other inputs to switch wheel modes
  */
-   
-   switch (sweep_state) {
-     case DESCENDING:
-     wanted_rpm -= RPM_STEP;
-     if (wanted_rpm <= RPM_MIN) {
-       sweep_state = ASCENDING;
-     }
-     //Serial.print("Descending, wanted_rpm is: ");
-     //Serial.println(wanted_rpm);
-     break;
-     case ASCENDING:
-     wanted_rpm += RPM_STEP;
-     if (wanted_rpm >= RPM_MAX) {
-       sweep_state = DESCENDING;
-     }
-     //Serial.print("Ascending, wanted_rpm is: ");
-     //Serial.println(wanted_rpm);    break;   
-   }
-   tmp=8000000/(wanted_rpm*Wheels[selected_wheel].rpm_scaler);
-   BIT_CS10 = 1;
-   BIT_CS11 = 0;
-   BIT_CS12 = 0;
-   if (tmp > 16776960) {
-      /* Need to set prescaler to x256 */
-      BIT_CS12 = 1;
-      new_OCR1A = tmp/256;
-      new_prescale = PRESCALE_256; 
-   } 
-   else if (tmp > 524288 ) {
-      /* Need to reset prescaler to 64 to prevent overflow */
-      BIT_CS11=1;
-      new_OCR1A = tmp/64;
-      new_prescale = PRESCALE_64;
-   } 
-   else if (tmp > 65536) {
-      BIT_CS10=0;
-      BIT_CS11=1;
-      new_OCR1A = tmp/8;
-      new_prescale = PRESCALE_8;
-   }
-   else {
-     new_OCR1A = (uint16_t)tmp;
-     new_prescale = PRESCALE_1;
-   }
-   if (new_prescale != last_prescale) {
-     reset_prescaler = 1;
-   }
-   last_prescale = new_prescale;
-   //Serial.print("new_OCR1A var is: ");
-   //Serial.println(new_OCR1A);
-   delay(RPM_STEP_DELAY);
-   //Serial.print("Free RAM is: ");
-   //Serial.println(freeRam());
-   if (stringComplete) {
-     processSerialCmd();
-	 inputString = "";  /* NOT ideal */
-	 stringComplete = false;
-   }
- }
+  
+  if (mySUI.checkForUser(150))
+  {
+	// Someone connected!
+	mySUI.enter();
+	while (mySUI.userPresent()) 
+	{
+	  mySUI.handleRequests();
+	
+  
+
+//  switch (sweep_state) {
+//    case DESCENDING:
+//    wanted_rpm -= RPM_STEP;
+//    if (wanted_rpm <= RPM_MIN) {
+//      sweep_state = ASCENDING;
+//    }
+//    //Serial.print("Descending, wanted_rpm is: ");
+//    //Serial.println(wanted_rpm);
+//    break;
+//    case ASCENDING:
+//    wanted_rpm += RPM_STEP;
+//    if (wanted_rpm >= RPM_MAX) {
+//      sweep_state = DESCENDING;
+//    }
+//    //Serial.print("Ascending, wanted_rpm is: ");
+//    //Serial.println(wanted_rpm);    break;   
+//  }
+  tmp=8000000/(wanted_rpm*Wheels[selected_wheel].rpm_scaler);
+  BIT_CS10 = 1;
+  BIT_CS11 = 0;
+  BIT_CS12 = 0;
+  if (tmp > 16776960) {
+     /* Need to set prescaler to x256 */
+     BIT_CS12 = 1;
+     new_OCR1A = tmp/256;
+     new_prescale = PRESCALE_256; 
+  } 
+  else if (tmp > 524288 ) {
+     /* Need to reset prescaler to 64 to prevent overflow */
+     BIT_CS11=1;
+     new_OCR1A = tmp/64;
+     new_prescale = PRESCALE_64;
+  } 
+  else if (tmp > 65536) {
+     BIT_CS10=0;
+     BIT_CS11=1;
+     new_OCR1A = tmp/8;
+     new_prescale = PRESCALE_8;
+  }
+  else {
+    new_OCR1A = (uint16_t)tmp;
+    new_prescale = PRESCALE_1;
+  }
+  if (new_prescale != last_prescale) {
+    reset_prescaler = 1;
+  }
+  last_prescale = new_prescale; 
+    }
+  } //delay(RPM_STEP_DELAY); 
+}
  
 int freeRam () {
   extern int __heap_start, *__brkval; 
@@ -228,35 +238,48 @@ int freeRam () {
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
-/* SerialEvent occurs when new data comes in over the hardware Serial RX
- * This runs after each loop() run
- */
-void serialEvent() {
-  while (Serial.available()) {
-	/* Get new byte */
-	char inChar = (char) Serial.read();
-	/* If inputchar is new line process the buffer */
-	if (inChar == '\n') {
-		stringComplete = true;
-	}
-	else
-		inputString += inChar;
-  }
+/* SerialUI Callbacks */
+void show_info()
+{
+  mySUI.print("Hello... ");
+  mySUI.println("This is all my info!");
 }
 
-/* Process the inputString buffer and handle the request
- * This gets called after any Newline char in the string
- */
-void processSerialCmd() {
-  static byte wanted_wheel = 0;
-  /* RPM change (r <somenumber>\n */
-  if (inputString.startswith('r')) {
-   wanted_rpm = inputString.toInt();
+void set_wheel_id()
+{
+  mySUI.showEnterNumericDataPrompt();
+  byte newWheel = mySUI.parseInt();
+  if ((newWheel < 1) || (newWheel > (MAX_WHEELS+1))) {
+    mySUI.returnError("Invalid Wheel ID");
   }
-  /* Wheel change (w <somenumber>\n */
-  if (inputString.startswith('w')) {
+  selected_wheel = newWheel - 1; /* use 1-MAX_WHEELS range */
+  mySUI.print("New Wheel chosen:");
+  mySUI.print(selected_wheel+1);
+  mySUI.println(Wheels[selected_wheel].decoder_name);
+  mySUI.returnOK();
+}
 
-   wanted_rpm = inputString.toInt();
+void set_rpm()
+{
+  mySUI.showEnterNumericDataPrompt();
+  uint16_t newRPM = mySUI.parseInt();
+  if ((newRPM < 100) || (newRPM > 65535)) {
+    mySUI.returnError("Invalid RPM, out of range 100-65535");
   }
+  wanted_rpm = (unsigned long)newRPM;
+  mySUI.print("New RPM chosen:");
+  mySUI.println(wanted_rpm);
+  mySUI.returnOK();
+}
 
+void list_wheels()
+{
+  byte i = 0;
+  for (i=0;i<MAX_WHEELS;i++)
+  {
+    mySUI.print(i+1);
+    mySUI.print(": ");
+    mySUI.println((char *)(Wheels[i].decoder_name));
+  }
+  mySUI.returnOK();
 }
