@@ -41,7 +41,7 @@ SUI_DeclareString(wheel_list_help, "List all wheel patterns");
 SUI_DeclareString(rpm_key, "rpm");
 SUI_DeclareString(rpm_help, "Set the RPM");
 SUI_DeclareString(sweep_key, "sweep");
-SUI_DeclareString(sweep_help, "Sweep the RPM (min,max,step,delay (in ms)");
+SUI_DeclareString(sweep_help, "Sweep the RPM (min,max,rpm/second");
 
 SUI_DeclareString(colon_space, ": ");
 #endif
