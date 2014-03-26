@@ -88,7 +88,8 @@ struct pattern_set {
   byte prescaler_bits;
   uint16_t oc_step;
   uint16_t steps;
-}SweepSteps[max_sweep_steps];
+}
+SweepSteps[max_sweep_steps];
 
 /* Tie things into one nicer structure ... */
 struct wheels {
@@ -101,94 +102,94 @@ Wheels[MAX_WHEELS] = {
 
   /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
   { 
-    dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4     }
+    dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4         }
   ,
   { 
-    dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6     }
+    dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6         }
   ,
   { 
-    dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8     }
+    dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8         }
   ,
   { 
-    sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120     }
+    sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120         }
   ,
   { 
-    sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240     }
+    sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240         }
   ,
   { 
-    thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72     }
+    thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72         }
   ,
   { 
-    four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16     }
+    four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16         }
   ,
   { 
-    eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16     }
+    eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16         }
   ,
   { 
-    six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36     }
+    six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36         }
   ,
   { 
-    twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144     }
+    twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144         }
   ,
   { 
-    fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80     }
+    fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80         }
   ,
   { 
-    dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9     }
+    dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9         }
   ,
   { 
-    oddfire_vr_friendly_name, oddfire_vr, 0.2, 24     }
+    oddfire_vr_friendly_name, oddfire_vr, 0.2, 24         }
   ,
   { 
-    optispark_lt1_friendly_name, optispark_lt1, 3.0, 720     }
+    optispark_lt1_friendly_name, optispark_lt1, 3.0, 720         }
   ,
   { 
-    twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48     }
+    twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48         }
   ,
   { 
-    thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72     }
+    thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72         }
   ,
   { 
-    thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144     }
+    thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144         }
   ,
   { 
-    fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72     }
+    fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72         }
   ,
   { 
-    thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144     }
+    thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144         }
   ,
   { 
-    six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144     }
+    six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144         }
   ,
   { 
-    buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80     }
+    buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80         }
   ,
   { 
-    gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720     }
+    gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720         }
   ,
   { 
-    lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72     }
+    lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72         }
   ,
   { 
-    honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48     }
+    honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48         }
   ,
   { 
-    thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144     }
+    thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144         }
   ,
   { 
-    thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720     }
+    thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720         }
   ,
   { 
-    weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144     }
+    weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144         }
   ,
   { 
-    fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720     }
+    fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720         }
   ,
   { 
-    three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720     }
+    three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720         }
   ,
   { 
-    twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72     }
+    twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72         }
   ,
 };
 
@@ -279,8 +280,8 @@ void check_to_run_ardustim()
   {
     if (currentMillis - previousMillis > rpm_step_delay)
     {
-	  previousMillis = currentMillis;
-	  run_ardustim();
+      previousMillis = currentMillis;
+      run_ardustim();
     }
   }
   else
@@ -456,10 +457,10 @@ void sweep_rpm()
   byte doubles = 0;
   byte last_prescaler = 0;
   long low_tcnt = 0;
-  uint16_t min_rpm = 0;
+  uint16_t low_rpm = 0;
   long high_tcnt = 0;
   uint16_t high_rpm = 0;
-//state = 0;
+  //state = 0;
 
   char sweep_buffer[20];
   mySUI.showEnterDataPrompt();
@@ -484,38 +485,41 @@ void sweep_rpm()
     (tmp_min < tmp_max))
   {
     tmpi = tmp_min;
-	/* Find MSB, which corresponds to the number of times
-	 * RPM doubles from start to end
-	 */
-/*	while (tmpi*=2 < tmp_max)
-    {
-      doubles++;
-      mySUI.println("doubles++");
-    }
-  */
+    /* Find MSB, which corresponds to the number of times
+     	 * RPM doubles from start to end
+     	 */
+    /*	while (tmpi*=2 < tmp_max)
+     {
+     doubles++;
+     mySUI.println("doubles++");
+     }
+     */
     doubles=5;  
 
-//struct pattern_set {
-//  bool reset_prescale;
-//  byte prescaler_bits;
-//  uint16_t oc_step;
-//  uint16_t steps;
-//}SweepSteps[max_sweep_steps];
+    //struct pattern_set {
+    //  bool reset_prescale;
+    //  byte prescaler_bits;
+    //  uint16_t oc_step;
+    //  uint16_t steps;
+    //}SweepSteps[max_sweep_steps];
     last_prescaler = PRESCALE_1;
-    min_rpm = tmp_min;
-	for (byte i=0; i < doubles; i++)
-	{
-      //avg_step = (1/low_
-	  low_tcnt = (long)(8000000.0/(((float)min_rpm)*Wheels[selected_wheel].rpm_scaler));
-	  high_tcnt = low_tcnt >> 1; /* divide by two */
+    low_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
+    low_rpm = tmp_min;
+    for (byte i=0; i < doubles; i++)
+    {
+      high_tcnt = low_tcnt >> 1; /* divide by two */
       SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt,&high_rpm);
-      SweepSteps[i].oc_step = (((1.0/min_rpm)*high_tcnt)*tmp_rpm_per_sec)/1000;
+      SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
       SweepSteps[i].steps = (low_tcnt-high_tcnt)/SweepSteps[i].oc_step;
       if (last_prescaler != SweepSteps[i].prescaler_bits)
         SweepSteps[i].reset_prescale = 1;
 
-      mySUI.print(F("step: "));
+      mySUI.print(F("sweep step: "));
       mySUI.println(i);
+      mySUI.print(F("Beginning tcnt: "));
+      mySUI.println(low_tcnt);
+      mySUI.print(F("Ending tcnt: "));
+      mySUI.println(high_tcnt);
       mySUI.print(F("prescaler: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
       mySUI.print(F("steps: "));
@@ -528,7 +532,12 @@ void sweep_rpm()
       mySUI.print(i);
       mySUI.print(F(" High RPM at end: "));
       mySUI.println(high_rpm);
-      min_rpm = high_rpm;	}
+      low_tcnt = high_tcnt - SweepSteps[i].oc_step;	
+      low_rpm = (uint16_t)((float)(8000000.0/low_tcnt)/Wheels[selected_wheel].rpm_scaler);
+      last_prescaler = SweepSteps[i].prescaler_bits;
+      mySUI.print(F("Low RPM for next step: "));
+      mySUI.println(low_rpm);
+    }
   }
   else {
     mySUI.returnError("Parameter error!");
@@ -538,7 +547,7 @@ void sweep_rpm()
 
 int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt, uint16_t *high_rpm) 
 {
-  
+
   if ((*low_tcnt >= 16777216) && (*high_tcnt >= 16777216))
   {
     *high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*(*high_tcnt)));
@@ -589,3 +598,5 @@ int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt, uint16_t *high
 /* In the passed low/high params, one of them will cause a prescaler overflow
  * so we need to determine a new limit that stays inside the prescaler limits
  */
+
+
