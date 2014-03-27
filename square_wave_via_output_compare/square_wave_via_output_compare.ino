@@ -511,16 +511,17 @@ void sweep_rpm()
       SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt);
       SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
       SweepSteps[i].steps = (low_tcnt-high_tcnt)/SweepSteps[i].oc_step;
-      SweepSteps[i].beginning_ocr = low_tcnt;
       if (SweepSteps[i].prescaler_bits == 4) {
-        SweepSteps[i].oc_step >>= 8;  /* Divide by 256 */
-        SweepSteps[i].beginning_ocr >>= 8;  /* Divide by 256 */
+        SweepSteps[i].oc_step /= 256;  /* Divide by 256 */
+        SweepSteps[i].beginning_ocr = low_tcnt/256;  /* Divide by 256 */
       } else if (SweepSteps[i].prescaler_bits == 3) {
-        SweepSteps[i].oc_step >>= 6;  /* Divide by 64 */
-        SweepSteps[i].beginning_ocr >>= 6;  /* Divide by 64 */
+        SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
+        SweepSteps[i].beginning_ocr = low_tcnt/64;  /* Divide by 64 */
       } else if (SweepSteps[i].prescaler_bits == 2) {
-        SweepSteps[i].oc_step >>= 3;  /* Divide by 8 */
-        SweepSteps[i].beginning_ocr >>= 3;  /* Divide by 8 */
+        SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
+        SweepSteps[i].beginning_ocr = low_tcnt/8;  /* Divide by 8 */
+      } else {
+        SweepSteps[i].beginning_ocr = low_tcnt;  /* Divide by 1 */
       }
       
       if (last_prescaler != SweepSteps[i].prescaler_bits)
@@ -531,6 +532,8 @@ void sweep_rpm()
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("Beginning tcnt: "));
+      mySUI.println(low_tcnt);
+      mySUI.print(F("Prescaled tcnt: "));
       mySUI.println(SweepSteps[i].beginning_ocr);
       mySUI.print(F("prescaler: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
@@ -568,12 +571,12 @@ int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt)
   }
   else if ((*low_tcnt >= 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 16777216))
   {
-    *high_tcnt = 1677216;
+    *high_tcnt = 1677215;
     return PRESCALE_256;
   }
   else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 1677216))
   {
-    *low_tcnt = 1677216;
+    *low_tcnt = 1677215;
     return PRESCALE_256;
   }
   else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 16777216))
@@ -582,12 +585,12 @@ int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt)
   }
   else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
-    *high_tcnt = 524288;
+    *high_tcnt = 524287;
     return PRESCALE_64; 
   }
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 524288) && (*high_tcnt < 1677216))
   {
-    *low_tcnt = 524288;
+    *low_tcnt = 524287;
     return PRESCALE_64; 
   }
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
@@ -596,12 +599,12 @@ int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt)
   }
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt < 65536))
   {
-    *high_tcnt = 65536;
+    *high_tcnt = 65535;
     return PRESCALE_8; 
   }
   else if ((*low_tcnt < 65536) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
-    *low_tcnt = 65536;
+    *low_tcnt = 65535;
     return PRESCALE_8; 
   }
   else
