@@ -31,7 +31,7 @@
 #include <SerialUI.h>
 #include "serialmenu.h"
 
-int check_and_adjust_tcnt_limits(long *, long *, uint16_t*) ;
+int check_and_adjust_tcnt_limits(long *, long *) ;
 
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 uint16_t rpm_min = 100;
@@ -84,6 +84,7 @@ volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
 volatile uint16_t total_sweep_steps = 0;
 
 struct pattern_set {
+  uint16_t beginning_ocr;
   bool reset_prescale;
   byte prescaler_bits;
   uint16_t oc_step;
@@ -454,13 +455,12 @@ void sweep_rpm()
   uint16_t tmp_max = 0;
   uint16_t tmp_rpm_per_sec = 0;
   uint16_t tmpi = 0;
-  byte doubles = 0;
   byte last_prescaler = 0;
   long low_tcnt = 0;
   uint16_t low_rpm = 0;
   long high_tcnt = 0;
   uint16_t high_rpm = 0;
-  //state = 0;
+  int i = 0;
 
   char sweep_buffer[20];
   mySUI.showEnterDataPrompt();
@@ -494,9 +494,9 @@ void sweep_rpm()
      mySUI.println("doubles++");
      }
      */
-    doubles=5;  
 
     //struct pattern_set {
+    //  uint16_t beginning_ocr
     //  bool reset_prescale;
     //  byte prescaler_bits;
     //  uint16_t oc_step;
@@ -505,21 +505,33 @@ void sweep_rpm()
     last_prescaler = PRESCALE_1;
     low_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
     low_rpm = tmp_min;
-    for (byte i=0; i < doubles; i++)
+    while((i < 12) && (high_rpm < tmp_max))
     {
       high_tcnt = low_tcnt >> 1; /* divide by two */
-      SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt,&high_rpm);
+      SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt);
       SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
       SweepSteps[i].steps = (low_tcnt-high_tcnt)/SweepSteps[i].oc_step;
+      SweepSteps[i].beginning_ocr = low_tcnt;
+      if (SweepSteps[i].prescaler_bits == 4) {
+        SweepSteps[i].oc_step >>= 8;  /* Divide by 256 */
+        SweepSteps[i].beginning_ocr >>= 8;  /* Divide by 256 */
+      } else if (SweepSteps[i].prescaler_bits == 3) {
+        SweepSteps[i].oc_step >>= 6;  /* Divide by 64 */
+        SweepSteps[i].beginning_ocr >>= 6;  /* Divide by 64 */
+      } else if (SweepSteps[i].prescaler_bits == 2) {
+        SweepSteps[i].oc_step >>= 3;  /* Divide by 8 */
+        SweepSteps[i].beginning_ocr >>= 3;  /* Divide by 8 */
+      }
+      
       if (last_prescaler != SweepSteps[i].prescaler_bits)
         SweepSteps[i].reset_prescale = 1;
-
+      else 
+        SweepSteps[i].reset_prescale = 0;
+        
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("Beginning tcnt: "));
-      mySUI.println(low_tcnt);
-      mySUI.print(F("Ending tcnt: "));
-      mySUI.println(high_tcnt);
+      mySUI.println(SweepSteps[i].beginning_ocr);
       mySUI.print(F("prescaler: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
       mySUI.print(F("steps: "));
@@ -531,12 +543,14 @@ void sweep_rpm()
       mySUI.print(F("End of step: "));
       mySUI.print(i);
       mySUI.print(F(" High RPM at end: "));
+      high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*high_tcnt));
       mySUI.println(high_rpm);
-      low_tcnt = high_tcnt - SweepSteps[i].oc_step;	
+      low_tcnt = high_tcnt; // - SweepSteps[i].oc_step;	
       low_rpm = (uint16_t)((float)(8000000.0/low_tcnt)/Wheels[selected_wheel].rpm_scaler);
       last_prescaler = SweepSteps[i].prescaler_bits;
       mySUI.print(F("Low RPM for next step: "));
       mySUI.println(low_rpm);
+      i++;
     }
   }
   else {
@@ -545,53 +559,53 @@ void sweep_rpm()
   mySUI.returnOK();
 }
 
-int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt, uint16_t *high_rpm) 
+int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt) 
 {
 
   if ((*low_tcnt >= 16777216) && (*high_tcnt >= 16777216))
   {
-    *high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*(*high_tcnt)));
     return PRESCALE_256; /* Very low RPM condition wiht low edge pattern */
   }
-
   else if ((*low_tcnt >= 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 16777216))
   {
-    *high_rpm = (uint16_t)(0.4768/Wheels[selected_wheel].rpm_scaler);
-    *high_tcnt = (long)(8000000.0/((*high_rpm)*Wheels[selected_wheel].rpm_scaler));
+    *high_tcnt = 1677216;
+    return PRESCALE_256;
+  }
+  else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 1677216))
+  {
+    *low_tcnt = 1677216;
     return PRESCALE_256;
   }
   else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 16777216))
   {
-    *high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*(*high_tcnt)));
     return PRESCALE_64; 
   }
-
   else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
-    *high_rpm = (uint16_t)(15.2588/Wheels[selected_wheel].rpm_scaler);
-    *high_tcnt = (long)(8000000.0/((*high_rpm)*Wheels[selected_wheel].rpm_scaler));
+    *high_tcnt = 524288;
+    return PRESCALE_64; 
+  }
+  else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 524288) && (*high_tcnt < 1677216))
+  {
+    *low_tcnt = 524288;
     return PRESCALE_64; 
   }
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
-    *high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*(*high_tcnt)));
     return PRESCALE_8; 
   }
-
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt < 65536))
   {
-    *high_rpm = (uint16_t)(122.07/Wheels[selected_wheel].rpm_scaler);
-    *high_tcnt = (long)(8000000.0/((*high_rpm)*Wheels[selected_wheel].rpm_scaler));
+    *high_tcnt = 65536;
     return PRESCALE_8; 
   }
-
   else if ((*low_tcnt < 65536) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
-    *high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*(*high_tcnt)));
+    *low_tcnt = 65536;
     return PRESCALE_8; 
   }
-
-  *high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*(*high_tcnt)));
+  else
+    return PRESCALE_1;
   return PRESCALE_1;
 }
 
