@@ -1,3 +1,4 @@
+/* vim: set syntax=c expandtab sw=2 softtabstop=2 autoindent smartindent smarttab : */
 /*
  * Arbritrary wheel pattern generator wheel definitions
  *
