@@ -22,10 +22,21 @@
  
 #include <SerialUI.h>
 
-SUI_DeclareString(greeting,
-		"+++ Welcome to the ArduStim +++\r\nEnter ? for help.");
-SUI_DeclareString(top_menu_title,
-		"ArduStim Main Menu");
+/* Prototypes */
+void serial_setup();
+void show_info();
+void select_next_wheel();
+void select_previous_wheel();
+void list_wheels();
+void select_wheel();
+void set_rpm();
+void sweep_rpm();
+int check_and_adjust_tcnt_limits(long *, long *) ;                              
+/* Prototypes */
+
+
+SUI_DeclareString(greeting,"+++ Welcome to the ArduStim +++\r\nEnter ? for help.");
+SUI_DeclareString(top_menu_title,"ArduStim Main Menu");
 SUI_DeclareString(info_key, "information");
 SUI_DeclareString(info_help, "Retrieve data and current settings");
 SUI_DeclareString(next_key, "next");
@@ -42,6 +53,5 @@ SUI_DeclareString(rpm_key, "rpm");
 SUI_DeclareString(rpm_help, "Set the RPM");
 SUI_DeclareString(sweep_key, "sweep");
 SUI_DeclareString(sweep_help, "Sweep the RPM (min,max,rpm/second");
-
 SUI_DeclareString(colon_space, ": ");
 #endif
