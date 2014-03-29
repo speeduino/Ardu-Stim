@@ -432,7 +432,7 @@
 	   * 12 deg low, 3 deg high, 12 deg low,
 	   * 3 deg high, 12 deg low, 3 deg high
 	   * Second rotation is the SAME pattern
-	   * with cam signal held hight for 360 
+	   * with cam signal held high for 360 
 	   * crank degrees */
       0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,
       1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,
