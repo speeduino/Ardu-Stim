@@ -444,6 +444,7 @@ void sweep_rpm()
   uint16_t tmp_max = 0;
   uint16_t tmp_rpm_per_sec = 0;
   uint16_t tmpi = 0;
+  uint16_t end_tcnt = 0;
   byte last_prescaler = 0;
   long low_tcnt = 0;
   uint16_t low_rpm = 0;
@@ -493,11 +494,15 @@ void sweep_rpm()
     //}SweepSteps[max_sweep_steps];
     last_prescaler = PRESCALE_1;
     low_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
+    high_tcnt = low_tcnt >> 1; /* divide by two */
     low_rpm = tmp_min;
+    end_tcnt = 8000000/(tmp_max*Wheels[selected_wheel].rpm_scaler);
+
     while((i < 12) && (high_rpm < tmp_max))
     {
-      high_tcnt = low_tcnt >> 1; /* divide by two */
       SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt);
+      if (high_tcnt < end_tcnt) /* Prevent overshoot */
+        high_tcnt = end_tcnt;
       SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
       SweepSteps[i].steps = (low_tcnt-high_tcnt)/SweepSteps[i].oc_step;
       if (SweepSteps[i].prescaler_bits == 4) {
@@ -545,9 +550,11 @@ void sweep_rpm()
       mySUI.print(F(" High RPM at end: "));
       high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*high_tcnt));
       mySUI.println(high_rpm);
-      low_tcnt = high_tcnt; // - SweepSteps[i].oc_step;	
-      low_rpm = (uint16_t)((float)(8000000.0/low_tcnt)/Wheels[selected_wheel].rpm_scaler);
-      last_prescaler = SweepSteps[i].prescaler_bits;
+      high_tcnt >>= 1; //  SweepSteps[i].oc_step;eset for next round.
+
+      low_tcnt = 8000000/((high_rpm + (tmp_rpm_per_sec/1000))*Wheels[selected_wheel].rpm_scaler);
+      low_rpm =  (uint16_t)((float)(8000000.0/low_tcnt)/Wheels[selected_wheel].rpm_scaler);
+last_prescaler = SweepSteps[i].prescaler_bits;
       mySUI.print(F("Low RPM for next step: "));
       mySUI.println(low_rpm);
       i++;
