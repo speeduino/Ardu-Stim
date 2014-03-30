@@ -41,28 +41,32 @@ volatile unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above,
 
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile byte reset_prescaler = 0;
-volatile byte BIT_CS10 = 0;
-volatile byte BIT_CS11 = 0;
-volatile byte BIT_CS12 = 0;
+volatile byte sweep_direction = ASCENDING;
+volatile byte total_sweep_stages = 0;
+volatile uint16_t sweep_step_counter = 0;
+volatile int8_t sweep_stage = 0;
+volatile byte prescaler_bits = 0;
+volatile byte mode = FIXED_RPM;
+volatile byte last_prescale = 0;
+volatile byte sweep_lock = 0;
+volatile byte last_prescaler = 0;
+
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 
-byte mode = FIXED_RPM;
-byte sweep_state = ASCENDING;
- SUI::SerialUI mySUI = SUI::SerialUI(greeting);                                  
+SUI::SerialUI mySUI = SUI::SerialUI(greeting);                                  
 
-/* Where to store out pattern sets */
+/* Where to store our sweep pattern sets */
 typedef struct _pattern_set pattern_set;
 struct _pattern_set {
   uint16_t beginning_ocr;
   uint16_t ending_ocr;
-  bool reset_prescale;
   uint8_t prescaler_bits;
   uint16_t oc_step;
   uint16_t steps;
 }SweepSteps[MAX_SWEEP_STEPS];
 
-/* Tie things into one nicer structure ... */
+/* Tie things wheel related into one nicer structure ... */
 typedef struct _wheels wheels;
 struct _wheels {
   prog_char *decoder_name;
@@ -70,98 +74,37 @@ struct _wheels {
   const float rpm_scaler;
   const uint16_t wheel_max_edges;
 }Wheels[MAX_WHEELS] = {
-
   /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
-  { 
-    dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 }
-  ,
-  { 
-    dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 }
-  ,
-  { 
-    dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 }
-  ,
-  { 
-    sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 }
-  ,
-  { 
-    sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240 }
-  ,
-  { 
-    thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 }
-  ,
-  { 
-    four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16 }
-  ,
-  { 
-    eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 }
-  ,
-  { 
-    six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 }
-  ,
-  { 
-    twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 }
-  ,
-  { 
-    fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 }
-  ,
-  { 
-    dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9 }
-  ,
-  { 
-    oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 }
-  ,
-  { 
-    optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 }
-  ,
-  { 
-    twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 }
-  ,
-  { 
-    thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 }
-  ,
-  { 
-    thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144 }
-  ,
-  { 
-    fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 }
-  ,
-  { 
-    thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 }
-  ,
-  { 
-    six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 }
-  ,
-  { 
-    buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 }
-  ,
-  { 
-    gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720 }
-  ,
-  { 
-    lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 }
-  ,
-  { 
-    honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 }
-  ,
-  { 
-    thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 }
-  ,
-  { 
-    thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 }
-  ,
-  { 
-    weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 }
-  ,
-  { 
-    fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 }
-  ,
-  { 
-    three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 }
-  ,
-  { 
-    twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 }
-  ,
+  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 },
+  { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
+  { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
+  { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
+  { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240 },
+  { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 },
+  { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16 },
+  { eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 },
+  { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 },
+  { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 },
+  { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 },
+  { dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9 },
+  { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
+  { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 },
+  { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
+  { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
+  { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144 },
+  { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
+  { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 },
+  { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 },
+  { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 },
+  { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720 },
+  { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72 },
+  { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 },
+  { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 },
+  { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 },
+  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
+  { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
+  { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
+  { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
 };
 
 
@@ -187,31 +130,110 @@ void setup() {
   // Enable output compare interrupt
   TIMSK1 |= (1 << OCIE1A);
 
-  // Set timer2 to run sweeper
+  // Set timer2 to run sweeper routine
   TCCR2A = 0;
   TCCR2B = 0;
   TCNT2 = 0;
 
   // Set compare register to sane default
-  OCR2A = 250;  /* 8000 RPM (60-2) */
+  OCR2A = 124;  
 
   // Turn on CTC mode
-  TCCR2B |= (1 << WGM12); // Normal mode (not PWM)
+  TCCR2B |= (1 << WGM22); // Normal mode (not PWM)
   // Set prescaler to 1
-  TCCR2B |= (1 << CS22); /* Prescaler of 1 */
+  TCCR2B |= (1 << CS22); /* Prescaler of 64 */
   // Enable output compare interrupt
-  TIMSK1 |= (1 << OCIE2A);
+  TIMSK2 |= (1 << OCIE2A);
 
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
+  pinMode(7, OUTPUT); /* debugging for toggling pin 10 on timer2 */
 
   sei(); // Enable interrupts
 } // End setup
 
 
 ISR(TIMER2_COMPA_vect) {
+
+
   /* Don't do anything yet */
+  if ( mode != SWEEPING_RPM)
+    return;
+  sweep_lock = 1;
+  /* Sweep code */
+  /*
+  struct _pattern_set {
+    uint16_t beginning_ocr;
+    uint16_t ending_ocr;
+    uint8_t prescaler_bits;
+    uint16_t oc_step;
+    uint16_t steps;
+  }SweepSteps[MAX_SWEEP_STEPS];
+  */
+  if (sweep_direction == ASCENDING)
+  {
+    PORTD |= 1 << 7;  /* Debugginga, ascending */
+    if (sweep_step_counter < SweepSteps[sweep_stage].steps)
+    {
+      new_OCR1A -= SweepSteps[sweep_stage].oc_step;
+      sweep_step_counter++;
+    }
+    else /* END of the stage, find out where we are */
+    {
+      sweep_stage++;
+       
+      if (sweep_stage < total_sweep_stages)
+      {
+        new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
+        sweep_step_counter = 1; /* we got the "0'th value in hte previous line */
+        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler)
+        {
+          reset_prescaler = 1;
+          prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
+          last_prescaler = prescaler_bits;
+        }
+      }
+      else /* END of line, time to reverse direction */
+      {
+        sweep_stage--; /*Bring back within limits */
+        sweep_direction = DESCENDING;
+        new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
+        sweep_step_counter = SweepSteps[sweep_stage].steps -1; /* we got the last value in hte previous line */
+      }
+    }
+  }
+  else /* Descending */
+  {
+      PORTD &= ~(1<<7);  /*Descending  turn pin off */
+    if (sweep_step_counter > 0)
+    {
+      new_OCR1A += SweepSteps[sweep_stage].oc_step;
+      sweep_step_counter--;
+    }
+    else /* End of stage */
+    {
+      sweep_stage--;
+      if (sweep_stage >= 0)
+      {
+        new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
+        sweep_step_counter = SweepSteps[sweep_stage].steps - 1;
+        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler)
+        {
+          reset_prescaler = 1;
+          prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
+          last_prescaler = prescaler_bits;
+        }
+      }
+      else /*End of the line */
+      {
+        sweep_stage++; /*Bring back within limits */
+        sweep_direction = ASCENDING;
+        new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
+        sweep_step_counter = 1; /* we got the last value in hte previous line */
+      }
+    }
+  }
+  sweep_lock = 0;
 }
 
 ISR(TIMER1_COMPA_vect) {
@@ -227,7 +249,7 @@ ISR(TIMER1_COMPA_vect) {
   if (reset_prescaler)
   {
     TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); /* Clear CS10, CS11 and CS12 */
-    TCCR1B |= (BIT_CS10 << CS10) | (BIT_CS11 << CS11) | (BIT_CS12 << CS12);
+    TCCR1B |= prescaler_bits;
     reset_prescaler = 0;
   }
   /* Reset next compare value for RPM changes */
@@ -253,62 +275,6 @@ void loop() {
   }
 }
 
-
-/*
-void run_ardustim()
-{
-  uint32_t tmp = 0;
-  switch (mode) {
-  case SWEEPING_RPM: 
-    switch (sweep_state) {
-    case DESCENDING:
-      wanted_rpm -= rpm_step;
-      if (wanted_rpm <= rpm_min) {
-        sweep_state = ASCENDING;
-      }
-      break;
-    case ASCENDING:
-      wanted_rpm += rpm_step;
-      if (wanted_rpm >= rpm_max) {
-        sweep_state = DESCENDING;
-      }
-      break;
-    }
-  case FIXED_RPM:
-    break;
-  }
-  tmp=8000000/(wanted_rpm*Wheels[selected_wheel].rpm_scaler);
-  BIT_CS10 = 1;
-  BIT_CS11 = 0;
-  BIT_CS12 = 0;
-  if (tmp > 16776960) {
-    // Need to set prescaler to x256 
-    BIT_CS12 = 1;
-    new_OCR1A = tmp/256;
-    new_prescale = PRESCALE_256; 
-  } 
-  else if (tmp > 524288 ) {
-    // Need to reset prescaler to 64 to prevent overflow 
-    BIT_CS11=1;
-    new_OCR1A = tmp/64;
-    new_prescale = PRESCALE_64;
-  } 
-  else if (tmp > 65536) {
-    BIT_CS10=0;
-    BIT_CS11=1;
-    new_OCR1A = tmp/8;
-    new_prescale = PRESCALE_8;
-  }
-  else {
-    new_OCR1A = (uint16_t)tmp;
-    new_prescale = PRESCALE_1;
-  }
-  if (new_prescale != last_prescale) {
-    reset_prescaler = 1;
-  }
-  last_prescale = new_prescale; 
-}
-*/
 
 /* 
  * Setup the initial menu structure and callbacks
@@ -381,6 +347,7 @@ void select_wheel()
   mySUI.print_P(colon_space);
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
   mySUI.returnOK();
+  edge_counter = 0;
 }
 
 void set_rpm()
@@ -415,7 +382,8 @@ void select_next_wheel()
     selected_wheel = 0;
   else 
     selected_wheel++;
-
+  edge_counter = 0;
+  
   mySUI.print("New wheel is ");
   mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
@@ -429,7 +397,8 @@ void select_previous_wheel()
     selected_wheel = MAX_WHEELS-1;
   else 
     selected_wheel--;
-
+  edge_counter = 0;
+  
   mySUI.print(F("New wheel is "));
   mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
@@ -445,7 +414,6 @@ void sweep_rpm()
   uint16_t tmp_rpm_per_sec = 0;
   uint16_t tmpi = 0;
   uint16_t end_tcnt = 0;
-  byte last_prescaler = 0;
   long low_tcnt = 0;
   uint16_t low_rpm = 0;
   long high_tcnt = 0;
@@ -474,17 +442,6 @@ void sweep_rpm()
     (tmp_rpm_per_sec < 51200) &&
     (tmp_min < tmp_max))
   {
-    tmpi = tmp_min;
-    /* Find MSB, which corresponds to the number of times
-     	 * RPM doubles from start to end
-     	 */
-    /*	while (tmpi*=2 < tmp_max)
-     {
-     doubles++;
-     mySUI.println("doubles++");
-     }
-     */
-
     //struct pattern_set {
     //  uint16_t beginning_ocr
     //  bool reset_prescale;
@@ -492,13 +449,13 @@ void sweep_rpm()
     //  uint16_t oc_step;
     //  uint16_t steps;
     //}SweepSteps[max_sweep_steps];
-    last_prescaler = PRESCALE_1;
+    sweep_lock = 1;
     low_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
     high_tcnt = low_tcnt >> 1; /* divide by two */
     low_rpm = tmp_min;
     end_tcnt = 8000000/(tmp_max*Wheels[selected_wheel].rpm_scaler);
 
-    while((i < 12) && (high_rpm < tmp_max))
+    while((i < MAX_SWEEP_STEPS) && (high_rpm < tmp_max))
     {
       SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt);
       if (high_tcnt < end_tcnt) /* Prevent overshoot */
@@ -521,12 +478,6 @@ void sweep_rpm()
         SweepSteps[i].beginning_ocr = low_tcnt;  /* Divide by 1 */
         SweepSteps[i].ending_ocr = high_tcnt;  /* Divide by 1 */
       }
-      
-      if (last_prescaler != SweepSteps[i].prescaler_bits)
-        SweepSteps[i].reset_prescale = 1;
-      else 
-        SweepSteps[i].reset_prescale = 0;
-        
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("Beginning tcnt: "));
@@ -541,8 +492,6 @@ void sweep_rpm()
       mySUI.println(SweepSteps[i].prescaler_bits);
       mySUI.print(F("steps: "));
       mySUI.println(SweepSteps[i].steps);
-      mySUI.print(F("reset_prescale: "));
-      mySUI.println(SweepSteps[i].reset_prescale);
       mySUI.print(F("OC_Step: "));
       mySUI.println(SweepSteps[i].oc_step);
       mySUI.print(F("End of step: "));
@@ -554,16 +503,25 @@ void sweep_rpm()
 
       low_tcnt = 8000000/((high_rpm + (tmp_rpm_per_sec/1000))*Wheels[selected_wheel].rpm_scaler);
       low_rpm =  (uint16_t)((float)(8000000.0/low_tcnt)/Wheels[selected_wheel].rpm_scaler);
-last_prescaler = SweepSteps[i].prescaler_bits;
       mySUI.print(F("Low RPM for next step: "));
       mySUI.println(low_rpm);
       i++;
     }
+    total_sweep_stages = i;
+    mySUI.print(F("Total sweep stages: "));
+    mySUI.println(total_sweep_stages);
+      i++;
   }
   else {
     mySUI.returnError("Range error !(50-50000)!");
   } 
   mySUI.returnOK();
+  /* Reset params for Timer2 ISR */
+  sweep_stage = 0;
+  sweep_step_counter = 0;
+  sweep_direction = ASCENDING;
+  sweep_lock = 0;
+  mode = SWEEPING_RPM;
 }
 
 int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt) 
