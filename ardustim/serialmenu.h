@@ -38,6 +38,7 @@ void reset_new_OCR1A(uint16_t);
 
 
 SUI_DeclareString(greeting,"+++ Welcome to the ArduStim +++\r\nEnter ? for help.");
+SUI_DeclareString(bytes, " bytes.");
 SUI_DeclareString(top_menu_title,"ArduStim Main Menu");
 SUI_DeclareString(info_key, "information");
 SUI_DeclareString(info_help, "Retrieve data and current settings");
@@ -56,4 +57,19 @@ SUI_DeclareString(rpm_help, "Set the RPM");
 SUI_DeclareString(sweep_key, "sweep");
 SUI_DeclareString(sweep_help, "Sweep the RPM (min,max,rpm/second");
 SUI_DeclareString(colon_space, ": ");
+SUI_DeclareString(space_RPM, " RPM");
+SUI_DeclareString(space_at_space, " at ");
+SUI_DeclareString(new_wheel_chosen, "New Wheel chosen: ");
+SUI_DeclareString(new_rpm_chosen, "New RPM chosen: ");
+
+/* Info callback */
+SUI_DeclareString(info_title, "Welcome to ArduStim, written by David J. Andruczyk");
+SUI_DeclareString(free_ram, "Free RAM: ");
+SUI_DeclareString(current_pattern, "Currently selected Wheel pattern: ");
+SUI_DeclareString(fixed_current_rpm, "Fixed RPM mode, Current RPM: ");
+SUI_DeclareString(swept_rpm_from, "Swept RPM mode From: ");
+SUI_DeclareString(space_to_colon_space, " to: ");
+SUI_DeclareString(space_at_colon_space, " at: ");
+SUI_DeclareString(rpm_per_second, " RPM/second");
+
 #endif

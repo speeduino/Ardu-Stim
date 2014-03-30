@@ -28,6 +28,7 @@
 #define MAX_SWEEP_STEPS 12
 
 
+/* Sensistive stuff used in ISR's */
 volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 volatile unsigned long wanted_rpm = 6000; 
@@ -37,14 +38,19 @@ volatile byte sweep_direction = ASCENDING;
 volatile byte total_sweep_stages = 0;
 volatile uint16_t sweep_step_counter = 0;
 volatile int8_t sweep_stage = 0;
+volatile byte sweep_reset_prescaler = 1; /* Force sweep to reset prescaler value */
 volatile byte prescaler_bits = 0;
 volatile byte mode = FIXED_RPM;
 volatile byte last_prescale = 0;
 volatile byte sweep_lock = 0;
 volatile byte last_prescaler = 0;
-
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
+
+/* Less sensitive globals */
+uint16_t sweep_low_rpm = 0;
+uint16_t sweep_high_rpm = 0;
+uint16_t sweep_rate = 0;
 
 SUI::SerialUI mySUI = SUI::SerialUI(greeting);                                  
 
@@ -99,14 +105,13 @@ struct _wheels {
   { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
 };
 
-
+/* Initialization */
 void setup() {
   serial_setup();
 
   cli(); // stop interrupts
 
   /* Configuring TIMER1 (pattern generator) */
-
   // Set timer1 to generate pulses
   TCCR1A = 0;
   TCCR1B = 0;
@@ -128,7 +133,7 @@ void setup() {
   TCNT2 = 0;
 
   // Set compare register to sane default
-  OCR2A = 124;  
+  OCR2A = 124;  /* With prescale of x64 gives 1ms tick */
 
   // Turn on CTC mode
   TCCR2B |= (1 << WGM22); // Normal mode (not PWM)
@@ -139,19 +144,26 @@ void setup() {
 
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-  pinMode(7, OUTPUT); /* debugging for toggling pin 10 on timer2 */
+//  pinMode(7, OUTPUT); /* debugging for toggling pin 10 on timer2 */
 
   sei(); // Enable interrupts
 } // End setup
 
 
 ISR(TIMER2_COMPA_vect) {
-
-
-  /* Don't do anything yet */
-  if ( mode != SWEEPING_RPM)
+  if ( mode != LINEAR_SWEPT_RPM)
+    return;
+  if (sweep_lock)
     return;
   sweep_lock = 1;
+  if (sweep_reset_prescaler == 1)
+  {
+    reset_prescaler = 1;
+    sweep_reset_prescaler = 0;
+    prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
+    last_prescaler = prescaler_bits;  
+    new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
+  }
   /* Sweep code */
   /*
   struct _pattern_set {
@@ -164,7 +176,7 @@ ISR(TIMER2_COMPA_vect) {
   */
   if (sweep_direction == ASCENDING)
   {
-    PORTD |= 1 << 7;  /* Debugginga, ascending */
+//    PORTD |= 1 << 7;  /* Debugginga, ascending */
     if (sweep_step_counter < SweepSteps[sweep_stage].steps)
     {
       new_OCR1A -= SweepSteps[sweep_stage].oc_step;
@@ -173,11 +185,10 @@ ISR(TIMER2_COMPA_vect) {
     else /* END of the stage, find out where we are */
     {
       sweep_stage++;
-       
       if (sweep_stage < total_sweep_stages)
       {
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        sweep_step_counter = 1; /* we got the "0'th value in hte previous line */
+        sweep_step_counter = 0; /* we got the "0'th value in the previous line */
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler)
         {
           reset_prescaler = 1;
@@ -190,13 +201,13 @@ ISR(TIMER2_COMPA_vect) {
         sweep_stage--; /*Bring back within limits */
         sweep_direction = DESCENDING;
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        sweep_step_counter = SweepSteps[sweep_stage].steps -1; /* we got the last value in hte previous line */
+        sweep_step_counter = SweepSteps[sweep_stage].steps; /* we got the last value in hte previous line */
       }
     }
   }
   else /* Descending */
   {
-      PORTD &= ~(1<<7);  /*Descending  turn pin off */
+//      PORTD &= ~(1<<7);  /*Descending  turn pin off */
     if (sweep_step_counter > 0)
     {
       new_OCR1A += SweepSteps[sweep_stage].oc_step;
@@ -208,7 +219,7 @@ ISR(TIMER2_COMPA_vect) {
       if (sweep_stage >= 0)
       {
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        sweep_step_counter = SweepSteps[sweep_stage].steps - 1;
+        sweep_step_counter = SweepSteps[sweep_stage].steps;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler)
         {
           reset_prescaler = 1;
@@ -221,13 +232,18 @@ ISR(TIMER2_COMPA_vect) {
         sweep_stage++; /*Bring back within limits */
         sweep_direction = ASCENDING;
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        sweep_step_counter = 1; /* we got the last value in hte previous line */
+        sweep_step_counter = 0; /* we got the last value in hte previous line */
       }
     }
   }
   sweep_lock = 0;
 }
 
+/* Pumps the pattern out of flash to the port 
+ * The rate at which this runs is dependent on what OCR1A is set to
+ * the sweeper in timer2 alters this on the fly to alow changing of RPM
+ * in a very nice way
+ */
 ISR(TIMER1_COMPA_vect) {
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
   edge_counter++;
@@ -245,15 +261,12 @@ ISR(TIMER1_COMPA_vect) {
     reset_prescaler = 0;
   }
   /* Reset next compare value for RPM changes */
-  OCR1A = new_OCR1A;  /* Apply new "RPM" from main loop, i.e. speed up/down the virtual "wheel" */
+  OCR1A = new_OCR1A;  /* Apply new "RPM" from Timer2 ISR, i.e. speed up/down the virtual "wheel" */
 }
 
 void loop() {
-  /* We could do one of the following:
-   * programmatically screw with the OCR1A register to adjust the RPM (i.e. auto-sweep)
-   * read a pot and modify it
-   * read the serial port and modify it
-   * read other inputs to switch wheel modes
+  /* Just handle the Serial UI, everything else is in 
+   * interrupt handlers or callbacks from SerialUI.
    */
 
   if (mySUI.checkForUserOnce())
@@ -299,18 +312,27 @@ int freeRam () {
 /* SerialUI Callbacks */
 void show_info()
 {
-  mySUI.println(F("Welcome to ArduStim, written by David J. Andruczyk"));
-  mySUI.print(F("Free RAM: "));
+  mySUI.println_P(info_title);
+  mySUI.print_P(free_ram);
   mySUI.print(freeRam());
-  mySUI.println(F(" bytes"));
-  mySUI.print(F("Currently selected Wheel pattern: "));
+  mySUI.println_P(bytes);
+  mySUI.print_P(current_pattern);
   mySUI.print(selected_wheel+1);
-  mySUI.print(" ");
+  mySUI.print_P(colon_space);
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
   if (mode == FIXED_RPM) {
-    mySUI.print(F("Fixed RPM mode, Current RPM: "));
+    mySUI.print_P(fixed_current_rpm);
     mySUI.println(wanted_rpm);
   } 
+  if (mode == LINEAR_SWEPT_RPM) {
+    mySUI.print_P(swept_rpm_from);
+    mySUI.print(sweep_low_rpm);
+    mySUI.print_P(space_to_colon_space);
+    mySUI.print(sweep_high_rpm);
+    mySUI.print_P(space_at_colon_space);
+    mySUI.print(sweep_rate);
+    mySUI.println_P(rpm_per_second);
+  }
 }
 
 void select_wheel()
@@ -323,10 +345,13 @@ void select_wheel()
   selected_wheel = newWheel - 1; /* use 1-MAX_WHEELS range */
   reset_new_OCR1A(wanted_rpm);
 
-  mySUI.println(F("New Wheel chosen"));
+  mySUI.println_P(new_wheel_chosen);
   mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
-  mySUI.println_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(space_at_space);
+  mySUI.print(wanted_rpm);
+  mySUI.println_P(space_RPM);
   mySUI.returnOK();
   edge_counter = 0;
 }
@@ -342,7 +367,7 @@ void set_rpm()
   reset_new_OCR1A(newRPM);
   wanted_rpm = newRPM;
 
-  mySUI.print(F("New RPM chosen: "));
+  mySUI.print_P(new_rpm_chosen);
   mySUI.println(wanted_rpm);
   mySUI.returnOK();
 }
@@ -368,10 +393,13 @@ void select_next_wheel()
   edge_counter = 0;
   reset_new_OCR1A(wanted_rpm);
   
-  mySUI.print("New wheel is ");
+  mySUI.println_P(new_wheel_chosen);
   mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
-  mySUI.println_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(space_at_space);
+  mySUI.print(wanted_rpm);
+  mySUI.println_P(space_RPM);
   mySUI.returnOK();
 }
 
@@ -384,10 +412,13 @@ void select_previous_wheel()
   edge_counter = 0;
   reset_new_OCR1A(wanted_rpm);
   
-  mySUI.print(F("New wheel is "));
+  mySUI.println_P(new_wheel_chosen);
   mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
-  mySUI.println_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(space_at_space);
+  mySUI.print(wanted_rpm);
+  mySUI.println_P(space_RPM);
   mySUI.returnOK();
 }
 
@@ -436,6 +467,9 @@ void sweep_rpm()
     (tmp_rpm_per_sec < 51200) &&
     (tmp_min < tmp_max))
   {
+    sweep_low_rpm = tmp_min;
+    sweep_high_rpm = tmp_max;
+    sweep_rate = tmp_rpm_per_sec;
     //struct pattern_set {
     //  uint16_t beginning_ocr
     //  bool reset_prescale;
@@ -455,6 +489,8 @@ void sweep_rpm()
       if (high_tcnt < end_tcnt) /* Prevent overshoot */
         high_tcnt = end_tcnt;
       SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
+      if (SweepSteps[i].oc_step == 0)
+        SweepSteps[i].oc_step = 1;
       SweepSteps[i].steps = (low_tcnt-high_tcnt)/SweepSteps[i].oc_step;
       if (SweepSteps[i].prescaler_bits == 4) {
         SweepSteps[i].oc_step /= 256;  /* Divide by 256 */
@@ -514,8 +550,9 @@ void sweep_rpm()
   sweep_stage = 0;
   sweep_step_counter = 0;
   sweep_direction = ASCENDING;
+  sweep_reset_prescaler = 1;
+  mode = LINEAR_SWEPT_RPM;
   sweep_lock = 0;
-  mode = SWEEPING_RPM;
 }
 
 int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt) 
