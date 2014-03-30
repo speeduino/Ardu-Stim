@@ -19,13 +19,6 @@
  *
  */
 
-/* The "RPM" of the wheel is dependent on the number of edges
- * so for a 60-2 wheel (120 edges), the time between teeth is
- * 8000000/RPM,  but for lesser teeth wheels this will be different
- * Thus we need a corresponding array to fix that, so that the 
- * requested RPM is actually synthesized as we want
- */
-
 #include "enums.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
@@ -37,8 +30,7 @@
 
 volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
-volatile unsigned long wanted_rpm = 4000; /* Used ONLY when RPM_STEP is 0 above, otherwise it's the starting point... */
-
+volatile unsigned long wanted_rpm = 6000; 
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile byte reset_prescaler = 0;
 volatile byte sweep_direction = ASCENDING;
@@ -86,12 +78,12 @@ struct _wheels {
   { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 },
   { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 },
   { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 },
-  { dizzy_trigger_return_friendly_name, dizzy_trigger_return, 0.075, 9 },
+  { dizzy_four_trigger_return_friendly_name, dizzy_four_trigger_return, 0.15, 9 },
   { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
   { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 },
   { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
   { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
-  { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.15, 144 },
+  { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 144 },
   { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
   { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 },
   { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 },
@@ -101,7 +93,7 @@ struct _wheels {
   { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 },
   { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 },
   { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 },
-  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
+  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144 },
   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
   { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
@@ -319,19 +311,6 @@ void show_info()
     mySUI.print(F("Fixed RPM mode, Current RPM: "));
     mySUI.println(wanted_rpm);
   } 
-  /*else {
-    mySUI.print(F("Linear Sweep RPM mode, Low RPM Setpoint: "));
-    mySUI.print(rpm_min);    
-    mySUI.print(F(" High RPM Setpoint: "));
-    mySUI.println(rpm_max);    
-    mySUI.print(F("RPM Step: "));
-    mySUI.print(rpm_step);    
-    mySUI.print(F(" Delay between steps (ms): "));
-    mySUI.println(rpm_step_delay);
-    mySUI.print(F("Current RPM: "));
-    mySUI.println(wanted_rpm);
-  }
-  */
 }
 
 void select_wheel()
@@ -342,6 +321,8 @@ void select_wheel()
     mySUI.returnError("Wheel ID out of range");
   }
   selected_wheel = newWheel - 1; /* use 1-MAX_WHEELS range */
+  reset_new_OCR1A(wanted_rpm);
+
   mySUI.println(F("New Wheel chosen"));
   mySUI.print(selected_wheel+1);
   mySUI.print_P(colon_space);
@@ -358,7 +339,9 @@ void set_rpm()
     mySUI.returnError("Invalid RPM, out of range 100-65535");
   }
   mode = FIXED_RPM;
-  wanted_rpm = (unsigned long)newRPM;
+  reset_new_OCR1A(newRPM);
+  wanted_rpm = newRPM;
+
   mySUI.print(F("New RPM chosen: "));
   mySUI.println(wanted_rpm);
   mySUI.returnOK();
@@ -383,6 +366,7 @@ void select_next_wheel()
   else 
     selected_wheel++;
   edge_counter = 0;
+  reset_new_OCR1A(wanted_rpm);
   
   mySUI.print("New wheel is ");
   mySUI.print(selected_wheel+1);
@@ -398,6 +382,7 @@ void select_previous_wheel()
   else 
     selected_wheel--;
   edge_counter = 0;
+  reset_new_OCR1A(wanted_rpm);
   
   mySUI.print(F("New wheel is "));
   mySUI.print(selected_wheel+1);
@@ -406,13 +391,22 @@ void select_previous_wheel()
   mySUI.returnOK();
 }
 
+void reset_new_OCR1A(uint16_t new_rpm)
+{
+  long tmpl = 0;
+  tmpl = (long)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)new_rpm));
+  prescaler_bits = check_and_adjust_tcnt_limits(&tmpl, &tmpl);
+  new_OCR1A = (uint16_t)tmpl; 
+  reset_prescaler = 1; 
+}
+
+
 void sweep_rpm()
 {
   byte count = 0;
   uint16_t tmp_min = 0;
   uint16_t tmp_max = 0;
   uint16_t tmp_rpm_per_sec = 0;
-  uint16_t tmpi = 0;
   uint16_t end_tcnt = 0;
   long low_tcnt = 0;
   uint16_t low_rpm = 0;

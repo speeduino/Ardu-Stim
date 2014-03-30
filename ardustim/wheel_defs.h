@@ -72,7 +72,7 @@
    SIX_MINUS_ONE_WITH_CAM,/* 6-1 crank + cam */
    TWELVE_MINUS_ONE_WITH_CAM, /* 12-1 crank + cam */
    FOURTY_MINUS_ONE,      /* Ford V-10 40-1 crank only */
-   DIZZY_TRIGGER_RETURN,  /* dizzy signal, 40deg on 50 deg off */
+   DIZZY_FOUR_TRIGGER_RETURN,  /* dizzy 4 cylinder signal, 40deg on 50 deg off */
    ODDFIRE_VR,            /* Oddfire V-twin */
    OPTISPARK_LT1,         /* Optispark 360 and 8 */
    TWELVE_MINUS_THREE,    /* 12-3 */
@@ -106,7 +106,7 @@
  PROGMEM prog_char six_minus_one_with_cam_friendly_name[] = "6-1 crank with cam";
  PROGMEM prog_char twelve_minus_one_with_cam_friendly_name[] = "12-1 crank with cam";
  PROGMEM prog_char fourty_minus_one_friendly_name[] = "40-1 crank only (Ford V10)";
- PROGMEM prog_char dizzy_trigger_return_friendly_name[] = "Distributor style 50deg off, 40 deg on";
+ PROGMEM prog_char dizzy_four_trigger_return_friendly_name[] = "Distributor style 4 cyl 50deg off, 40 deg on";
  PROGMEM prog_char oddfire_vr_friendly_name[] = "odd fire 90 deg pattern 0 and 135 pulses";
  PROGMEM prog_char optispark_lt1_friendly_name[] = "GM OptiSpark LT1 360 and 8";
  PROGMEM prog_char twelve_minus_three_friendly_name[] = "12-3 oddball";
@@ -260,7 +260,7 @@
    };
   
   /* 50deg off, 40 deg on dissy style signal */
-  PROGMEM prog_uchar dizzy_trigger_return[] = 
+  PROGMEM prog_uchar dizzy_four_trigger_return[] = 
     { /* dizzy trigger return */
       0,0,0,0,0,1,1,1,1l  /* Simple off/on signal, 50deg off, 40 deg on */
     };

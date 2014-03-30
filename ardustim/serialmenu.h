@@ -32,7 +32,8 @@ void list_wheels();
 void select_wheel();
 void set_rpm();
 void sweep_rpm();
-int check_and_adjust_tcnt_limits(long *, long *) ;                              
+int check_and_adjust_tcnt_limits(long *, long *) ;  
+void reset_new_OCR1A(uint16_t);
 /* Prototypes */
 
 
