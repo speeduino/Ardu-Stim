@@ -144,7 +144,7 @@ void setup() {
 
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-//  pinMode(7, OUTPUT); /* debugging for toggling pin 10 on timer2 */
+  pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern */
 
   sei(); // Enable interrupts
 } // End setup
