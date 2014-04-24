@@ -46,6 +46,7 @@ volatile byte sweep_lock = 0;
 volatile byte last_prescaler = 0;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
+volatile byte state = 0;
 
 /* Less sensitive globals */
 uint16_t sweep_low_rpm = 0;
@@ -133,15 +134,17 @@ void setup() {
   TCNT2 = 0;
 
   // Set compare register to sane default
-  OCR2A = 124;  /* With prescale of x64 gives 1ms tick */
+  OCR2A = 249;  /* With prescale of x64 gives 1ms tick */
 
   // Turn on CTC mode
-  TCCR2B |= (1 << WGM22); // Normal mode (not PWM)
-  // Set prescaler to 1
+  TCCR2A |= (1 << WGM21); // Normal mode (not PWM)
+  // Set prescaler to x64
   TCCR2B |= (1 << CS22); /* Prescaler of 64 */
   // Enable output compare interrupt
   TIMSK2 |= (1 << OCIE2A);
 
+
+  pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern */
@@ -151,10 +154,17 @@ void setup() {
 
 
 ISR(TIMER2_COMPA_vect) {
+  PORTD = (1 << 7);
   if ( mode != LINEAR_SWEPT_RPM)
+  {
+    PORTD = (0 << 7);
     return;
-  if (sweep_lock)
+  }
+  if (sweep_lock)  // semaphore to protect around changes/critical sections
+  {  
+    PORTD = (0 << 7);
     return;
+  }
   sweep_lock = 1;
   if (sweep_reset_prescaler == 1)
   {
@@ -237,6 +247,7 @@ ISR(TIMER2_COMPA_vect) {
     }
   }
   sweep_lock = 0;
+  PORTD = (0 << 7);
 }
 
 /* Pumps the pattern out of flash to the port 
@@ -359,9 +370,10 @@ void select_wheel()
 void set_rpm()
 {
   mySUI.showEnterNumericDataPrompt();
-  uint16_t newRPM = mySUI.parseInt();
-  if ((newRPM < 100) || (newRPM > 65535)) {
-    mySUI.returnError("Invalid RPM, out of range 100-65535");
+  uint32_t newRPM = mySUI.parseULong();
+  if (newRPM < 100)  {
+    mySUI.returnError("Invalid RPM, RPM too low");
+    return;
   }
   mode = FIXED_RPM;
   reset_new_OCR1A(newRPM);
