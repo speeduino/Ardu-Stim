@@ -91,6 +91,7 @@
    FIAT_ONE_POINT_EIGHT_SIXTEEN_VALVE_WITH_CAM, /* Fiat 1.8 16V from jimstim */
    THREE_SIXTY_NISSAN_CAS, /*from jimstim 360 tooth cas with 6 slots */
    TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER, /* Mazda CAS 24-1 inner ring single pulse outer ring */
+   EIGHT_TOOTH_WITH_CAM, /* 02-03 Yamaha R1, seank */
    MAX_WHEELS,
  }WheelType;
 
@@ -125,6 +126,7 @@
  PROGMEM prog_char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] = "Fiat 1.8 16V crank and cam";
  PROGMEM prog_char three_sixty_nissan_cas_friendly_name[] = "Nissan 360 CAS with 6 slots";
  PROGMEM prog_char twenty_four_minus_two_with_second_trigger_friendly_name[] = "Mazda CAS 24-2 with single pulse outer ring";
+ PROGMEM prog_char eight_tooth_with_cam_friendly_name[] = "Yamah 02-03 R1 8 tooth crank with 1 tooth cam";
 
 
  /* Very simple 50% duty cycle */
@@ -625,5 +627,14 @@
 	 /* See http://postimg.org/image/pcwkrxktx/, 24-2 inner ring, single outer pulse */
 	 1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,3,2,2,2,2,2, /* 11 teeth then outer and missing */
 	 3,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0, /* 11 more teeth then missing */
+   };
+
+ /* eight tooth with 1 tooth cam */
+ PROGMEM prog_uchar eight_tooth_with_cam[] = 
+   { /* Yamaha R1 (02-03) 8 tooth crank with 1 tooth cam */
+     0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1, /* Teeth 1-4, 11.25 deg per step */
+     0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1, /* teeth 5-8 */
+     0,2,2,3,2,0,0,1,0,0,0,1,0,0,0,1, /* Cam tooth on 9 */
+     0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1  /* Teeth 13-16 */
    };
   #endif

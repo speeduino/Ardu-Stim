@@ -29,7 +29,7 @@
 
 
 /* Sensistive stuff used in ISR's */
-volatile byte selected_wheel = TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER;
+volatile byte selected_wheel = EIGHT_TOOTH_WITH_CAM;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 volatile unsigned long wanted_rpm = 6000; 
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -104,6 +104,7 @@ struct _wheels {
   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
   { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
+  { eight_tooth_with_cam_friendly_name, eight_tooth_with_cam, 0.26667, 64 },
 };
 
 /* Initialization */
