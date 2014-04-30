@@ -126,7 +126,7 @@
  PROGMEM prog_char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] = "Fiat 1.8 16V crank and cam";
  PROGMEM prog_char three_sixty_nissan_cas_friendly_name[] = "Nissan 360 CAS with 6 slots";
  PROGMEM prog_char twenty_four_minus_two_with_second_trigger_friendly_name[] = "Mazda CAS 24-2 with single pulse outer ring";
- PROGMEM prog_char eight_tooth_with_cam_friendly_name[] = "Yamah 02-03 R1 8 tooth crank with 1 tooth cam";
+ PROGMEM prog_char eight_tooth_with_cam_friendly_name[] = "Yamaha 2002-03 R1 8 even-tooth crank with 1 tooth cam";
 
 
  /* Very simple 50% duty cycle */
