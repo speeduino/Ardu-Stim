@@ -440,11 +440,14 @@ void reset_new_OCR1A(uint16_t new_rpm)
   long tmpl = 0;
   long tmp2 = 0;
   tmpl = (long)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)new_rpm));
-  mySUI.print(F("new_OCR1a: "));
+/*  mySUI.print(F("new_OCR1a: "));
   mySUI.println(tmpl);
+  */
   tmp2 = (long)check_and_adjust_tcnt_limits(&prescaler_bits, &tmpl, &tmpl);
+  /*
   mySUI.print(F("new_OCR1a: "));
   mySUI.println(tmp2);
+  */
   new_OCR1A = (uint16_t)tmp2; 
   reset_prescaler = 1; 
 }
