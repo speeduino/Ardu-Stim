@@ -372,7 +372,7 @@ void set_rpm()
 {
   mySUI.showEnterNumericDataPrompt();
   uint32_t newRPM = mySUI.parseULong();
-  if (newRPM < 100)  {
+  if (newRPM < 10)  {
     mySUI.returnError("Invalid RPM, RPM too low");
     return;
   }
@@ -438,9 +438,14 @@ void select_previous_wheel()
 void reset_new_OCR1A(uint16_t new_rpm)
 {
   long tmpl = 0;
+  long tmp2 = 0;
   tmpl = (long)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)new_rpm));
-  prescaler_bits = check_and_adjust_tcnt_limits(&tmpl, &tmpl);
-  new_OCR1A = (uint16_t)tmpl; 
+  mySUI.print(F("new_OCR1a: "));
+  mySUI.println(tmpl);
+  tmp2 = (long)check_and_adjust_tcnt_limits(&prescaler_bits, &tmpl, &tmpl);
+  mySUI.print(F("new_OCR1a: "));
+  mySUI.println(tmp2);
+  new_OCR1A = (uint16_t)tmp2; 
   reset_prescaler = 1; 
 }
 
@@ -474,7 +479,7 @@ void sweep_rpm()
   mySUI.print(F("RPM/sec: "));
   mySUI.println(tmp_rpm_per_sec);
   if ((count == 3) && 
-    (tmp_min >= 50) &&
+    (tmp_min >= 10) &&
     (tmp_max < 51200) &&
     (tmp_rpm_per_sec > 0) &&
     (tmp_rpm_per_sec < 51200) &&
@@ -498,7 +503,7 @@ void sweep_rpm()
 
     while((i < MAX_SWEEP_STEPS) && (high_rpm < tmp_max))
     {
-      SweepSteps[i].prescaler_bits = check_and_adjust_tcnt_limits(&low_tcnt,&high_tcnt);
+      check_and_adjust_tcnt_limits(&SweepSteps[i].prescaler_bits, &low_tcnt,&high_tcnt);
       if (high_tcnt < end_tcnt) /* Prevent overshoot */
         high_tcnt = end_tcnt;
       SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
@@ -568,54 +573,81 @@ void sweep_rpm()
   sweep_lock = 0;
 }
 
-int check_and_adjust_tcnt_limits(long *low_tcnt, long *high_tcnt) 
+uint16_t check_and_adjust_tcnt_limits(volatile byte *prescale_bits, long *low_tcnt, long *high_tcnt) 
 {
-
+  /* Really Really LOW RPM */
   if ((*low_tcnt >= 16777216) && (*high_tcnt >= 16777216))
   {
-    return PRESCALE_256; /* Very low RPM condition wiht low edge pattern */
+     *prescale_bits = PRESCALE_1024; /* Very low RPM condition with low edge pattern */
+    return (uint16_t)(*low_tcnt/1024);
   }
-  else if ((*low_tcnt >= 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 16777216))
+  else if ((*low_tcnt >= 16777216) && (*high_tcnt >= 4194304) && (*high_tcnt < 16777216))
   {
-    *high_tcnt = 1677215;
-    return PRESCALE_256;
+    *high_tcnt = 16777215;
+    *prescale_bits = PRESCALE_1024;
+    return (uint16_t)(*low_tcnt/1024);
   }
-  else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 1677216))
+  else if ((*low_tcnt >= 4194304) && (*low_tcnt < 16777216) && (*high_tcnt >= 16777216))
   {
-    *low_tcnt = 1677215;
-    return PRESCALE_256;
+    *low_tcnt = 16777215;
+    *prescale_bits = PRESCALE_1024;
+    return (uint16_t)(*low_tcnt/1024);
   }
-  else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 16777216))
+  else if ((*low_tcnt >= 4194304) && (*low_tcnt < 16777216) && (*high_tcnt >= 4194304) && (*high_tcnt < 16777216))
   {
-    return PRESCALE_64; 
+    *prescale_bits = PRESCALE_256; 
+    return (uint16_t)(*low_tcnt/256);
   }
-  else if ((*low_tcnt >= 524288) && (*low_tcnt < 16777216) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
+  else if ((*low_tcnt >= 4194304) && (*low_tcnt < 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 4194304))
   {
     *high_tcnt = 524287;
-    return PRESCALE_64; 
+    *prescale_bits = PRESCALE_256; 
+    return (uint16_t)(*low_tcnt/256);
   }
-  else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 524288) && (*high_tcnt < 1677216))
+  else if ((*low_tcnt >= 524288) && (*low_tcnt < 4194304) && (*high_tcnt >= 4194304) && (*high_tcnt < 16777216))
   {
     *low_tcnt = 524287;
-    return PRESCALE_64; 
+    *prescale_bits = PRESCALE_256; 
+    return (uint16_t)(*low_tcnt/256);
+  }
+  else if ((*low_tcnt >= 524288) && (*low_tcnt < 4194304) && (*high_tcnt >= 524288) && (*high_tcnt < 4194304))
+  {
+    *prescale_bits = PRESCALE_64; 
+    return (uint16_t)(*low_tcnt/64);
+  }
+  else if ((*low_tcnt >= 524288) && (*low_tcnt < 4194304) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
+  {
+    *high_tcnt = 524287;
+    *prescale_bits = PRESCALE_64; 
+    return (uint16_t)(*low_tcnt/64);
+  }
+  else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 524288) && (*high_tcnt < 4194304))
+  {
+    *low_tcnt = 524287;
+    *prescale_bits = PRESCALE_64; 
+    return (uint16_t)(*low_tcnt/64);
   }
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
-    return PRESCALE_8; 
+    *prescale_bits = PRESCALE_8; 
+    return (uint16_t)(*low_tcnt/8);
   }
   else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt < 65536))
   {
     *high_tcnt = 65535;
-    return PRESCALE_8; 
+    *prescale_bits = PRESCALE_8; 
+    return (uint16_t)(*low_tcnt/8);
   }
   else if ((*low_tcnt < 65536) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
   {
     *low_tcnt = 65535;
-    return PRESCALE_8; 
+    *prescale_bits = PRESCALE_8; 
+    return (uint16_t)(*low_tcnt/8);
   }
   else
-    return PRESCALE_1;
-  return PRESCALE_1;
+    *prescale_bits = PRESCALE_1;
+  *prescale_bits = PRESCALE_1;
+  return (uint16_t)*low_tcnt;
 }
 
 /* In the passed low/high params, one of them will cause a prescaler overflow

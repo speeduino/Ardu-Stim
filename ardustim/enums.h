@@ -27,6 +27,7 @@ enum {
   PRESCALE_8 = 2,
   PRESCALE_64 = 3,
   PRESCALE_256 = 4,
+  PRESCALE_1024 = 5,
   RECALC
 };
 
