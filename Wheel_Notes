@@ -1,0 +1,121 @@
+
+Calculating the numbers..
+
+at 6000 RPM, CRANK wheel is turning at 100revs/sec, cam at 50
+
+So for 4 cylinder distributor thats:
+ 2 pulses per revolution
+ thus 200Hz.
+
+6 cylinder distributor:
+ 3 pulses per crank revolution
+  thus 300 hz
+
+8 cylinder distributor:
+ 4 pulses per crank revolution
+  thus 400 hz
+
+60-2 crank wheel
+ 60 pulses per crank rev
+ thus 6000 hz
+
+60-2 crank wheel with cam
+ 60 pulses per crank rev
+ thus 6000 hz
+
+36-1 crank wheel with cam
+ 36 pulses per crank rev
+ thus 3600 hz
+
+4-1 crank wheel with cam
+ 4 pulses per crank rev
+ thus 400 hz
+
+8-1 crank wheel with cam
+ 8 pulses per crank rev
+ thus 800 hz
+
+6-1 crank wheel with cam
+ 6 pulses per crank rev
+ thus 600 hz
+
+12-1 crank wheel with cam
+ 12 pulses per crank rev
+ thus 1200 hz
+
+40-1 crank wheel with cam
+ 40 pulses per crank rev
+ thus 4000 hz
+
+disty four style 50 off 40 on
+ 2 pulses per crank rev (4 per cam)
+ thus 200 hz
+
+oddfire 90 0,135
+ odd pattern, thus no constant freq portion
+
+Optispark 360 and 8
+ 360 pulses per cam rev, thus 180 pulses per crank rev
+ thus 18000 hz
+ NOTE: max rpm about 15krpm MAX with this pattern before ISR overload...
+ Sweeping on this one may have jitter issues too
+
+12-3 oddball
+ 12 pulses per rev
+ thus 1200 hz
+
+36-2-2-2 
+ 36 pulses per rev
+ thus 3600 hz
+
+4200 wheel
+ odd pattern, thus no constant freq portion
+
+36-1 mazda FE
+ 36 pulses per rev
+ thus 3600 hz
+
+mitsu 6G72 with cam
+ 3 pulses per rev (crank)
+ thus 300 hz
+
+Buell oddfire
+ 4 pulses per rev (crank)
+ thus 400 hz
+
+GM LS1
+ Odd pattern thus no constant freq portion
+
+Lotus 36-1-1-1-1 oddball
+ 36 pulses per crank
+ 3600 hz
+
+Honda RC51 wiht cam
+ 12 crank pulses
+ 1200 hz
+
+36-1 with zecond trigger on 33-34
+ 36 crank pulses
+ 3600 hz
+
+36-1+1 NGC4
+ 36 crank pulses
+ 3600 hz
+
+Weber marelli 8 crank 2 cam pulses
+ 8 crank pulses 
+ 800 hz
+
+Fiat 1.8 16V
+ Odd pattern
+
+Nissan 360 CAM wheel sensor
+ 360 cma teeth (180 crank equivalent)
+ 18000 hz
+ NOTE: RPM limited to about 15K rpm
+ Sweeping may introduce some jitter
+
+Mazda 24-2 caz (equal to 12-1 crank)
+ 12 crank teeth
+ 1200 hz
+
