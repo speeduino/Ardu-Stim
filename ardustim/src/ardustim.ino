@@ -29,22 +29,21 @@
 
 
 /* Sensistive stuff used in ISR's */
+volatile uint32_t wanted_rpm = 6000; 
+volatile uint16_t sweep_step_counter = 0;
 volatile byte selected_wheel = EIGHT_TOOTH_WITH_CAM;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
-volatile unsigned long wanted_rpm = 6000; 
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile bool reset_prescaler = false;
+volatile bool normal = true;
+volatile bool sweep_reset_prescaler = true; /* Force sweep to reset prescaler value */
+volatile bool sweep_lock = false;
 volatile byte sweep_direction = ASCENDING;
 volatile byte total_sweep_stages = 0;
-volatile bool normal = true;
-volatile uint16_t sweep_step_counter = 0;
 volatile int8_t sweep_stage = 0;
-volatile byte sweep_reset_prescaler = 1; /* Force sweep to reset prescaler value */
 volatile byte prescaler_bits = 0;
-volatile byte mode = FIXED_RPM;
-volatile byte last_prescale = 0;
-volatile bool sweep_lock = false;
 volatile byte last_prescaler_bits = 0;
+volatile byte mode = FIXED_RPM;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 
@@ -167,10 +166,10 @@ ISR(TIMER2_COMPA_vect) {
     return;
   }
   sweep_lock = true;
-  if (sweep_reset_prescaler == 1)
+  if (sweep_reset_prescaler)
   {
     reset_prescaler = true;
-    sweep_reset_prescaler = 0;
+    sweep_reset_prescaler = false;
     prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
     last_prescaler_bits = prescaler_bits;  
     new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
@@ -461,7 +460,7 @@ void reverse_wheel_direction()
     mySUI.returnOK();
 }
 
-void reset_new_OCR1A(uint16_t new_rpm)
+void reset_new_OCR1A(uint32_t new_rpm)
 {
   long tmpl = 0;
   long tmp2 = 0;
@@ -597,7 +596,7 @@ void sweep_rpm()
   sweep_stage = 0;
   sweep_step_counter = 0;
   sweep_direction = ASCENDING;
-  sweep_reset_prescaler = 1;
+  sweep_reset_prescaler = true;
   mode = LINEAR_SWEPT_RPM;
   sweep_lock = false;
 }
