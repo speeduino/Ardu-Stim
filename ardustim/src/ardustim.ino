@@ -33,7 +33,7 @@ volatile byte selected_wheel = EIGHT_TOOTH_WITH_CAM;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 volatile unsigned long wanted_rpm = 6000; 
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
-volatile byte reset_prescaler = 0;
+volatile bool reset_prescaler = false;
 volatile byte sweep_direction = ASCENDING;
 volatile byte total_sweep_stages = 0;
 volatile bool normal = true;
@@ -43,11 +43,10 @@ volatile byte sweep_reset_prescaler = 1; /* Force sweep to reset prescaler value
 volatile byte prescaler_bits = 0;
 volatile byte mode = FIXED_RPM;
 volatile byte last_prescale = 0;
-volatile byte sweep_lock = 0;
-volatile byte last_prescaler = 0;
+volatile bool sweep_lock = false;
+volatile byte last_prescaler_bits = 0;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
-volatile byte state = 0;
 
 /* Less sensitive globals */
 uint16_t sweep_low_rpm = 0;
@@ -167,13 +166,13 @@ ISR(TIMER2_COMPA_vect) {
     PORTD = (0 << 7);
     return;
   }
-  sweep_lock = 1;
+  sweep_lock = true;
   if (sweep_reset_prescaler == 1)
   {
-    reset_prescaler = 1;
+    reset_prescaler = true;
     sweep_reset_prescaler = 0;
     prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
-    last_prescaler = prescaler_bits;  
+    last_prescaler_bits = prescaler_bits;  
     new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
   }
   /* Sweep code */
@@ -201,11 +200,11 @@ ISR(TIMER2_COMPA_vect) {
       {
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
         sweep_step_counter = 0; /* we got the "0'th value in the previous line */
-        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler)
+        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
         {
-          reset_prescaler = 1;
+          reset_prescaler = true;
           prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
-          last_prescaler = prescaler_bits;
+          last_prescaler_bits = prescaler_bits;
         }
       }
       else /* END of line, time to reverse direction */
@@ -232,11 +231,11 @@ ISR(TIMER2_COMPA_vect) {
       {
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
         sweep_step_counter = SweepSteps[sweep_stage].steps;
-        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler)
+        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
         {
-          reset_prescaler = 1;
+          reset_prescaler = true;
           prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
-          last_prescaler = prescaler_bits;
+          last_prescaler_bits = prescaler_bits;
         }
       }
       else /*End of the line */
@@ -248,7 +247,7 @@ ISR(TIMER2_COMPA_vect) {
       }
     }
   }
-  sweep_lock = 0;
+  sweep_lock = false;
   PORTD = (0 << 7);
 }
 
@@ -281,7 +280,7 @@ ISR(TIMER1_COMPA_vect) {
   {
     TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); /* Clear CS10, CS11 and CS12 */
     TCCR1B |= prescaler_bits;
-    reset_prescaler = 0;
+    reset_prescaler = false;
   }
   /* Reset next compare value for RPM changes */
   OCR1A = new_OCR1A;  /* Apply new "RPM" from Timer2 ISR, i.e. speed up/down the virtual "wheel" */
@@ -476,7 +475,7 @@ void reset_new_OCR1A(uint16_t new_rpm)
   mySUI.println(tmp2);
   */
   new_OCR1A = (uint16_t)tmp2; 
-  reset_prescaler = 1; 
+  reset_prescaler = true; 
 }
 
 
@@ -525,7 +524,7 @@ void sweep_rpm()
     //  uint16_t oc_step;
     //  uint16_t steps;
     //}SweepSteps[max_sweep_steps];
-    sweep_lock = 1;
+    sweep_lock = true;
     low_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
     high_tcnt = low_tcnt >> 1; /* divide by two */
     low_rpm = tmp_min;
@@ -600,7 +599,7 @@ void sweep_rpm()
   sweep_direction = ASCENDING;
   sweep_reset_prescaler = 1;
   mode = LINEAR_SWEPT_RPM;
-  sweep_lock = 0;
+  sweep_lock = false;
 }
 
 uint16_t check_and_adjust_tcnt_limits(volatile byte *prescale_bits, long *low_tcnt, long *high_tcnt) 
