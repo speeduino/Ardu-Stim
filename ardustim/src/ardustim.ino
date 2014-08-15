@@ -27,23 +27,22 @@
 
 #define MAX_SWEEP_STEPS 12
 
-
 /* Sensistive stuff used in ISR's */
 volatile uint32_t wanted_rpm = 6000; 
 volatile uint16_t sweep_step_counter = 0;
-volatile byte selected_wheel = EIGHT_TOOTH_WITH_CAM;
+volatile uint8_t selected_wheel = EIGHT_TOOTH_WITH_CAM;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile bool reset_prescaler = false;
 volatile bool normal = true;
 volatile bool sweep_reset_prescaler = true; /* Force sweep to reset prescaler value */
 volatile bool sweep_lock = false;
-volatile byte sweep_direction = ASCENDING;
+volatile uint8_t sweep_direction = ASCENDING;
 volatile byte total_sweep_stages = 0;
 volatile int8_t sweep_stage = 0;
-volatile byte prescaler_bits = 0;
-volatile byte last_prescaler_bits = 0;
-volatile byte mode = FIXED_RPM;
+volatile uint8_t prescaler_bits = 0;
+volatile uint8_t last_prescaler_bits = 0;
+volatile uint8_t mode = FIXED_RPM;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 
