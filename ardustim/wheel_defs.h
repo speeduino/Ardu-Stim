@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with any FreeEMS software.  If not, see http://www.gnu.org/licenses/
+ * along with any ArduStim software.  If not, see http://www.gnu.org/licenses/
  *
  */
  #ifndef __WHEEL_DEFS_H__
@@ -96,59 +96,59 @@
  }WheelType;
 
 /* Name strings for EACH wheel type, for serial UI */
- PROGMEM prog_char dizzy_four_cylinder_friendly_name[] = "4 cylinder dizzy";
- PROGMEM prog_char dizzy_six_cylinder_friendly_name[] = "6 cylinder dizzy";
- PROGMEM prog_char dizzy_eight_cylinder_friendly_name[] = "8 cylinder dizzy";
- PROGMEM prog_char sixty_minus_two_friendly_name[] = "60-2 crank only";
- PROGMEM prog_char sixty_minus_two_with_cam_friendly_name[] = "60-2 crank and cam";
- PROGMEM prog_char thirty_six_minus_one_friendly_name[] = "36-1 crank only";
- PROGMEM prog_char four_minus_one_with_cam_friendly_name[] = "4-1 crank wheel with cam";
- PROGMEM prog_char eight_minus_one_friendly_name[] = "8-1 crank only (R6)";
- PROGMEM prog_char six_minus_one_with_cam_friendly_name[] = "6-1 crank with cam";
- PROGMEM prog_char twelve_minus_one_with_cam_friendly_name[] = "12-1 crank with cam";
- PROGMEM prog_char fourty_minus_one_friendly_name[] = "40-1 crank only (Ford V10)";
- PROGMEM prog_char dizzy_four_trigger_return_friendly_name[] = "Distributor style 4 cyl 50deg off, 40 deg on";
- PROGMEM prog_char oddfire_vr_friendly_name[] = "odd fire 90 deg pattern 0 and 135 pulses";
- PROGMEM prog_char optispark_lt1_friendly_name[] = "GM OptiSpark LT1 360 and 8";
- PROGMEM prog_char twelve_minus_three_friendly_name[] = "12-3 oddball";
- PROGMEM prog_char thirty_six_minus_two_two_two_friendly_name[] = "36-2-2-2 Crank only";
- PROGMEM prog_char thirty_six_minus_two_two_two_with_cam_friendly_name[] = "36-2-2-2 Crank and cam";
- PROGMEM prog_char fourty_two_hundred_wheel_friendly_name[] = "GM 4200 crank wheel";
- PROGMEM prog_char thirty_six_minus_one_with_cam_fe3_friendly_name[] = "Mazda FE3 36-1 with cam";
- PROGMEM prog_char six_g_seventy_two_with_cam_friendly_name[] = "Mitsubishi 6g72 with cam";
- PROGMEM prog_char buell_oddfire_cam_friendly_name[] = "Buell Oddfire CAM wheel";
- PROGMEM prog_char gm_ls1_crank_and_cam_friendly_name[] = "GM LS1 crank and cam";
- PROGMEM prog_char lotus_thirty_six_minus_one_one_one_one_friendly_name[] = "Odd Lotus 36-1-1-1-1 flywheel";
- PROGMEM prog_char honda_rc51_with_cam_friendly_name[] = "Honda RC51 with cam";
- PROGMEM prog_char thirty_six_minus_one_with_second_trigger_friendly_name[] = "36-1 crank with 2nd trigger on teeth 33-34";
- PROGMEM prog_char thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name[] = "36-1+1 crank with cam pattern NGC4";
- PROGMEM prog_char weber_iaw_with_cam_friendly_name[] = "Weber-Marelli 8 crank+2 cam pattern";
- PROGMEM prog_char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] = "Fiat 1.8 16V crank and cam";
- PROGMEM prog_char three_sixty_nissan_cas_friendly_name[] = "Nissan 360 CAS with 6 slots";
- PROGMEM prog_char twenty_four_minus_two_with_second_trigger_friendly_name[] = "Mazda CAS 24-2 with single pulse outer ring";
- PROGMEM prog_char eight_tooth_with_cam_friendly_name[] = "Yamaha 2002-03 R1 8 even-tooth crank with 1 tooth cam";
+ const char dizzy_four_cylinder_friendly_name[] PROGMEM = "4 cylinder dizzy";
+ const char dizzy_six_cylinder_friendly_name[] PROGMEM = "6 cylinder dizzy";
+ const char dizzy_eight_cylinder_friendly_name[] PROGMEM = "8 cylinder dizzy";
+ const char sixty_minus_two_friendly_name[] PROGMEM = "60-2 crank only";
+ const char sixty_minus_two_with_cam_friendly_name[] PROGMEM = "60-2 crank and cam";
+ const char thirty_six_minus_one_friendly_name[] PROGMEM = "36-1 crank only";
+ const char four_minus_one_with_cam_friendly_name[] PROGMEM = "4-1 crank wheel with cam";
+ const char eight_minus_one_friendly_name[] PROGMEM = "8-1 crank only (R6)";
+ const char six_minus_one_with_cam_friendly_name[] PROGMEM = "6-1 crank with cam";
+ const char twelve_minus_one_with_cam_friendly_name[] PROGMEM = "12-1 crank with cam";
+ const char fourty_minus_one_friendly_name[] PROGMEM = "40-1 crank only (Ford V10)";
+ const char dizzy_four_trigger_return_friendly_name[] PROGMEM = "Distributor style 4 cyl 50deg off, 40 deg on";
+ const char oddfire_vr_friendly_name[] PROGMEM = "odd fire 90 deg pattern 0 and 135 pulses";
+ const char optispark_lt1_friendly_name[] PROGMEM = "GM OptiSpark LT1 360 and 8";
+ const char twelve_minus_three_friendly_name[] PROGMEM = "12-3 oddball";
+ const char thirty_six_minus_two_two_two_friendly_name[] PROGMEM = "36-2-2-2 Crank only";
+ const char thirty_six_minus_two_two_two_with_cam_friendly_name[] PROGMEM = "36-2-2-2 Crank and cam";
+ const char fourty_two_hundred_wheel_friendly_name[] PROGMEM = "GM 4200 crank wheel";
+ const char thirty_six_minus_one_with_cam_fe3_friendly_name[] PROGMEM = "Mazda FE3 36-1 with cam";
+ const char six_g_seventy_two_with_cam_friendly_name[] PROGMEM = "Mitsubishi 6g72 with cam";
+ const char buell_oddfire_cam_friendly_name[] PROGMEM = "Buell Oddfire CAM wheel";
+ const char gm_ls1_crank_and_cam_friendly_name[] PROGMEM = "GM LS1 crank and cam";
+ const char lotus_thirty_six_minus_one_one_one_one_friendly_name[] PROGMEM = "Odd Lotus 36-1-1-1-1 flywheel";
+ const char honda_rc51_with_cam_friendly_name[] PROGMEM = "Honda RC51 with cam";
+ const char thirty_six_minus_one_with_second_trigger_friendly_name[] PROGMEM = "36-1 crank with 2nd trigger on teeth 33-34";
+ const char thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name[] PROGMEM = "36-1+1 crank with cam pattern NGC4";
+ const char weber_iaw_with_cam_friendly_name[] PROGMEM = "Weber-Marelli 8 crank+2 cam pattern";
+ const char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] PROGMEM = "Fiat 1.8 16V crank and cam";
+ const char three_sixty_nissan_cas_friendly_name[] PROGMEM = "Nissan 360 CAS with 6 slots";
+ const char twenty_four_minus_two_with_second_trigger_friendly_name[] PROGMEM = "Mazda CAS 24-2 with single pulse outer ring";
+ const char eight_tooth_with_cam_friendly_name[] PROGMEM = "Yamaha 2002-03 R1 8 even-tooth crank with 1 tooth cam";
 
 
  /* Very simple 50% duty cycle */
- PROGMEM prog_uchar dizzy_four_cylinder[] = 
+ const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
      1,0,1,0 /* two pulses per crank revolution (one per cylinder) */
    };
    
  /* Very simple 50% duty cycle */
- PROGMEM prog_uchar dizzy_six_cylinder[] = 
+ const unsigned char dizzy_six_cylinder[] PROGMEM = 
    { /* dizzy 6 cylinder */
      1,0,1,0,1,0 /* three pulses per crank revolution (one per cylinder) */
    };
    
  /* Very simple 50% duty cycle */
- PROGMEM prog_uchar dizzy_eight_cylinder[] = 
+ const unsigned char dizzy_eight_cylinder[] PROGMEM = 
    { /* dizzy 8 cyl */
      1,0,1,0,1,0,1,0 /* four pulses per crank revolution (one per cylinder) */
    };
    
  /* Standard bosch 60-2 pattern, 50% duty cyctle during normal teeth */
- PROGMEM prog_uchar sixty_minus_two[] = 
+ const unsigned char sixty_minus_two[] PROGMEM = 
    { /* 60-2 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
      1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
@@ -166,7 +166,7 @@
  
  /* Bosch 60-2 pattern with 2nd trigger on rotation 2, 
   * 50% duty cyctle during normal teeth */
- PROGMEM prog_uchar sixty_minus_two_with_cam[] = 
+ const unsigned char sixty_minus_two_with_cam[] PROGMEM = 
    { /* 60-2 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
      1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
@@ -195,7 +195,7 @@
    };
  
  /* Standard ford/mazda and aftermarket 36-1 pattern, 50% duty cyctle during normal teeth */  
- PROGMEM prog_uchar thirty_six_minus_one[] = 
+ const unsigned char thirty_six_minus_one[] PROGMEM = 
    { /* 36-1 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
@@ -208,7 +208,7 @@
    }; 
    
  /* 4-1 crank signal 50% duty cycle with Cam tooth enabled during the second rotation prior to tooth 2 */
- PROGMEM prog_uchar four_minus_one_with_cam[] = 
+ const unsigned char four_minus_one_with_cam[] PROGMEM = 
    { /* 4-1 with cam */
      0,1,0,1,0,1,0,0,  /* Teeth 1-3, then MISSING */
      0,1,2,1,0,1,0,0   /* Tooth 5, 2nd trigger on cam between 5 and 6 
@@ -216,14 +216,14 @@
    };
    
  /* Yamaha R6 crank trigger 8 teeth missing one, (22.5deg low, 22.5deg high) 50% duty cycle during normal teeth */
- PROGMEM prog_uchar eight_minus_one[] = 
+ const unsigned char eight_minus_one[] PROGMEM = 
    { /* 8-1 */
      0,1,0,1,0,1,0,1,  /* Teeth 1-4 */
      0,1,0,1,0,1,0,0   /* Teeth 5-7, then MISSING */
    };
   
   /* 40deg low, 20 deg high per tooth, cam signal on second rotation during 40deg low portion of 3rd tooth */
- PROGMEM prog_uchar six_minus_one_with_cam[] = 
+ const unsigned char six_minus_one_with_cam[] PROGMEM = 
    { /* 6-1 with cam */
      0,0,1,0,0,1,0,0,1,  /* Teeth 1-3 */
      0,0,1,0,0,1,0,0,0,  /* Teeth 4 and 5 and MISSING 6th */
@@ -232,7 +232,7 @@
    };
   
   /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 21 (9) */
- PROGMEM prog_uchar twelve_minus_one_with_cam[] = 
+ const unsigned char twelve_minus_one_with_cam[] PROGMEM = 
    { /* 12-1 with cam */
      0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 1 and 2 */
      0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 3 and 4 */
@@ -249,7 +249,7 @@
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
- PROGMEM prog_uchar fourty_minus_one[] = 
+ const unsigned char fourty_minus_one[] PROGMEM = 
    { /* 40-1 */
      0,1,0,1,0,1,0,1,0,1,  /* Teeth 1-5 */
      0,1,0,1,0,1,0,1,0,1,  /* Teeth 6-10 */ 
@@ -262,37 +262,61 @@
    };
   
   /* 50deg off, 40 deg on dissy style signal */
-  PROGMEM prog_uchar dizzy_four_trigger_return[] = 
+  const unsigned char dizzy_four_trigger_return[] PROGMEM = 
     { /* dizzy trigger return */
       0,0,0,0,0,1,1,1,1l  /* Simple off/on signal, 50deg off, 40 deg on */
     };
    
   /* Oddfire V twin  135/225 split */
-  PROGMEM prog_uchar oddfire_vr[] = 
+  const unsigned char oddfire_vr[] PROGMEM = 
     { /* Oddfire VR */
       1,0,0,0,0,0,0,0,0,1,0,0, /* Tooth 1 and 2 at 0 deg and 135 deg, then 225 off */
       0,0,0,0,0,0,0,0,0,0,0,0 
     };
   
   /* GM LT1 360 and 8 wheel, see http://powerefi.com/files/opti-LT1-count.JPG */
-  PROGMEM prog_uchar optispark_lt1[] = 
+  const unsigned char optispark_lt1[] PROGMEM = 
     { /* Optispark 360 outside teeth, 8 varying inside teeth */
     /* 1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 */
-      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2, /* 0-30 */
-      3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 31-60 */
-      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 61-90 */
-      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 91-120 */
-      3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 121-150 */
-      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 151-180 */
-      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 181-210 */
-      1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 211-240 */
-      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 241-270 */
-      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 271-300 */
-      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 301-330 */
-      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 331-360 */
+      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2, /* 0-30 */
+      3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,
+      3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 31-60 */
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 61-90 */
+      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 91-120 */
+      3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,3,2,
+      3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 121-150 */
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 151-180 */
+      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 181-210 */
+      1,0,1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2,3,2,
+      3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 211-240 */
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 241-270 */
+      3,2,3,2,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 271-300 */
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      3,2,3,2,3,2,3,2,3,2,3,2,3,2,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 301-330 */
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0, /* 331-360 */
   };
   
-  PROGMEM prog_uchar twelve_minus_three[] = 
+  const unsigned char twelve_minus_three[] PROGMEM = 
     { /* 12-3, http://www.msextra.com/doc/triggers/12_3_wheel_133.jpg */
       1,0,0,0,1,0,0,0,  /* Teeth 1-2 */
       1,0,0,0,1,0,0,0,  /* Teeth 3-4 */
@@ -302,7 +326,7 @@
       0,0,0,0,0,0,0,0   /* MISSING Teeth 11-12 */
     };
   
-  PROGMEM prog_uchar thirty_six_minus_two_two_two[] = 
+  const unsigned char thirty_six_minus_two_two_two[] PROGMEM = 
     { /* 36-2-2-2  */
       1,0,0,0,0,0,1,0,0,0, /* Tooth 1, then MISSING 2 and 3, then 4 and MISSING 5 */
       0,0,1,0,1,0,1,0,1,0, /* Missing Tooth 6, then 7-10 */
@@ -314,7 +338,7 @@
       1,0                  /* 36th Tooth */
     };
   
-  PROGMEM prog_uchar thirty_six_minus_two_two_two_with_cam[] = 
+  const unsigned char thirty_six_minus_two_two_two_with_cam[] PROGMEM = 
     { /* 36-2-2-2 with cam  */
       1,0,0,2,0,0,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
       0,0,1,0,1,0,1,0,1,0, /* Missing tooth 6, then 7-10 */
@@ -334,7 +358,7 @@
       1,0                  /* 36th Tooth */
     };
   
-  PROGMEM prog_uchar fourty_two_hundred_wheel[] = 
+  const unsigned char fourty_two_hundred_wheel[] PROGMEM = 
     { /* 4200 wheel http://msextra.com/doc/triggers/4200_timing.pdf */
 		/* 55 deg high, 5 deg low, 55 deg high, 5 deg low,
 		 * 5 deg high, 5 deg low, 45 deg high, 5 deg low,
@@ -351,7 +375,7 @@
   };
 
  /* Mazda F3 36-1 with cam */
- PROGMEM prog_uchar thirty_six_minus_one_with_cam_fe3[] = 
+ const unsigned char thirty_six_minus_one_with_cam_fe3[] PROGMEM = 
    { /* 36-1 with cam, 3 cam teeth, 2 180deg from each other */
      1,0,1,0,1,0,1,0,1,0,1,0, /* 0-55 deg */
      1,0,1,0,1,0,3,2,3,0,1,0, /* 60-115 deg  cam tooth at 90 deg crank for 15 crank degrees */
@@ -368,7 +392,7 @@
    }; 
   
   /* Mitsubishi 6g72 crank/cam */
-  PROGMEM prog_uchar six_g_seventy_two_with_cam[] = 
+  const unsigned char six_g_seventy_two_with_cam[] PROGMEM = 
     { /* Mitsubishi 6g72 */
 	  /* Crank signal's are 50 deg wide, and one per cylinder
 	   * Cam signals have 3 40 deg wide teeh and one 85 deg wide tooth
@@ -394,7 +418,7 @@
       0,2,2,3
     };
    
-  PROGMEM prog_uchar buell_oddfire_cam[] = 
+  const unsigned char buell_oddfire_cam[] PROGMEM = 
     { /* Buell oddfire cam wheel */
 	  /* Wheel is a cam wheel (degress are in crank degrees 
 	   * 36 deg high, 54 deg low,
@@ -415,7 +439,7 @@
 	  0,0,0,0,0,0,0,0,0,0  /* Tail of 99 deg space */
     };
   
-  PROGMEM prog_uchar gm_ls1_crank_and_cam[] = 
+  const unsigned char gm_ls1_crank_and_cam[] PROGMEM = 
     { /* GM LS1 24 tooth crank snd 1 tooth cam */
 	  /* 12 deg low, 3 deg high, 3 deg low,
 	   * 12 deg high, 3deg low, 12 deg high,
@@ -477,7 +501,7 @@
  /* Lotus 36-1-1-1-1 wheel, missing teeth at
   * 36,32,17 and 14
   */
- PROGMEM prog_uchar lotus_thirty_six_minus_one_one_one_one[] = 
+ const unsigned char lotus_thirty_six_minus_one_one_one_one[] PROGMEM = 
    { /* 36-1 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 1-5 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 6-10 */
@@ -488,7 +512,7 @@
      1,0,0,0,1,0,1,0,1,0, /* teeth 31-35 */
      0,0                  /* MISSING 36th tooth */
    }; 
- PROGMEM prog_uchar honda_rc51_with_cam[] = 
+ const unsigned char honda_rc51_with_cam[] PROGMEM = 
    { /* Honda RC51 oddfire 90deg Vtwin with cam */
       0,1,0,1,0,1,0,1,0,1, /* teeth 1-5 */
       0,3,0,1,0,1,0,1,0,1, /* teeth 6-10, cam triggers on tooth 6 */
@@ -499,7 +523,7 @@
    };
 
  /* 36-1 with second trigger pulse across teeth 33-34 on first rotation */
- PROGMEM prog_uchar thirty_six_minus_one_with_second_trigger[] = 
+ const unsigned char thirty_six_minus_one_with_second_trigger[] PROGMEM = 
    { /* 36-1 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 1-5 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 6-10  */
@@ -519,7 +543,7 @@
      0,0                  /* 36th MISSING tooth */
    }; 
    
- PROGMEM prog_uchar thirty_six_minus_one_plus_one_with_cam_ngc4[] = 
+ const unsigned char thirty_six_minus_one_plus_one_with_cam_ngc4[] PROGMEM = 
    { /* 36-1+1 NGC-4 needs 1 deg resolution, chrysler 2.0/2.4 engines
       * cam edges are at 26,62,98,134,170,314,350,368,422,458,494,530,674 and 710 dev
 	  * crank is 36-1 with alarge window at one end 2.5 teeth cycles (25 deg) wide and alosed
@@ -548,7 +572,7 @@
    };
 
 
- PROGMEM prog_uchar weber_iaw_with_cam[] =
+ const unsigned char weber_iaw_with_cam[] PROGMEM =
    { /*Weber marelli (Cosworth/Lancia) from jimstim
 	   80 deg low, 10 deg high, Tooth 1
 	   20 deg low, 45 deg cam pulse, 15 deg low, 10 deg high, Cam tooth 1 and crank tooth 2
@@ -564,7 +588,7 @@
 	 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1  /* Teeth 7 and 8 */
    };
 
- PROGMEM prog_uchar fiat_one_point_eight_sixteen_valve_with_cam[] =
+ const unsigned char fiat_one_point_eight_sixteen_valve_with_cam[] PROGMEM =
    {
      /* Starting from TDC #1 
       * Cam is high for 40 deg, low for 20, high 170deg, low for 170, high for 20, 
@@ -597,7 +621,7 @@
      2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2
    };
 
- PROGMEM prog_uchar three_sixty_nissan_cas[] = 
+ const unsigned char three_sixty_nissan_cas[] PROGMEM = 
    {
      /* Home teeth every 120 degrees in increasing widths (8,16,24,32,40,48) */
      /* Crankshaft degrees
@@ -622,7 +646,7 @@
      1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3, /* 681-720 deg */
    };
 
- PROGMEM prog_uchar twenty_four_minus_two_with_second_trigger[] = 
+ const unsigned char twenty_four_minus_two_with_second_trigger[] PROGMEM = 
    {
 	 /* See http://postimg.org/image/pcwkrxktx/, 24-2 inner ring, single outer pulse */
 	 1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,3,2,2,2,2,2, /* 11 teeth then outer and missing */
@@ -630,7 +654,7 @@
    };
 
  /* eight tooth with 1 tooth cam */
- PROGMEM prog_uchar eight_tooth_with_cam[] = 
+ const unsigned char eight_tooth_with_cam[] PROGMEM = 
    { /* Yamaha R1 (02-03) 8 tooth crank with 1 tooth cam */
      0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1, /* Teeth 1-4, 11.25 deg per step */
      0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1, /* teeth 5-8 */

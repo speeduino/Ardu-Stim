@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with any FreeEMS software.  If not, see http://www.gnu.org/licenses/
+ * along with any ArduStim software.  If not, see http://www.gnu.org/licenses/
  *
  */
 
@@ -36,6 +36,7 @@ volatile unsigned long wanted_rpm = 6000;
 volatile byte reset_prescaler = 0;
 volatile byte sweep_direction = ASCENDING;
 volatile byte total_sweep_stages = 0;
+volatile bool normal = true;
 volatile uint16_t sweep_step_counter = 0;
 volatile int8_t sweep_stage = 0;
 volatile byte sweep_reset_prescaler = 1; /* Force sweep to reset prescaler value */
@@ -68,8 +69,8 @@ struct _pattern_set {
 /* Tie things wheel related into one nicer structure ... */
 typedef struct _wheels wheels;
 struct _wheels {
-  prog_char *decoder_name;
-  prog_uchar *edge_states_ptr;
+  const char *decoder_name PROGMEM;
+  const unsigned char *edge_states_ptr PROGMEM;
   const float rpm_scaler;
   const uint16_t wheel_max_edges;
 }Wheels[MAX_WHEELS] = {
@@ -126,7 +127,7 @@ void setup() {
   TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
   // Set prescaler to 1
   TCCR1B |= (1 << CS10); /* Prescaler of 1 */
-  // Enable output compare interrupt
+  // Enable output compare interrupt ffor timer channel 1 (16 bit)
   TIMSK1 |= (1 << OCIE1A);
 
   // Set timer2 to run sweeper routine
@@ -141,14 +142,14 @@ void setup() {
   TCCR2A |= (1 << WGM21); // Normal mode (not PWM)
   // Set prescaler to x64
   TCCR2B |= (1 << CS22); /* Prescaler of 64 */
-  // Enable output compare interrupt
+  // Enable output compare interrupt for timer channel 2
   TIMSK2 |= (1 << OCIE2A);
 
 
-  pinMode(7, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern */
+  pinMode(7, OUTPUT); /* Debug pin for Saleae to track sweep ISR execution speed */
+  pinMode(8, OUTPUT); /* Primary (crank usually) output */
+  pinMode(9, OUTPUT); /* Secondary (cam usually) output */
+  pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
 
   sei(); // Enable interrupts
 } // End setup
@@ -258,12 +259,22 @@ ISR(TIMER2_COMPA_vect) {
  */
 ISR(TIMER1_COMPA_vect) {
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
-  edge_counter++;
-  if (edge_counter >= Wheels[selected_wheel].wheel_max_edges) {
-    edge_counter = 0;
+  PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+  /* Normal direction  overflow handling */
+  if (normal)
+  {
+    edge_counter++;
+    if (edge_counter == Wheels[selected_wheel].wheel_max_edges) {
+      edge_counter = 0;
+    }
+  }
+  else
+  {
+    if (edge_counter == 0)
+      edge_counter = Wheels[selected_wheel].wheel_max_edges;
+    edge_counter--;
   }
   /* The tables are in flash so we need pgm_read_byte() */
-  PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
 
   /* Reset Prescaler only if flag is set */
   if (reset_prescaler)
@@ -309,6 +320,7 @@ void serial_setup()
   mainMenu->addCommand(previous_key,select_previous_wheel,previous_help);
   mainMenu->addCommand(list_key,list_wheels,list_help);
   mainMenu->addCommand(choose_key,select_wheel,choose_help);
+  mainMenu->addCommand(reverse_key,reverse_wheel_direction,reverse_help);
   mainMenu->addCommand(rpm_key,set_rpm,rpm_help);
   mainMenu->addCommand(sweep_key,sweep_rpm,sweep_help);
 }
@@ -433,6 +445,21 @@ void select_previous_wheel()
   mySUI.print(wanted_rpm);
   mySUI.println_P(space_RPM);
   mySUI.returnOK();
+}
+
+void reverse_wheel_direction()
+{
+    if (normal)
+    {
+      normal = false;
+      mySUI.println_P(wheel_reverse);
+    }
+    else
+    {
+      normal = true;
+      mySUI.println_P(wheel_forward);
+    }
+    mySUI.returnOK();
 }
 
 void reset_new_OCR1A(uint16_t new_rpm)
