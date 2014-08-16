@@ -37,6 +37,7 @@ volatile bool reset_prescaler = false;
 volatile bool normal = true;
 volatile bool sweep_reset_prescaler = true; /* Force sweep to reset prescaler value */
 volatile bool sweep_lock = false;
+volatile uint8_t output_invert_mask = 0x00; /* Don't invert anything */
 volatile uint8_t sweep_direction = ASCENDING;
 volatile byte total_sweep_stages = 0;
 volatile int8_t sweep_stage = 0;
@@ -256,7 +257,7 @@ ISR(TIMER2_COMPA_vect) {
  */
 ISR(TIMER1_COMPA_vect) {
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
-  PORTB = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+  PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
   /* Normal direction  overflow handling */
   if (normal)
   {
@@ -320,6 +321,8 @@ void serial_setup()
   mainMenu->addCommand(reverse_key,reverse_wheel_direction,reverse_help);
   mainMenu->addCommand(rpm_key,set_rpm,rpm_help);
   mainMenu->addCommand(sweep_key,sweep_rpm,sweep_help);
+  mainMenu->addCommand(pri_invert_key,toggle_invert_primary,pri_invert_help);
+  mainMenu->addCommand(sec_invert_key,toggle_invert_secondary,sec_invert_help);
 }
 
 /* Helper function to spit out amount of ram remainig */
@@ -331,6 +334,28 @@ int freeRam () {
 
 
 /* SerialUI Callbacks */
+void toggle_invert_primary()
+{
+  output_invert_mask ^= 0x01; /* Flip crank invert mask bit */
+  mySUI.print_P(primary);
+  mySUI.print_P(space_signal);
+  if (output_invert_mask & 0x01)
+    mySUI.println_P(space_inverted);
+  else
+    mySUI.println_P(space_normal);
+}
+
+void toggle_invert_secondary()
+{
+  output_invert_mask ^= 0x02; /* Flip cam invert mask bit */
+  mySUI.print_P(secondary);
+  mySUI.print_P(space_signal);
+  if (output_invert_mask & 0x02)
+    mySUI.println_P(space_inverted);
+  else
+    mySUI.println_P(space_normal);
+}
+
 void show_info()
 {
   mySUI.println_P(info_title);

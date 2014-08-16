@@ -37,8 +37,7 @@ int check_and_adjust_tcnt_limits(long *, long *) ;
 void reset_new_OCR1A(uint16_t);
 /* Prototypes */
 
-
-SUI_DeclareString(greeting,"+++ Welcome to the ArduStim +++\r\nEnter ? for help.");
+SUI_DeclareString(greeting,"+++ Welcome to the ArduStim +++\r\nEnter ? for help");
 SUI_DeclareString(bytes, " bytes.");
 SUI_DeclareString(top_menu_title,"ArduStim Main Menu");
 SUI_DeclareString(info_key, "Information");
@@ -53,6 +52,10 @@ SUI_DeclareString(choose_key, "Choose wheel");
 SUI_DeclareString(choose_help, "Choose a specific wheel pattern by number");
 SUI_DeclareString(reverse_key, "Reverse Wheel Direction");
 SUI_DeclareString(reverse_help, "Reverse the wheel's direction of rotation");
+SUI_DeclareString(pri_invert_key, "Invert Primary");
+SUI_DeclareString(pri_invert_help, "Invert Primary (crank) signal polarity");
+SUI_DeclareString(sec_invert_key, "Invert Secondary");
+SUI_DeclareString(sec_invert_help, "Invert Secondary (cam) signal polarity");
 SUI_DeclareString(rpm_key, "RPM");
 SUI_DeclareString(rpm_help, "Set the RPM");
 SUI_DeclareString(sweep_key, "Sweep");
@@ -74,5 +77,10 @@ SUI_DeclareString(space_at_colon_space, " at: ");
 SUI_DeclareString(rpm_per_second, " RPM/second");
 SUI_DeclareString(wheel_reverse, "Reversed Wheel Direction");
 SUI_DeclareString(wheel_forward, "Normal Wheel Direction");
+SUI_DeclareString(space_signal, " Signal");
+SUI_DeclareString(space_inverted, " Inverted");
+SUI_DeclareString(space_normal, " Normal");
+SUI_DeclareString(primary, "Primary");
+SUI_DeclareString(secondary, "Secondary");
 
 #endif
