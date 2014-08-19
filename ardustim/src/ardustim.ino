@@ -193,36 +193,39 @@ ISR(TIMER2_COMPA_vect) {
     uint16_t ending_ocr;
     uint8_t prescaler_bits;
     uint16_t oc_step;
-    uint8_t oc_step_tenth;
-    uint8_t oc_step_hundredth;
-    uint8_t oc_step_thousandth;
-    uint8_t oc_step_tenthousandth;
-    uint16_t steps;
+    uint16_t oc_step_tenth;
+    uint16_t oc_step_hundredth;
+    uint16_t oc_step_thousandth;
+    uint16_t oc_step_tenthousandth;
   }SweepSteps[MAX_SWEEP_STEPS];
   */
+  tenths--;
+  hundredths--;
+  thousandths--;
+  tenthousandths--;
   if (sweep_direction == ASCENDING)
   {
     PORTD |= 1 << 7;  /* Debugginga, ascending */
     fraction = 0;
     /* Handle the fractional part using modulo */
-    if(tenths-- == 0)
+    if(!tenths)
     {
       tenths = SweepSteps[sweep_stage].oc_step_tenth;
       fraction++;
     }
-    if(hundredths-- == 0)
+    if(!hundredths)
     {
-      hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
       fraction++;
     }
-    if(thousandths-- == 0)
+    if(!thousandths)
     {
-      thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
       fraction++;
     }
-    if(tenthousandths-- == 0)
+    if(!tenthousandths)
     {
-      tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
+      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
       fraction++;
     }
     if (new_OCR1A > SweepSteps[sweep_stage].ending_ocr)
@@ -234,50 +237,50 @@ ISR(TIMER2_COMPA_vect) {
       sweep_stage++;
       if (sweep_stage < total_sweep_stages)
       {
+        /* Toggle  when changing stages */
+        PORTD &= ~(1<<7); /* turn DBG pin off */
+        PORTD |= (1<<7);  /* Turn DBG pin on */
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        tenths = SweepSteps[sweep_stage].oc_step_tenth;
-        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
-        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
-        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
       else /* END of line, time to reverse direction */
       {
         sweep_stage--; /*Bring back within limits */
-        tenths = SweepSteps[sweep_stage].oc_step_tenth;
-        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
-        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
-        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         sweep_direction = DESCENDING;
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
+      /* Reset fractionals or next round */
+      tenths = SweepSteps[sweep_stage].oc_step_tenth;
+      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
+      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
+      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
     }
   }
   else /* Descending */
   {
     PORTD &= ~(1<<7);  /*Descending  turn pin off */
     fraction = 0;
-    if(tenths-- == 0)
+    if(!tenths)
     {
       tenths = SweepSteps[sweep_stage].oc_step_tenth;
       fraction++;
     }
-    if(hundredths-- == 0)
+    if(!hundredths)
     {
-      hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
       fraction++;
     }
-    if(thousandths-- == 0)
+    if(!thousandths)
     {
-      thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
       fraction++;
     }
-    if(tenthousandths-- == 0)
+    if(!tenthousandths)
     {
-      tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
+      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
       fraction++;
     }
     if (new_OCR1A < SweepSteps[sweep_stage].beginning_ocr)
@@ -289,26 +292,25 @@ ISR(TIMER2_COMPA_vect) {
       sweep_stage--;
       if (sweep_stage >= 0)
       {
+        PORTD |= (1<<7);  /* Turn DBG pin on */
+        PORTD &= ~(1<<7); /* turn DBG pin off */
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        tenths = SweepSteps[sweep_stage].oc_step_tenth;
-        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
-        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
-        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
       else /*End of the line */
       {
         sweep_stage++; /*Bring back within limits */
-        tenths = SweepSteps[sweep_stage].oc_step_tenth;
-        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
-        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
-        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         sweep_direction = ASCENDING;
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
+      /* Reset fractionals or next round */
+      tenths = SweepSteps[sweep_stage].oc_step_tenth;
+      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
+      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
+      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
     }
   }
   sweep_lock = false;
@@ -572,7 +574,6 @@ void sweep_rpm()
   byte count = 0;
   uint16_t tmp_min = 0;
   uint16_t tmp_max = 0;
-  uint16_t tmp_rpm_per_sec = 0;
   uint16_t end_tcnt = 0;
   long low_rpm_tcnt = 0;
   uint16_t low_rpm = 0;
@@ -583,13 +584,13 @@ void sweep_rpm()
   float oc_step_f = 0.0;
   int i = 0;
 
-  char sweep_buffer[20];
+  char sweep_buffer[20] = {0};
   mySUI.showEnterDataPrompt();
   count = mySUI.readBytesToEOL(sweep_buffer,20);
   mySUI.print(F("Read: "));
   mySUI.print(count);
   mySUI.println(F(" characters from the user...")); 
-  count = sscanf(sweep_buffer,"%i,%i,%i",&tmp_min,&tmp_max,&tmp_rpm_per_sec);
+  count = sscanf(sweep_buffer,"%i,%i,%i",&tmp_min,&tmp_max,&sweep_rate);
   mySUI.print(F("Number of successfull matches (should be 3): "));
   mySUI.println(count);
   mySUI.print(F("min: "));
@@ -597,17 +598,16 @@ void sweep_rpm()
   mySUI.print(F("max: "));
   mySUI.println(tmp_max);
   mySUI.print(F("RPM/sec: "));
-  mySUI.println(tmp_rpm_per_sec);
+  mySUI.println(sweep_rate);
   if ((count == 3) && 
     (tmp_min >= 10) &&
     (tmp_max < 51200) &&
-    (tmp_rpm_per_sec > 0) &&
-    (tmp_rpm_per_sec < 51200) &&
+    (sweep_rate > 0) &&
+    (sweep_rate < 51200) &&
     (tmp_min < tmp_max))
   {
     sweep_low_rpm = tmp_min;
     sweep_high_rpm = tmp_max;
-    sweep_rate = tmp_rpm_per_sec;
     //struct pattern_set {
     //  uint16_t beginning_ocr
     //  bool reset_prescale;
@@ -627,43 +627,33 @@ void sweep_rpm()
       if (high_rpm_tcnt < end_tcnt) /* Prevent overshoot */
         high_rpm_tcnt = end_tcnt;
       /* Get the RPM endpoints for this step */
-      this_step_low_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*low_rpm_tcnt));
-      this_step_high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*high_rpm_tcnt));
+      this_step_low_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*low_rpm_tcnt));
+      this_step_high_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*high_rpm_tcnt));
       if (SweepSteps[i].prescaler_bits == 4) {
-        SweepSteps[i].oc_step /= 256;  /* Divide by 256 */
         SweepSteps[i].beginning_ocr = low_rpm_tcnt/256;  /* Divide by 256 */
         SweepSteps[i].ending_ocr = high_rpm_tcnt/256;  /* Divide by 256 */
+        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/256.0);
       } else if (SweepSteps[i].prescaler_bits == 3) {
         SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
         SweepSteps[i].beginning_ocr = low_rpm_tcnt/64;  /* Divide by 64 */
         SweepSteps[i].ending_ocr = high_rpm_tcnt/64;  /* Divide by 64 */
+        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/64.0);
       } else if (SweepSteps[i].prescaler_bits == 2) {
         SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
         SweepSteps[i].beginning_ocr = low_rpm_tcnt/8;  /* Divide by 8 */
         SweepSteps[i].ending_ocr = high_rpm_tcnt/8;  /* Divide by 8 */
+        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/8.0);
       } else {
         SweepSteps[i].beginning_ocr = low_rpm_tcnt;  /* Divide by 1 */
         SweepSteps[i].ending_ocr = high_rpm_tcnt;  /* Divide by 1 */
+        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0));
       }
       /* TCNT_diff/(RPM_diff*rpm_per_sec*1000) */
-      oc_step_f = (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)tmp_rpm_per_sec) * 1000.0);
       SweepSteps[i].oc_step = (uint16_t)oc_step_f;
       SweepSteps[i].oc_step_tenth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 10);
       SweepSteps[i].oc_step_hundredth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 100) - (SweepSteps[i].oc_step_tenth*10);
       SweepSteps[i].oc_step_thousandth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 1000) - (SweepSteps[i].oc_step_hundredth*10) - (SweepSteps[i].oc_step_tenth*100);
       SweepSteps[i].oc_step_tenthousandth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 10000) - (SweepSteps[i].oc_step_thousandth*10) - (SweepSteps[i].oc_step_hundredth*100) - (SweepSteps[i].oc_step_tenth*1000);
-      mySUI.print(F("oc_step in FP: "));
-      mySUI.println(oc_step_f,6);
-      mySUI.print(F("oc_step integer: "));
-      mySUI.println(SweepSteps[i].oc_step);
-      mySUI.print(F("oc_step tenth: "));
-      mySUI.println(SweepSteps[i].oc_step_tenth);
-      mySUI.print(F("oc_step hundredth: "));
-      mySUI.println(SweepSteps[i].oc_step_hundredth);
-      mySUI.print(F("oc_step thousandth: "));
-      mySUI.println(SweepSteps[i].oc_step_thousandth);
-      mySUI.print(F("oc_step tenthousandth: "));
-      mySUI.println(SweepSteps[i].oc_step_tenthousandth);
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("Beginning tcnt: "));
@@ -680,8 +670,18 @@ void sweep_rpm()
       mySUI.println(SweepSteps[i].ending_ocr);
       mySUI.print(F("prescaler: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
-      mySUI.print(F("OC_Integer Step: "));
+      mySUI.print(F("oc_step in Integer: "));
       mySUI.println(SweepSteps[i].oc_step);
+      mySUI.print(F("oc_step in FP: "));
+      mySUI.println(oc_step_f,6);
+      mySUI.print(F("oc_step tenth: "));
+      mySUI.println(SweepSteps[i].oc_step_tenth);
+      mySUI.print(F("oc_step hundredth: "));
+      mySUI.println(SweepSteps[i].oc_step_hundredth);
+      mySUI.print(F("oc_step thousandth: "));
+      mySUI.println(SweepSteps[i].oc_step_thousandth);
+      mySUI.print(F("oc_step tenthousandth: "));
+      mySUI.println(SweepSteps[i].oc_step_tenthousandth);
       mySUI.print(F("End of step: "));
       mySUI.println(i);
       /* Divide low and high_rpm_tcnt by two (right shift 1 bit) for next round */
