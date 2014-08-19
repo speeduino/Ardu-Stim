@@ -28,9 +28,13 @@
 #define MAX_SWEEP_STEPS 12
 
 /* Sensistive stuff used in ISR's */
+volatile uint8_t fraction = 0;
 volatile uint32_t wanted_rpm = 6000; 
-volatile uint16_t sweep_step_counter = 0;
 volatile uint8_t selected_wheel = EIGHT_TOOTH_WITH_CAM;
+volatile uint16_t tenths = 0;
+volatile uint16_t hundredths = 0;
+volatile uint32_t thousandths = 0;
+volatile uint32_t tenthousandths = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile bool reset_prescaler = false;
@@ -61,7 +65,10 @@ struct _pattern_set {
   uint16_t ending_ocr;
   uint8_t prescaler_bits;
   uint16_t oc_step;
-  uint16_t steps;
+  uint8_t oc_step_tenth;
+  uint8_t oc_step_hundredth;
+  uint8_t oc_step_thousandth;
+  uint8_t oc_step_tenthousandth;
 }SweepSteps[MAX_SWEEP_STEPS];
 
 /* Tie things wheel related into one nicer structure ... */
@@ -153,26 +160,31 @@ void setup() {
 } // End setup
 
 
+/* This is the "low speed" 1000x/second sweeper interrupt routine
+ * who's sole purpose in life is to reset the output compare value
+ * for timer zero to change the output RPM.  In cases where the RPM
+ * change per ISR is LESS than one LSB of the counter a set of modulus
+ * variabels are used to handle fractional values.
+ */
 ISR(TIMER2_COMPA_vect) {
-  PORTD = (1 << 7);
+//  PORTD = (1 << 7);
   if ( mode != LINEAR_SWEPT_RPM)
   {
-    PORTD = (0 << 7);
+//    PORTD = (0 << 7);
     return;
   }
   if (sweep_lock)  // semaphore to protect around changes/critical sections
   {  
-    PORTD = (0 << 7);
+ //   PORTD = (0 << 7);
     return;
   }
   sweep_lock = true;
   if (sweep_reset_prescaler)
   {
-    reset_prescaler = true;
     sweep_reset_prescaler = false;
+    reset_prescaler = true;
     prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
     last_prescaler_bits = prescaler_bits;  
-    new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
   }
   /* Sweep code */
   /*
@@ -181,16 +193,41 @@ ISR(TIMER2_COMPA_vect) {
     uint16_t ending_ocr;
     uint8_t prescaler_bits;
     uint16_t oc_step;
+    uint8_t oc_step_tenth;
+    uint8_t oc_step_hundredth;
+    uint8_t oc_step_thousandth;
+    uint8_t oc_step_tenthousandth;
     uint16_t steps;
   }SweepSteps[MAX_SWEEP_STEPS];
   */
   if (sweep_direction == ASCENDING)
   {
-//    PORTD |= 1 << 7;  /* Debugginga, ascending */
-    if (sweep_step_counter < SweepSteps[sweep_stage].steps)
+    PORTD |= 1 << 7;  /* Debugginga, ascending */
+    fraction = 0;
+    /* Handle the fractional part using modulo */
+    if(tenths-- == 0)
     {
-      new_OCR1A -= SweepSteps[sweep_stage].oc_step;
-      sweep_step_counter++;
+      tenths = SweepSteps[sweep_stage].oc_step_tenth;
+      fraction++;
+    }
+    if(hundredths-- == 0)
+    {
+      hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+      fraction++;
+    }
+    if(thousandths-- == 0)
+    {
+      thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+      fraction++;
+    }
+    if(tenthousandths-- == 0)
+    {
+      tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
+      fraction++;
+    }
+    if (new_OCR1A > SweepSteps[sweep_stage].ending_ocr)
+    {
+      new_OCR1A -= (SweepSteps[sweep_stage].oc_step + fraction);
     }
     else /* END of the stage, find out where we are */
     {
@@ -198,30 +235,54 @@ ISR(TIMER2_COMPA_vect) {
       if (sweep_stage < total_sweep_stages)
       {
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        sweep_step_counter = 0; /* we got the "0'th value in the previous line */
+        tenths = SweepSteps[sweep_stage].oc_step_tenth;
+        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
-        {
-          reset_prescaler = true;
-          prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
-          last_prescaler_bits = prescaler_bits;
-        }
+          sweep_reset_prescaler = true;
       }
       else /* END of line, time to reverse direction */
       {
         sweep_stage--; /*Bring back within limits */
+        tenths = SweepSteps[sweep_stage].oc_step_tenth;
+        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         sweep_direction = DESCENDING;
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        sweep_step_counter = SweepSteps[sweep_stage].steps; /* we got the last value in hte previous line */
+        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
+          sweep_reset_prescaler = true;
       }
     }
   }
   else /* Descending */
   {
-//      PORTD &= ~(1<<7);  /*Descending  turn pin off */
-    if (sweep_step_counter > 0)
+    PORTD &= ~(1<<7);  /*Descending  turn pin off */
+    fraction = 0;
+    if(tenths-- == 0)
     {
-      new_OCR1A += SweepSteps[sweep_stage].oc_step;
-      sweep_step_counter--;
+      tenths = SweepSteps[sweep_stage].oc_step_tenth;
+      fraction++;
+    }
+    if(hundredths-- == 0)
+    {
+      hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+      fraction++;
+    }
+    if(thousandths-- == 0)
+    {
+      thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+      fraction++;
+    }
+    if(tenthousandths-- == 0)
+    {
+      tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
+      fraction++;
+    }
+    if (new_OCR1A < SweepSteps[sweep_stage].beginning_ocr)
+    {
+      new_OCR1A += (SweepSteps[sweep_stage].oc_step + fraction);
     }
     else /* End of stage */
     {
@@ -229,25 +290,29 @@ ISR(TIMER2_COMPA_vect) {
       if (sweep_stage >= 0)
       {
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        sweep_step_counter = SweepSteps[sweep_stage].steps;
+        tenths = SweepSteps[sweep_stage].oc_step_tenth;
+        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
-        {
-          reset_prescaler = true;
-          prescaler_bits = SweepSteps[sweep_stage].prescaler_bits;
-          last_prescaler_bits = prescaler_bits;
-        }
+          sweep_reset_prescaler = true;
       }
       else /*End of the line */
       {
         sweep_stage++; /*Bring back within limits */
+        tenths = SweepSteps[sweep_stage].oc_step_tenth;
+        hundredths = 10*SweepSteps[sweep_stage].oc_step_hundredth;
+        thousandths = 100*SweepSteps[sweep_stage].oc_step_thousandth;
+        tenthousandths = 1000*SweepSteps[sweep_stage].oc_step_tenthousandth;
         sweep_direction = ASCENDING;
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        sweep_step_counter = 0; /* we got the last value in hte previous line */
+        if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
+          sweep_reset_prescaler = true;
       }
     }
   }
   sweep_lock = false;
-  PORTD = (0 << 7);
+//  PORTD = (0 << 7);
 }
 
 /* Pumps the pattern out of flash to the port 
@@ -509,10 +574,13 @@ void sweep_rpm()
   uint16_t tmp_max = 0;
   uint16_t tmp_rpm_per_sec = 0;
   uint16_t end_tcnt = 0;
-  long low_tcnt = 0;
+  long low_rpm_tcnt = 0;
   uint16_t low_rpm = 0;
-  long high_tcnt = 0;
+  long high_rpm_tcnt = 0;
   uint16_t high_rpm = 0;
+  uint16_t this_step_low_rpm = 0;
+  uint16_t this_step_high_rpm = 0;
+  float oc_step_f = 0.0;
   int i = 0;
 
   char sweep_buffer[20];
@@ -548,63 +616,80 @@ void sweep_rpm()
     //  uint16_t steps;
     //}SweepSteps[max_sweep_steps];
     sweep_lock = true;
-    low_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
-    high_tcnt = low_tcnt >> 1; /* divide by two */
+    low_rpm_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
+    high_rpm_tcnt = low_rpm_tcnt >> 1; /* divide by two */
     low_rpm = tmp_min;
     end_tcnt = 8000000/(tmp_max*Wheels[selected_wheel].rpm_scaler);
 
-    while((i < MAX_SWEEP_STEPS) && (high_rpm < tmp_max))
+    while((i < MAX_SWEEP_STEPS) && (low_rpm_tcnt > end_tcnt))
     {
-      check_and_adjust_tcnt_limits(&SweepSteps[i].prescaler_bits, &low_tcnt,&high_tcnt);
-      if (high_tcnt < end_tcnt) /* Prevent overshoot */
-        high_tcnt = end_tcnt;
-      SweepSteps[i].oc_step = (((1.0/low_rpm)*high_tcnt)*(tmp_rpm_per_sec/1000.0));
-      if (SweepSteps[i].oc_step == 0)
-        SweepSteps[i].oc_step = 1;
-      SweepSteps[i].steps = (low_tcnt-high_tcnt)/SweepSteps[i].oc_step;
+      check_and_adjust_tcnt_limits(&SweepSteps[i].prescaler_bits, &low_rpm_tcnt,&high_rpm_tcnt);
+      if (high_rpm_tcnt < end_tcnt) /* Prevent overshoot */
+        high_rpm_tcnt = end_tcnt;
+      /* Get the RPM endpoints for this step */
+      this_step_low_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*low_rpm_tcnt));
+      this_step_high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*high_rpm_tcnt));
       if (SweepSteps[i].prescaler_bits == 4) {
         SweepSteps[i].oc_step /= 256;  /* Divide by 256 */
-        SweepSteps[i].beginning_ocr = low_tcnt/256;  /* Divide by 256 */
-        SweepSteps[i].ending_ocr = high_tcnt/256;  /* Divide by 256 */
+        SweepSteps[i].beginning_ocr = low_rpm_tcnt/256;  /* Divide by 256 */
+        SweepSteps[i].ending_ocr = high_rpm_tcnt/256;  /* Divide by 256 */
       } else if (SweepSteps[i].prescaler_bits == 3) {
         SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
-        SweepSteps[i].beginning_ocr = low_tcnt/64;  /* Divide by 64 */
-        SweepSteps[i].ending_ocr = high_tcnt/64;  /* Divide by 64 */
+        SweepSteps[i].beginning_ocr = low_rpm_tcnt/64;  /* Divide by 64 */
+        SweepSteps[i].ending_ocr = high_rpm_tcnt/64;  /* Divide by 64 */
       } else if (SweepSteps[i].prescaler_bits == 2) {
         SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
-        SweepSteps[i].beginning_ocr = low_tcnt/8;  /* Divide by 8 */
-        SweepSteps[i].ending_ocr = high_tcnt/8;  /* Divide by 8 */
+        SweepSteps[i].beginning_ocr = low_rpm_tcnt/8;  /* Divide by 8 */
+        SweepSteps[i].ending_ocr = high_rpm_tcnt/8;  /* Divide by 8 */
       } else {
-        SweepSteps[i].beginning_ocr = low_tcnt;  /* Divide by 1 */
-        SweepSteps[i].ending_ocr = high_tcnt;  /* Divide by 1 */
+        SweepSteps[i].beginning_ocr = low_rpm_tcnt;  /* Divide by 1 */
+        SweepSteps[i].ending_ocr = high_rpm_tcnt;  /* Divide by 1 */
       }
+      /* TCNT_diff/(RPM_diff*rpm_per_sec*1000) */
+      oc_step_f = (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)tmp_rpm_per_sec) * 1000.0);
+      SweepSteps[i].oc_step = (uint16_t)oc_step_f;
+      SweepSteps[i].oc_step_tenth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 10);
+      SweepSteps[i].oc_step_hundredth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 100) - (SweepSteps[i].oc_step_tenth*10);
+      SweepSteps[i].oc_step_thousandth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 1000) - (SweepSteps[i].oc_step_hundredth*10) - (SweepSteps[i].oc_step_tenth*100);
+      SweepSteps[i].oc_step_tenthousandth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 10000) - (SweepSteps[i].oc_step_thousandth*10) - (SweepSteps[i].oc_step_hundredth*100) - (SweepSteps[i].oc_step_tenth*1000);
+      mySUI.print(F("oc_step in FP: "));
+      mySUI.println(oc_step_f,6);
+      mySUI.print(F("oc_step integer: "));
+      mySUI.println(SweepSteps[i].oc_step);
+      mySUI.print(F("oc_step tenth: "));
+      mySUI.println(SweepSteps[i].oc_step_tenth);
+      mySUI.print(F("oc_step hundredth: "));
+      mySUI.println(SweepSteps[i].oc_step_hundredth);
+      mySUI.print(F("oc_step thousandth: "));
+      mySUI.println(SweepSteps[i].oc_step_thousandth);
+      mySUI.print(F("oc_step tenthousandth: "));
+      mySUI.println(SweepSteps[i].oc_step_tenthousandth);
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("Beginning tcnt: "));
-      mySUI.println(low_tcnt);
+      mySUI.print(low_rpm_tcnt);
+      mySUI.print(F(" RPM: "));
+      mySUI.println(this_step_low_rpm);
       mySUI.print(F("ending tcnt: "));
-      mySUI.println(high_tcnt);
+      mySUI.print(high_rpm_tcnt);
+      mySUI.print(F(" RPM: "));
+      mySUI.println(this_step_high_rpm);
       mySUI.print(F("Prescaled beginning tcnt: "));
       mySUI.println(SweepSteps[i].beginning_ocr);
       mySUI.print(F("Prescaled ending tcnt: "));
       mySUI.println(SweepSteps[i].ending_ocr);
       mySUI.print(F("prescaler: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
-      mySUI.print(F("steps: "));
-      mySUI.println(SweepSteps[i].steps);
-      mySUI.print(F("OC_Step: "));
+      mySUI.print(F("OC_Integer Step: "));
       mySUI.println(SweepSteps[i].oc_step);
       mySUI.print(F("End of step: "));
-      mySUI.print(i);
-      mySUI.print(F(" High RPM at end: "));
-      high_rpm = (8000000/(Wheels[selected_wheel].rpm_scaler*high_tcnt));
-      mySUI.println(high_rpm);
-      high_tcnt >>= 1; //  SweepSteps[i].oc_step;eset for next round.
+      mySUI.println(i);
+      /* Divide low and high_rpm_tcnt by two (right shift 1 bit) for next round */
+      high_rpm_tcnt >>= 1; //  SweepSteps[i].oc_step; reset for next round.
+      low_rpm_tcnt >>= 1; //  SweepSteps[i].oc_step; reset for next round.
 
-      low_tcnt = 8000000/((high_rpm + (tmp_rpm_per_sec/1000))*Wheels[selected_wheel].rpm_scaler);
-      low_rpm =  (uint16_t)((float)(8000000.0/low_tcnt)/Wheels[selected_wheel].rpm_scaler);
       mySUI.print(F("Low RPM for next step: "));
-      mySUI.println(low_rpm);
+      mySUI.println(this_step_high_rpm);
       i++;
     }
     total_sweep_stages = i;
@@ -618,88 +703,88 @@ void sweep_rpm()
   mySUI.returnOK();
   /* Reset params for Timer2 ISR */
   sweep_stage = 0;
-  sweep_step_counter = 0;
   sweep_direction = ASCENDING;
   sweep_reset_prescaler = true;
+  new_OCR1A = SweepSteps[0].beginning_ocr;  
   mode = LINEAR_SWEPT_RPM;
   sweep_lock = false;
 }
 
-uint16_t check_and_adjust_tcnt_limits(volatile byte *prescale_bits, long *low_tcnt, long *high_tcnt) 
+uint16_t check_and_adjust_tcnt_limits(volatile byte *prescale_bits, long *low_rpm_tcnt, long *high_rpm_tcnt) 
 {
   /* Really Really LOW RPM */
-  if ((*low_tcnt >= 16777216) && (*high_tcnt >= 16777216))
+  if ((*low_rpm_tcnt >= 16777216) && (*high_rpm_tcnt >= 16777216))
   {
      *prescale_bits = PRESCALE_1024; /* Very low RPM condition with low edge pattern */
-    return (uint16_t)(*low_tcnt/1024);
+    return (uint16_t)(*low_rpm_tcnt/1024);
   }
-  else if ((*low_tcnt >= 16777216) && (*high_tcnt >= 4194304) && (*high_tcnt < 16777216))
+  else if ((*low_rpm_tcnt >= 16777216) && (*high_rpm_tcnt >= 4194304) && (*high_rpm_tcnt < 16777216))
   {
-    *high_tcnt = 16777215;
+    *high_rpm_tcnt = 16777215;
     *prescale_bits = PRESCALE_1024;
-    return (uint16_t)(*low_tcnt/1024);
+    return (uint16_t)(*low_rpm_tcnt/1024);
   }
-  else if ((*low_tcnt >= 4194304) && (*low_tcnt < 16777216) && (*high_tcnt >= 16777216))
+  else if ((*low_rpm_tcnt >= 4194304) && (*low_rpm_tcnt < 16777216) && (*high_rpm_tcnt >= 16777216))
   {
-    *low_tcnt = 16777215;
+    *low_rpm_tcnt = 16777215;
     *prescale_bits = PRESCALE_1024;
-    return (uint16_t)(*low_tcnt/1024);
+    return (uint16_t)(*low_rpm_tcnt/1024);
   }
-  else if ((*low_tcnt >= 4194304) && (*low_tcnt < 16777216) && (*high_tcnt >= 4194304) && (*high_tcnt < 16777216))
+  else if ((*low_rpm_tcnt >= 4194304) && (*low_rpm_tcnt < 16777216) && (*high_rpm_tcnt >= 4194304) && (*high_rpm_tcnt < 16777216))
   {
     *prescale_bits = PRESCALE_256; 
-    return (uint16_t)(*low_tcnt/256);
+    return (uint16_t)(*low_rpm_tcnt/256);
   }
-  else if ((*low_tcnt >= 4194304) && (*low_tcnt < 16777216) && (*high_tcnt >= 524288) && (*high_tcnt < 4194304))
+  else if ((*low_rpm_tcnt >= 4194304) && (*low_rpm_tcnt < 16777216) && (*high_rpm_tcnt >= 524288) && (*high_rpm_tcnt < 4194304))
   {
-    *high_tcnt = 524287;
+    *high_rpm_tcnt = 524287;
     *prescale_bits = PRESCALE_256; 
-    return (uint16_t)(*low_tcnt/256);
+    return (uint16_t)(*low_rpm_tcnt/256);
   }
-  else if ((*low_tcnt >= 524288) && (*low_tcnt < 4194304) && (*high_tcnt >= 4194304) && (*high_tcnt < 16777216))
+  else if ((*low_rpm_tcnt >= 524288) && (*low_rpm_tcnt < 4194304) && (*high_rpm_tcnt >= 4194304) && (*high_rpm_tcnt < 16777216))
   {
-    *low_tcnt = 524287;
+    *low_rpm_tcnt = 524287;
     *prescale_bits = PRESCALE_256; 
-    return (uint16_t)(*low_tcnt/256);
+    return (uint16_t)(*low_rpm_tcnt/256);
   }
-  else if ((*low_tcnt >= 524288) && (*low_tcnt < 4194304) && (*high_tcnt >= 524288) && (*high_tcnt < 4194304))
+  else if ((*low_rpm_tcnt >= 524288) && (*low_rpm_tcnt < 4194304) && (*high_rpm_tcnt >= 524288) && (*high_rpm_tcnt < 4194304))
   {
     *prescale_bits = PRESCALE_64; 
-    return (uint16_t)(*low_tcnt/64);
+    return (uint16_t)(*low_rpm_tcnt/64);
   }
-  else if ((*low_tcnt >= 524288) && (*low_tcnt < 4194304) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
+  else if ((*low_rpm_tcnt >= 524288) && (*low_rpm_tcnt < 4194304) && (*high_rpm_tcnt >= 65536) && (*high_rpm_tcnt < 524288))
   {
-    *high_tcnt = 524287;
+    *high_rpm_tcnt = 524287;
     *prescale_bits = PRESCALE_64; 
-    return (uint16_t)(*low_tcnt/64);
+    return (uint16_t)(*low_rpm_tcnt/64);
   }
-  else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 524288) && (*high_tcnt < 4194304))
+  else if ((*low_rpm_tcnt >= 65536) && (*low_rpm_tcnt < 524288) && (*high_rpm_tcnt >= 524288) && (*high_rpm_tcnt < 4194304))
   {
-    *low_tcnt = 524287;
+    *low_rpm_tcnt = 524287;
     *prescale_bits = PRESCALE_64; 
-    return (uint16_t)(*low_tcnt/64);
+    return (uint16_t)(*low_rpm_tcnt/64);
   }
-  else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
+  else if ((*low_rpm_tcnt >= 65536) && (*low_rpm_tcnt < 524288) && (*high_rpm_tcnt >= 65536) && (*high_rpm_tcnt < 524288))
   {
     *prescale_bits = PRESCALE_8; 
-    return (uint16_t)(*low_tcnt/8);
+    return (uint16_t)(*low_rpm_tcnt/8);
   }
-  else if ((*low_tcnt >= 65536) && (*low_tcnt < 524288) && (*high_tcnt < 65536))
+  else if ((*low_rpm_tcnt >= 65536) && (*low_rpm_tcnt < 524288) && (*high_rpm_tcnt < 65536))
   {
-    *high_tcnt = 65535;
+    *high_rpm_tcnt = 65535;
     *prescale_bits = PRESCALE_8; 
-    return (uint16_t)(*low_tcnt/8);
+    return (uint16_t)(*low_rpm_tcnt/8);
   }
-  else if ((*low_tcnt < 65536) && (*high_tcnt >= 65536) && (*high_tcnt < 524288))
+  else if ((*low_rpm_tcnt < 65536) && (*high_rpm_tcnt >= 65536) && (*high_rpm_tcnt < 524288))
   {
-    *low_tcnt = 65535;
+    *low_rpm_tcnt = 65535;
     *prescale_bits = PRESCALE_8; 
-    return (uint16_t)(*low_tcnt/8);
+    return (uint16_t)(*low_rpm_tcnt/8);
   }
   else
     *prescale_bits = PRESCALE_1;
   *prescale_bits = PRESCALE_1;
-  return (uint16_t)*low_tcnt;
+  return (uint16_t)*low_rpm_tcnt;
 }
 
 /* In the passed low/high params, one of them will cause a prescaler overflow
