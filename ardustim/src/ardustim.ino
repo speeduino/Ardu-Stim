@@ -30,7 +30,7 @@
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;
 volatile uint32_t wanted_rpm = 6000; 
-volatile uint8_t selected_wheel = EIGHT_TOOTH_WITH_CAM;
+volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
 volatile uint16_t oc_remainder = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -104,7 +104,10 @@ struct _wheels {
   { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
   { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
-  { eight_tooth_with_cam_friendly_name, eight_tooth_with_cam, 0.26667, 64 },
+  { yamaha_eight_tooth_with_cam_friendly_name, yamaha_eight_tooth_with_cam, 0.26667, 64 },
+  { gm_four_tooth_with_cam_friendly_name, gm_four_tooth_with_cam, 0.06666, 8 },
+  { gm_six_tooth_with_cam_friendly_name, gm_six_tooth_with_cam, 0.1, 12 },
+  { gm_eight_tooth_with_cam_friendly_name, gm_eight_tooth_with_cam, 0.13333, 16 },
 };
 
 /* Initialization */

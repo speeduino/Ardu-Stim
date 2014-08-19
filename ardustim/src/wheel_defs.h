@@ -91,7 +91,10 @@
    FIAT_ONE_POINT_EIGHT_SIXTEEN_VALVE_WITH_CAM, /* Fiat 1.8 16V from jimstim */
    THREE_SIXTY_NISSAN_CAS, /*from jimstim 360 tooth cas with 6 slots */
    TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER, /* Mazda CAS 24-1 inner ring single pulse outer ring */
-   EIGHT_TOOTH_WITH_CAM, /* 02-03 Yamaha R1, seank */
+   YAMAHA_EIGHT_TOOTH_WITH_CAM, /* 02-03 Yamaha R1, seank */
+   GM_FOUR_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
+   GM_SIX_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
+   GM_EIGHT_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    MAX_WHEELS,
  }WheelType;
 
@@ -126,7 +129,10 @@
  const char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] PROGMEM = "Fiat 1.8 16V crank and cam";
  const char three_sixty_nissan_cas_friendly_name[] PROGMEM = "Nissan 360 CAS with 6 slots";
  const char twenty_four_minus_two_with_second_trigger_friendly_name[] PROGMEM = "Mazda CAS 24-2 with single pulse outer ring";
- const char eight_tooth_with_cam_friendly_name[] PROGMEM = "Yamaha 2002-03 R1 8 even-tooth crank with 1 tooth cam";
+ const char yamaha_eight_tooth_with_cam_friendly_name[] PROGMEM = "Yamaha 2002-03 R1 8 even-tooth crank with 1 tooth cam";
+ const char gm_four_tooth_with_cam_friendly_name[] PROGMEM = "GM 4 even-tooth crank with 1 tooth cam";
+ const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
+ const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
 
 
  /* Very simple 50% duty cycle */
@@ -654,11 +660,30 @@
    };
 
  /* eight tooth with 1 tooth cam */
- const unsigned char eight_tooth_with_cam[] PROGMEM = 
+ const unsigned char yamaha_eight_tooth_with_cam[] PROGMEM = 
    { /* Yamaha R1 (02-03) 8 tooth crank with 1 tooth cam */
      0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1, /* Teeth 1-4, 11.25 deg per step */
      0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1, /* teeth 5-8 */
      0,2,2,3,2,0,0,1,0,0,0,1,0,0,0,1, /* Cam tooth on 9 */
      0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1  /* Teeth 13-16 */
    };
+
+ /* 50% dutycle, 4 tooth + 1 cam */
+ const unsigned char gm_four_tooth_with_cam[] PROGMEM = 
+   { /* 4 cylinder with 1 cam pulse for 360 crank degrees */
+     1,0,1,0,3,2,3,2 /* two pulses per crank revolution (one per cylinder) */
+   };
+   
+ /* 50% dutycle, 6 tooth + 1 cam */
+ const unsigned char gm_six_tooth_with_cam[] PROGMEM = 
+   { /* 6 cylinder with 1 cam pulse for 360 crank degrees */
+     1,0,1,0,1,0,3,2,3,2,3,2 /* three pulses per crank revolution (one per cylinder) */
+   };
+   
+ /*  50% dutycle, 8 tooth + 1 cam */
+ const unsigned char gm_eight_tooth_with_cam[] PROGMEM = 
+   { /* 8 cylinder with 1 cam pulse for 360 crank degrees  */
+     1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2 /* four pulses per crank revolution (one per cylinder) */
+   };
+   
   #endif
