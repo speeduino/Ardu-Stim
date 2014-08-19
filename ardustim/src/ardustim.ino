@@ -31,10 +31,7 @@
 volatile uint8_t fraction = 0;
 volatile uint32_t wanted_rpm = 6000; 
 volatile uint8_t selected_wheel = EIGHT_TOOTH_WITH_CAM;
-volatile uint16_t tenths = 0;
-volatile uint16_t hundredths = 0;
-volatile uint32_t thousandths = 0;
-volatile uint32_t tenthousandths = 0;
+volatile uint16_t oc_remainder = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile bool reset_prescaler = false;
@@ -65,10 +62,7 @@ struct _pattern_set {
   uint16_t ending_ocr;
   uint8_t prescaler_bits;
   uint16_t oc_step;
-  uint8_t oc_step_tenth;
-  uint8_t oc_step_hundredth;
-  uint8_t oc_step_thousandth;
-  uint8_t oc_step_tenthousandth;
+  uint16_t oc_remainder;
 }SweepSteps[MAX_SWEEP_STEPS];
 
 /* Tie things wheel related into one nicer structure ... */
@@ -193,40 +187,19 @@ ISR(TIMER2_COMPA_vect) {
     uint16_t ending_ocr;
     uint8_t prescaler_bits;
     uint16_t oc_step;
-    uint16_t oc_step_tenth;
-    uint16_t oc_step_hundredth;
-    uint16_t oc_step_thousandth;
-    uint16_t oc_step_tenthousandth;
+    uint16_t oc_remainder;
   }SweepSteps[MAX_SWEEP_STEPS];
   */
-  tenths--;
-  hundredths--;
-  thousandths--;
-  tenthousandths--;
   if (sweep_direction == ASCENDING)
   {
     PORTD |= 1 << 7;  /* Debugginga, ascending */
     fraction = 0;
-    /* Handle the fractional part using modulo */
-    if(!tenths)
+    /* Handle the fractional part */
+    oc_remainder += SweepSteps[sweep_stage].oc_remainder;
+    if (oc_remainder > 10000)
     {
-      tenths = SweepSteps[sweep_stage].oc_step_tenth;
       fraction++;
-    }
-    if(!hundredths)
-    {
-      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
-      fraction++;
-    }
-    if(!thousandths)
-    {
-      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
-      fraction++;
-    }
-    if(!tenthousandths)
-    {
-      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
-      fraction++;
+      oc_remainder -= 10000;
     }
     if (new_OCR1A > SweepSteps[sweep_stage].ending_ocr)
     {
@@ -253,35 +226,18 @@ ISR(TIMER2_COMPA_vect) {
           sweep_reset_prescaler = true;
       }
       /* Reset fractionals or next round */
-      tenths = SweepSteps[sweep_stage].oc_step_tenth;
-      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
-      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
-      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
+      oc_remainder = SweepSteps[sweep_stage].oc_remainder;
     }
   }
   else /* Descending */
   {
     PORTD &= ~(1<<7);  /*Descending  turn pin off */
     fraction = 0;
-    if(!tenths)
+    oc_remainder += SweepSteps[sweep_stage].oc_remainder;
+    if (oc_remainder > 10000)
     {
-      tenths = SweepSteps[sweep_stage].oc_step_tenth;
       fraction++;
-    }
-    if(!hundredths)
-    {
-      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
-      fraction++;
-    }
-    if(!thousandths)
-    {
-      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
-      fraction++;
-    }
-    if(!tenthousandths)
-    {
-      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
-      fraction++;
+      oc_remainder -= 10000;
     }
     if (new_OCR1A < SweepSteps[sweep_stage].beginning_ocr)
     {
@@ -307,10 +263,7 @@ ISR(TIMER2_COMPA_vect) {
           sweep_reset_prescaler = true;
       }
       /* Reset fractionals or next round */
-      tenths = SweepSteps[sweep_stage].oc_step_tenth;
-      hundredths = 10*(SweepSteps[sweep_stage].oc_step_hundredth);
-      thousandths = 100*(SweepSteps[sweep_stage].oc_step_thousandth);
-      tenthousandths = 1000*(SweepSteps[sweep_stage].oc_step_tenthousandth);
+      oc_remainder = SweepSteps[sweep_stage].oc_remainder;
     }
   }
   sweep_lock = false;
@@ -650,10 +603,7 @@ void sweep_rpm()
       }
       /* TCNT_diff/(RPM_diff*rpm_per_sec*1000) */
       SweepSteps[i].oc_step = (uint16_t)oc_step_f;
-      SweepSteps[i].oc_step_tenth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 10);
-      SweepSteps[i].oc_step_hundredth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 100) - (SweepSteps[i].oc_step_tenth*10);
-      SweepSteps[i].oc_step_thousandth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 1000) - (SweepSteps[i].oc_step_hundredth*10) - (SweepSteps[i].oc_step_tenth*100);
-      SweepSteps[i].oc_step_tenthousandth = (uint8_t)((oc_step_f - (uint16_t)oc_step_f) * 10000) - (SweepSteps[i].oc_step_thousandth*10) - (SweepSteps[i].oc_step_hundredth*100) - (SweepSteps[i].oc_step_tenth*1000);
+      SweepSteps[i].oc_remainder = (uint16_t)((oc_step_f - (uint16_t)oc_step_f) * 10000);
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("Beginning tcnt: "));
@@ -674,14 +624,8 @@ void sweep_rpm()
       mySUI.println(SweepSteps[i].oc_step);
       mySUI.print(F("oc_step in FP: "));
       mySUI.println(oc_step_f,6);
-      mySUI.print(F("oc_step tenth: "));
-      mySUI.println(SweepSteps[i].oc_step_tenth);
-      mySUI.print(F("oc_step hundredth: "));
-      mySUI.println(SweepSteps[i].oc_step_hundredth);
-      mySUI.print(F("oc_step thousandth: "));
-      mySUI.println(SweepSteps[i].oc_step_thousandth);
-      mySUI.print(F("oc_step tenthousandth: "));
-      mySUI.println(SweepSteps[i].oc_step_tenthousandth);
+      mySUI.print(F("oc_remainder: "));
+      mySUI.println(SweepSteps[i].oc_remainder);
       mySUI.print(F("End of step: "));
       mySUI.println(i);
       /* Divide low and high_rpm_tcnt by two (right shift 1 bit) for next round */
