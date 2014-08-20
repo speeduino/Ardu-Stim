@@ -528,13 +528,11 @@ void reset_new_OCR1A(uint32_t new_rpm)
 void sweep_rpm()
 {
   byte count = 0;
-  uint16_t tmp_min = 0;
-  uint16_t tmp_max = 0;
+  uint16_t tmp_low_rpm = 0;
+  uint16_t tmp_high_rpm = 0;
   uint16_t end_tcnt = 0;
   long low_rpm_tcnt = 0;
-  uint16_t low_rpm = 0;
   long high_rpm_tcnt = 0;
-  uint16_t high_rpm = 0;
   uint16_t this_step_low_rpm = 0;
   uint16_t this_step_high_rpm = 0;
   float oc_step_f = 0.0;
@@ -546,24 +544,24 @@ void sweep_rpm()
   mySUI.print(F("Read: "));
   mySUI.print(count);
   mySUI.println(F(" characters from the user...")); 
-  count = sscanf(sweep_buffer,"%i,%i,%i",&tmp_min,&tmp_max,&sweep_rate);
+  count = sscanf(sweep_buffer,"%i,%i,%i",&tmp_low_rpm,&tmp_high_rpm,&sweep_rate);
   mySUI.print(F("Number of successfull matches (should be 3): "));
   mySUI.println(count);
-  mySUI.print(F("min: "));
-  mySUI.println(tmp_min);
-  mySUI.print(F("max: "));
-  mySUI.println(tmp_max);
+  mySUI.print(F("low RPM: "));
+  mySUI.println(tmp_low_rpm);
+  mySUI.print(F("high RPM: "));
+  mySUI.println(tmp_high_rpm);
   mySUI.print(F("RPM/sec: "));
   mySUI.println(sweep_rate);
   if ((count == 3) && 
-    (tmp_min >= 10) &&
-    (tmp_max < 51200) &&
+    (tmp_low_rpm >= 10) &&
+    (tmp_high_rpm < 51200) &&
     (sweep_rate > 0) &&
     (sweep_rate < 51200) &&
-    (tmp_min < tmp_max))
+    (tmp_low_rpm < tmp_high_rpm))
   {
-    sweep_low_rpm = tmp_min;
-    sweep_high_rpm = tmp_max;
+    sweep_low_rpm = tmp_low_rpm;
+    sweep_high_rpm = tmp_high_rpm;
     //struct pattern_set {
     //  uint16_t beginning_ocr
     //  bool reset_prescale;
@@ -572,10 +570,9 @@ void sweep_rpm()
     //  uint16_t steps;
     //}SweepSteps[max_sweep_steps];
     sweep_lock = true;
-    low_rpm_tcnt = (long)(8000000.0/(((float)tmp_min)*Wheels[selected_wheel].rpm_scaler));
+    low_rpm_tcnt = (long)(8000000.0/(((float)sweep_low_rpm)*Wheels[selected_wheel].rpm_scaler));
     high_rpm_tcnt = low_rpm_tcnt >> 1; /* divide by two */
-    low_rpm = tmp_min;
-    end_tcnt = 8000000/(tmp_max*Wheels[selected_wheel].rpm_scaler);
+    end_tcnt = 8000000/(sweep_high_rpm*Wheels[selected_wheel].rpm_scaler);
 
     while((i < MAX_SWEEP_STEPS) && (low_rpm_tcnt > end_tcnt))
     {
