@@ -63,6 +63,9 @@ struct _pattern_set {
   uint8_t prescaler_bits;
   uint16_t oc_step;
   uint16_t oc_remainder;
+  uint16_t low_rpm_tcnt_diff;
+  uint16_t high_rpm_tcnt_diff;
+  uint16_t factor;
 }SweepSteps[MAX_SWEEP_STEPS];
 
 /* Tie things wheel related into one nicer structure ... */
@@ -536,6 +539,10 @@ void sweep_rpm()
   uint16_t this_step_low_rpm = 0;
   uint16_t this_step_high_rpm = 0;
   float oc_step_f = 0.0;
+  uint16_t factor = 0;
+  uint16_t low_rpm_tcnt_diff = 0;
+  uint16_t high_rpm_tcnt_diff = 0;
+  uint16_t isr_iterations = 0;
   int i = 0;
 
   char sweep_buffer[20] = {0};
@@ -582,19 +589,35 @@ void sweep_rpm()
       /* Get the RPM endpoints for this step */
       this_step_low_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*low_rpm_tcnt));
       this_step_high_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*high_rpm_tcnt));
+      /* Get TCNT PER RPM at low and high points */
+      /* RPM changer per ISR ruin is sweep_rate/1000
+       * however we scale up by 10000, so 10000/1000 = 10 
+       */
+      low_rpm_tcnt_diff  = (sweep_rate * 10.0) * ((8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm))) - (8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm + 1))));
+      high_rpm_tcnt_diff = (sweep_rate * 10.0) * ((8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm - 1))) - (8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm))));
+      isr_iterations = (uint16_t)1000.0*((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate);
+      factor = (low_rpm_tcnt_diff-high_rpm_tcnt_diff)/isr_iterations;
+      /* So for each stage we start by setting TCNT tothe beginning value
+       * then  start totalling from the initial low_rpm_tcnt_diff, and 
+       * subtracting the factor off the ADDER each time, so the adder is
+       * decreasing in size,
+       * So add adder to sum, reduce adder by factor
+       * while sum>100000, sum-=10000l tcnt++;
+       */
+
       if (SweepSteps[i].prescaler_bits == 4) {
-        SweepSteps[i].beginning_ocr = low_rpm_tcnt/256;  /* Divide by 256 */
-        SweepSteps[i].ending_ocr = high_rpm_tcnt/256;  /* Divide by 256 */
+        SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 8);  /* Divide by 256 */
+        SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 8);  /* Divide by 256 */
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/256.0);
       } else if (SweepSteps[i].prescaler_bits == 3) {
         SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
-        SweepSteps[i].beginning_ocr = low_rpm_tcnt/64;  /* Divide by 64 */
-        SweepSteps[i].ending_ocr = high_rpm_tcnt/64;  /* Divide by 64 */
+        SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 6);  /* Divide by 64 */
+        SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 6);  /* Divide by 64 */
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/64.0);
       } else if (SweepSteps[i].prescaler_bits == 2) {
         SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
-        SweepSteps[i].beginning_ocr = low_rpm_tcnt/8;  /* Divide by 8 */
-        SweepSteps[i].ending_ocr = high_rpm_tcnt/8;  /* Divide by 8 */
+        SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 3);  /* Divide by 8 */
+        SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 3);  /* Divide by 8 */
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/8.0);
       } else {
         SweepSteps[i].beginning_ocr = low_rpm_tcnt;  /* Divide by 1 */
@@ -604,8 +627,19 @@ void sweep_rpm()
       /* TCNT_diff/(RPM_diff*rpm_per_sec*1000) */
       SweepSteps[i].oc_step = (uint16_t)oc_step_f;
       SweepSteps[i].oc_remainder = (uint16_t)((oc_step_f - (uint16_t)oc_step_f) * 10000);
+      SweepSteps[i].low_rpm_tcnt_diff = low_rpm_tcnt_diff;
+      SweepSteps[i].high_rpm_tcnt_diff = high_rpm_tcnt_diff;
+      SweepSteps[i].factor = factor;
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
+      mySUI.print(F("low_rpm_tcnt_diff: "));
+      mySUI.println(low_rpm_tcnt_diff);
+      mySUI.print(F("high_rpm_tcnt_diff: "));
+      mySUI.println(high_rpm_tcnt_diff);
+      mySUI.print(F("isr iterations: "));
+      mySUI.println(isr_iterations);
+      mySUI.print(F("factor: "));
+      mySUI.println(factor);
       mySUI.print(F("Beginning tcnt: "));
       mySUI.print(low_rpm_tcnt);
       mySUI.print(F(" RPM: "));
