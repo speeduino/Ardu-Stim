@@ -31,7 +31,8 @@
 volatile uint8_t fraction = 0;
 volatile uint32_t wanted_rpm = 6000; 
 volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
-volatile uint16_t oc_remainder = 0;
+volatile uint32_t oc_remainder = 0;
+volatile uint32_t partial = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile bool reset_prescaler = false;
@@ -61,10 +62,8 @@ struct _pattern_set {
   uint16_t beginning_ocr;
   uint16_t ending_ocr;
   uint8_t prescaler_bits;
-  uint16_t oc_step;
-  uint16_t oc_remainder;
-  uint16_t low_rpm_tcnt_diff;
-  uint16_t high_rpm_tcnt_diff;
+  uint32_t low_rpm_tcnt_diff;
+  uint32_t high_rpm_tcnt_diff;
   uint16_t factor;
 }SweepSteps[MAX_SWEEP_STEPS];
 
@@ -192,24 +191,22 @@ ISR(TIMER2_COMPA_vect) {
     uint16_t beginning_ocr;
     uint16_t ending_ocr;
     uint8_t prescaler_bits;
-    uint16_t oc_step;
-    uint16_t oc_remainder;
   }SweepSteps[MAX_SWEEP_STEPS];
   */
   if (sweep_direction == ASCENDING)
   {
     PORTD |= 1 << 7;  /* Debugginga, ascending */
     fraction = 0;
-    /* Handle the fractional part */
-    oc_remainder += SweepSteps[sweep_stage].oc_remainder;
-    if (oc_remainder > 10000)
+    oc_remainder += partial;
+    partial -= SweepSteps[sweep_stage].factor;
+    while (oc_remainder > 1000000)
     {
       fraction++;
-      oc_remainder -= 10000;
+      oc_remainder -= 1000000;
     }
     if (new_OCR1A > SweepSteps[sweep_stage].ending_ocr)
     {
-      new_OCR1A -= (SweepSteps[sweep_stage].oc_step + fraction);
+      new_OCR1A -= fraction;
     }
     else /* END of the stage, find out where we are */
     {
@@ -220,6 +217,7 @@ ISR(TIMER2_COMPA_vect) {
         PORTD &= ~(1<<7); /* turn DBG pin off */
         PORTD |= (1<<7);  /* Turn DBG pin on */
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
+        partial = SweepSteps[sweep_stage].low_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
@@ -228,26 +226,28 @@ ISR(TIMER2_COMPA_vect) {
         sweep_stage--; /*Bring back within limits */
         sweep_direction = DESCENDING;
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
+        partial = SweepSteps[sweep_stage].high_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
       /* Reset fractionals or next round */
-      oc_remainder = SweepSteps[sweep_stage].oc_remainder;
+      oc_remainder = 0;
     }
   }
   else /* Descending */
   {
     PORTD &= ~(1<<7);  /*Descending  turn pin off */
     fraction = 0;
-    oc_remainder += SweepSteps[sweep_stage].oc_remainder;
-    if (oc_remainder > 10000)
+    oc_remainder += partial;
+    partial += SweepSteps[sweep_stage].factor;
+    while (oc_remainder > 1000000)
     {
       fraction++;
-      oc_remainder -= 10000;
+      oc_remainder -= 1000000;
     }
     if (new_OCR1A < SweepSteps[sweep_stage].beginning_ocr)
     {
-      new_OCR1A += (SweepSteps[sweep_stage].oc_step + fraction);
+      new_OCR1A += fraction;
     }
     else /* End of stage */
     {
@@ -257,6 +257,7 @@ ISR(TIMER2_COMPA_vect) {
         PORTD |= (1<<7);  /* Turn DBG pin on */
         PORTD &= ~(1<<7); /* turn DBG pin off */
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
+        partial = SweepSteps[sweep_stage].high_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
@@ -265,11 +266,12 @@ ISR(TIMER2_COMPA_vect) {
         sweep_stage++; /*Bring back within limits */
         sweep_direction = ASCENDING;
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
+        partial = SweepSteps[sweep_stage].low_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
       /* Reset fractionals or next round */
-      oc_remainder = SweepSteps[sweep_stage].oc_remainder;
+      oc_remainder = 0;
     }
   }
   sweep_lock = false;
@@ -539,9 +541,9 @@ void sweep_rpm()
   uint16_t this_step_low_rpm = 0;
   uint16_t this_step_high_rpm = 0;
   float oc_step_f = 0.0;
-  uint16_t factor = 0;
-  uint16_t low_rpm_tcnt_diff = 0;
-  uint16_t high_rpm_tcnt_diff = 0;
+  uint16_t factor = 0.0;
+  uint32_t scaled_low_rpm_tcnt_diff = 0;
+  uint32_t scaled_high_rpm_tcnt_diff = 0;
   uint16_t isr_iterations = 0;
   int i = 0;
 
@@ -591,12 +593,12 @@ void sweep_rpm()
       this_step_high_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*high_rpm_tcnt));
       /* Get TCNT PER RPM at low and high points */
       /* RPM changer per ISR ruin is sweep_rate/1000
-       * however we scale up by 10000, so 10000/1000 = 10 
+       * however we scale up by 1000000, so 1000000/1000 = 1-0000 
        */
-      low_rpm_tcnt_diff  = (sweep_rate * 10.0) * ((8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm))) - (8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm + 1))));
-      high_rpm_tcnt_diff = (sweep_rate * 10.0) * ((8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm - 1))) - (8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm))));
+      scaled_low_rpm_tcnt_diff = ((float)sweep_rate/1000.0)*(1000000.0*(8000000.0/(float)(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm))) - (1000000.0*(8000000.0/(float)(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm + 1.0)))));
+      scaled_high_rpm_tcnt_diff = ((float)sweep_rate/1000.0)*(1000000*(8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm - 1))) - (1000000*(8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm)))));
       isr_iterations = (uint16_t)1000.0*((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate);
-      factor = (low_rpm_tcnt_diff-high_rpm_tcnt_diff)/isr_iterations;
+      factor = (scaled_low_rpm_tcnt_diff-scaled_high_rpm_tcnt_diff)/isr_iterations;
       /* So for each stage we start by setting TCNT tothe beginning value
        * then  start totalling from the initial low_rpm_tcnt_diff, and 
        * subtracting the factor off the ADDER each time, so the adder is
@@ -606,16 +608,17 @@ void sweep_rpm()
        */
 
       if (SweepSteps[i].prescaler_bits == 4) {
+        //SweepSteps[i].oc_step /= 256;  /* Divide by 64 */
         SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 8);  /* Divide by 256 */
         SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 8);  /* Divide by 256 */
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/256.0);
       } else if (SweepSteps[i].prescaler_bits == 3) {
-        SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
+        //SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
         SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 6);  /* Divide by 64 */
         SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 6);  /* Divide by 64 */
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/64.0);
       } else if (SweepSteps[i].prescaler_bits == 2) {
-        SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
+        //SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
         SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 3);  /* Divide by 8 */
         SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 3);  /* Divide by 8 */
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/8.0);
@@ -625,21 +628,21 @@ void sweep_rpm()
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0));
       }
       /* TCNT_diff/(RPM_diff*rpm_per_sec*1000) */
-      SweepSteps[i].oc_step = (uint16_t)oc_step_f;
-      SweepSteps[i].oc_remainder = (uint16_t)((oc_step_f - (uint16_t)oc_step_f) * 10000);
-      SweepSteps[i].low_rpm_tcnt_diff = low_rpm_tcnt_diff;
-      SweepSteps[i].high_rpm_tcnt_diff = high_rpm_tcnt_diff;
+     // SweepSteps[i].oc_step = (uint16_t)oc_step_f;
+     // SweepSteps[i].oc_remainder = (uint16_t)((oc_step_f - (uint16_t)oc_step_f) * 10000);
+      SweepSteps[i].low_rpm_tcnt_diff = scaled_low_rpm_tcnt_diff;
+      SweepSteps[i].high_rpm_tcnt_diff = scaled_high_rpm_tcnt_diff;
       SweepSteps[i].factor = factor;
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
-      mySUI.print(F("low_rpm_tcnt_diff: "));
-      mySUI.println(low_rpm_tcnt_diff);
-      mySUI.print(F("high_rpm_tcnt_diff: "));
-      mySUI.println(high_rpm_tcnt_diff);
+      mySUI.print(F("scaled_low_rpm_tcnt_diff: "));
+      mySUI.println(scaled_low_rpm_tcnt_diff);
+      mySUI.print(F("scaled_high_rpm_tcnt_diff: "));
+      mySUI.println(scaled_high_rpm_tcnt_diff);
       mySUI.print(F("isr iterations: "));
       mySUI.println(isr_iterations);
       mySUI.print(F("factor: "));
-      mySUI.println(factor);
+      mySUI.println(factor,4);
       mySUI.print(F("Beginning tcnt: "));
       mySUI.print(low_rpm_tcnt);
       mySUI.print(F(" RPM: "));
@@ -654,12 +657,12 @@ void sweep_rpm()
       mySUI.println(SweepSteps[i].ending_ocr);
       mySUI.print(F("prescaler: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
-      mySUI.print(F("oc_step in Integer: "));
-      mySUI.println(SweepSteps[i].oc_step);
-      mySUI.print(F("oc_step in FP: "));
-      mySUI.println(oc_step_f,6);
-      mySUI.print(F("oc_remainder: "));
-      mySUI.println(SweepSteps[i].oc_remainder);
+//      mySUI.print(F("oc_step in Integer: "));
+//      mySUI.println(SweepSteps[i].oc_step);
+//      mySUI.print(F("oc_step in FP: "));
+//      mySUI.println(oc_step_f,6);
+//      mySUI.print(F("oc_remainder: "));
+//      mySUI.println(SweepSteps[i].oc_remainder);
       mySUI.print(F("End of step: "));
       mySUI.println(i);
       /* Divide low and high_rpm_tcnt by two (right shift 1 bit) for next round */
