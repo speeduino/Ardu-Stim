@@ -64,7 +64,7 @@ struct _pattern_set {
   uint8_t prescaler_bits;
   uint32_t low_rpm_tcnt_diff;
   uint32_t high_rpm_tcnt_diff;
-  uint16_t factor;
+  uint32_t factor;
 }SweepSteps[MAX_SWEEP_STEPS];
 
 /* Tie things wheel related into one nicer structure ... */
@@ -637,35 +637,32 @@ void sweep_rpm()
         SweepSteps[i].high_rpm_tcnt_diff = scaled_high_rpm_tcnt_diff;
         oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0));
       }
-      SweepSteps[i].factor = (SweepSteps[i].low_rpm_tcnt_diff - SweepSteps[i].high_rpm_tcnt_diff)/isr_iterations;
-      /*
+      SweepSteps[i].factor = (uint32_t)((float)(SweepSteps[i].low_rpm_tcnt_diff - SweepSteps[i].high_rpm_tcnt_diff)/(float)isr_iterations);
+      if (SweepSteps[i].factor == 0)
+        SweepSteps[i].factor = 1;
+
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
       mySUI.print(F("scaled_low_rpm_tcnt_diff: "));
-      mySUI.println(scaled_low_rpm_tcnt_diff);
+      mySUI.println(SweepSteps[i].low_rpm_tcnt_diff);
       mySUI.print(F("scaled_high_rpm_tcnt_diff: "));
-      mySUI.println(scaled_high_rpm_tcnt_diff);
+      mySUI.println(SweepSteps[i].high_rpm_tcnt_diff);
       mySUI.print(F("isr iterations: "));
       mySUI.println(isr_iterations);
       mySUI.print(F("factor: "));
       mySUI.println(SweepSteps[i].factor);
       mySUI.print(F("Beginning tcnt: "));
-      mySUI.print(low_rpm_tcnt);
+      mySUI.print(SweepSteps[i].beginning_ocr);
       mySUI.print(F(" RPM: "));
       mySUI.println(this_step_low_rpm);
       mySUI.print(F("ending tcnt: "));
-      mySUI.print(high_rpm_tcnt);
+      mySUI.print(SweepSteps[i].ending_ocr);
       mySUI.print(F(" RPM: "));
       mySUI.println(this_step_high_rpm);
-      mySUI.print(F("Prescaled beginning tcnt: "));
-      mySUI.println(SweepSteps[i].beginning_ocr);
-      mySUI.print(F("Prescaled ending tcnt: "));
-      mySUI.println(SweepSteps[i].ending_ocr);
-      mySUI.print(F("prescaler: "));
+      mySUI.print(F("prescaler bits: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
       mySUI.print(F("End of step: "));
       mySUI.println(i);
-      */
       /* Divide low and high_rpm_tcnt by two 
       (right shift 1 bit) for next round */
       high_rpm_tcnt >>= 1; //  SweepSteps[i].oc_step; reset for next round.
