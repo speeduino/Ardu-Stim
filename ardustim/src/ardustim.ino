@@ -19,20 +19,21 @@
  *
  */
 
+#include "ardustim.h"
 #include "enums.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <SerialUI.h>
 #include "serialmenu.h"
 
-#define MAX_SWEEP_STEPS 12
+#define SWEEP_ISR_RATE 1000
+#define FACTOR_THRESHOLD 1000000
 
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;
 volatile uint32_t wanted_rpm = 6000; 
 volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
 volatile uint32_t oc_remainder = 0;
-volatile uint32_t partial = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile bool reset_prescaler = false;
@@ -56,25 +57,9 @@ uint16_t sweep_rate = 0;
 
 SUI::SerialUI mySUI = SUI::SerialUI(greeting);                                  
 
-/* Where to store our sweep pattern sets */
-typedef struct _pattern_set pattern_set;
-struct _pattern_set {
-  uint16_t beginning_ocr;
-  uint16_t ending_ocr;
-  uint8_t prescaler_bits;
-  uint32_t low_rpm_tcnt_diff;
-  uint32_t high_rpm_tcnt_diff;
-  uint32_t factor;
-}SweepSteps[MAX_SWEEP_STEPS];
+sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 
-/* Tie things wheel related into one nicer structure ... */
-typedef struct _wheels wheels;
-struct _wheels {
-  const char *decoder_name PROGMEM;
-  const unsigned char *edge_states_ptr PROGMEM;
-  const float rpm_scaler;
-  const uint16_t wheel_max_edges;
-}Wheels[MAX_WHEELS] = {
+wheels Wheels[MAX_WHEELS] = {
   /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
   { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 },
   { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
@@ -186,38 +171,32 @@ ISR(TIMER2_COMPA_vect) {
     last_prescaler_bits = prescaler_bits;  
   }
   /* Sweep code */
-  /*
-  struct _pattern_set {
-    uint16_t beginning_ocr;
-    uint16_t ending_ocr;
-    uint8_t prescaler_bits;
-  }SweepSteps[MAX_SWEEP_STEPS];
-  */
   if (sweep_direction == ASCENDING)
   {
-    PORTD |= 1 << 7;  /* Debugginga, ascending */
-    fraction = 0;
-    oc_remainder += partial;
-    partial -= SweepSteps[sweep_stage].factor;
-    while (oc_remainder > 1000000)
+    oc_remainder += SweepSteps[sweep_stage].remainder_per_isr;
+    /* IF the total is over the threshold we increment the TCNT factor
+     * for each multiple it is over by
+     */
+    while (oc_remainder > FACTOR_THRESHOLD)
     {
       fraction++;
-      oc_remainder -= 1000000;
+      oc_remainder -= FACTOR_THRESHOLD;
     }
     if (new_OCR1A > SweepSteps[sweep_stage].ending_ocr)
     {
-      new_OCR1A -= fraction;
+      new_OCR1A -= (SweepSteps[sweep_stage].tcnt_per_isr + fraction);
+      fraction = 0;
     }
     else /* END of the stage, find out where we are */
     {
       sweep_stage++;
+      oc_remainder = 0;
       if (sweep_stage < total_sweep_stages)
       {
         /* Toggle  when changing stages */
-        PORTD &= ~(1<<7); /* turn DBG pin off */
-        PORTD |= (1<<7);  /* Turn DBG pin on */
+        //PORTD &= ~(1<<7); /* turn DBG pin off */
+        //PORTD |= (1<<7);  /* Turn DBG pin on */
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        partial = SweepSteps[sweep_stage].low_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
@@ -226,38 +205,33 @@ ISR(TIMER2_COMPA_vect) {
         sweep_stage--; /*Bring back within limits */
         sweep_direction = DESCENDING;
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        partial = SweepSteps[sweep_stage].high_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
+        PORTD |= 1 << 7;  /* Debugginga, ascending */
       }
       /* Reset fractionals or next round */
-      oc_remainder = 0;
     }
   }
   else /* Descending */
   {
-    PORTD &= ~(1<<7);  /*Descending  turn pin off */
-    fraction = 0;
-    oc_remainder += partial;
-    partial += SweepSteps[sweep_stage].factor;
-    while (oc_remainder > 1000000)
+    oc_remainder += SweepSteps[sweep_stage].remainder_per_isr;
+    while (oc_remainder > FACTOR_THRESHOLD)
     {
       fraction++;
-      oc_remainder -= 1000000;
+      oc_remainder -= FACTOR_THRESHOLD;
     }
     if (new_OCR1A < SweepSteps[sweep_stage].beginning_ocr)
     {
-      new_OCR1A += fraction;
+      new_OCR1A += (SweepSteps[sweep_stage].tcnt_per_isr + fraction);
+      fraction = 0;
     }
     else /* End of stage */
     {
       sweep_stage--;
+      oc_remainder = 0;
       if (sweep_stage >= 0)
       {
-        PORTD |= (1<<7);  /* Turn DBG pin on */
-        PORTD &= ~(1<<7); /* turn DBG pin off */
         new_OCR1A = SweepSteps[sweep_stage].ending_ocr;
-        partial = SweepSteps[sweep_stage].high_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
       }
@@ -266,12 +240,10 @@ ISR(TIMER2_COMPA_vect) {
         sweep_stage++; /*Bring back within limits */
         sweep_direction = ASCENDING;
         new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;
-        partial = SweepSteps[sweep_stage].low_rpm_tcnt_diff;
         if (SweepSteps[sweep_stage].prescaler_bits != last_prescaler_bits)
           sweep_reset_prescaler = true;
+        PORTD &= ~(1<<7);  /*Descending  turn pin off */
       }
-      /* Reset fractionals or next round */
-      oc_remainder = 0;
     }
   }
   sweep_lock = false;
@@ -514,37 +486,88 @@ void reverse_wheel_direction()
 
 void reset_new_OCR1A(uint32_t new_rpm)
 {
-  long tmpl = 0;
-  long tmp2 = 0;
-  tmpl = (long)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)new_rpm));
+  uint32_t tmp;
+  uint8_t bitshift;
+  uint8_t tmp_prescaler_bits;
+  tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)new_rpm));
 /*  mySUI.print(F("new_OCR1a: "));
   mySUI.println(tmpl);
   */
-  tmp2 = (long)check_and_adjust_tcnt_limits(&prescaler_bits, &tmpl, &tmpl);
+  get_prescaler_bits(&tmp,&tmp_prescaler_bits,&bitshift);
   /*
   mySUI.print(F("new_OCR1a: "));
   mySUI.println(tmp2);
   */
-  new_OCR1A = (uint16_t)tmp2; 
+  new_OCR1A = (uint16_t)(tmp >> bitshift); 
+  prescaler_bits = tmp_prescaler_bits;
   reset_prescaler = true; 
 }
 
 
+uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
+{
+  switch (*prescaler_bits)
+  {
+    case PRESCALE_1024:
+    return 10;
+    case PRESCALE_256:
+    return 8;
+    case PRESCALE_64:
+    return 6;
+    case PRESCALE_8:
+    return 3;
+    case PRESCALE_1:
+    return 0;
+  }
+  return 0;
+}
+
+
+//! Gets RPM from the TCNT value
+/*!
+ * Gets the RPM value based on the passed TCNT and prescaler
+ * \param tcnt pointer to Output Compare register value
+ * \param prescaler_bits point to prescaler bits enum
+ */
+uint16_t get_rpm_from_tcnt(uint16_t *tcnt, uint8_t *prescaler_bits)
+{
+  uint8_t bitshift = get_bitshift_from_prescaler(prescaler_bits);
+  return (uint16_t)((float)(8000000 >> bitshift)/(Wheels[selected_wheel].rpm_scaler*(*tcnt)));
+}
+
+
+//! Parses input from user and setups up RPM sweep
+/*!
+ * Provides the user with a prompt and request input then parses a 3 param 
+ * comma separate list from the user, validates the input
+ * and determins the appropriate Ouput Compare threshold values and
+ * prescaler settings as well as the amount to increment with each sweep
+ * ISR iteration.  It breaks up the sweep range into octaves and linearily
+ * changes OC threshold between those points, mainly due to the fact that the 
+ * relationship between RPM and output compare register is an inverse
+ * relationship, NOT a linear one, by working in octaves, we end up with
+ * a smoother sweep rate, that doesn't accelerate as it approaches the higher
+ * RPM threshold.   Since the arduino canot do floating point FAST in an ISR
+ * we use this to keep things as quick as possible. This function takes
+ * no parameters (it cannot due to SerialUI) and returns void
+ */
 void sweep_rpm()
 {
-  byte count = 0;
-  uint16_t tmp_low_rpm = 0;
-  uint16_t tmp_high_rpm = 0;
-  uint16_t end_tcnt = 0;
-  long low_rpm_tcnt = 0;
-  long high_rpm_tcnt = 0;
-  uint16_t this_step_low_rpm = 0;
-  uint16_t this_step_high_rpm = 0;
-  float oc_step_f = 0.0;
-  uint32_t scaled_low_rpm_tcnt_diff = 0;
-  uint32_t scaled_high_rpm_tcnt_diff = 0;
-  uint16_t isr_iterations = 0;
-  int i = 0;
+  byte count;
+  uint8_t total_stages;
+  uint16_t tmp_low_rpm;
+  uint16_t tmp_high_rpm;
+  uint16_t end_tcnt;
+  uint32_t low_rpm_tcnt;
+  uint32_t high_rpm_tcnt;
+  uint16_t this_step_low_rpm;
+  uint16_t this_step_high_rpm;
+  uint16_t divisor;
+  uint16_t steps;
+  uint32_t scaled_remainder;
+  uint16_t rpm_span_this_stage;
+  float per_isr_tcnt_change;
+  float rpm_per_isr;
 
   char sweep_buffer[20] = {0};
   mySUI.showEnterDataPrompt();
@@ -561,118 +584,63 @@ void sweep_rpm()
   mySUI.println(tmp_high_rpm);
   mySUI.print(F("RPM/sec: "));
   mySUI.println(sweep_rate);
+  // Validate input ranges
   if ((count == 3) && 
-    (tmp_low_rpm >= 50) &&
-    (tmp_high_rpm < 51200) &&
-    (sweep_rate > 10) &&
-    (sweep_rate < 51200) &&
-    (tmp_low_rpm < tmp_high_rpm))
+      (tmp_low_rpm >= 25) &&
+      (tmp_high_rpm < 51200) &&
+      (sweep_rate > 10) &&
+      (sweep_rate < 51200) &&
+      (tmp_low_rpm < tmp_high_rpm))
   {
-    sweep_low_rpm = tmp_low_rpm;
-    sweep_high_rpm = tmp_high_rpm;
-    //struct pattern_set {
-    //  uint16_t beginning_ocr
-    //  bool reset_prescale;
-    //  byte prescaler_bits;
-    //  uint16_t oc_step;
-    //  uint16_t steps;
-    //}SweepSteps[max_sweep_steps];
-    sweep_lock = true;
-    low_rpm_tcnt = (long)(8000000.0/(((float)sweep_low_rpm)*Wheels[selected_wheel].rpm_scaler));
-    high_rpm_tcnt = low_rpm_tcnt >> 1; /* divide by two */
-    end_tcnt = 8000000/(sweep_high_rpm*Wheels[selected_wheel].rpm_scaler);
+    // Get OC Register values for begin/end points
+    low_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_low_rpm)*Wheels[selected_wheel].rpm_scaler));
+    high_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_high_rpm)*Wheels[selected_wheel].rpm_scaler));
 
-    while((i < MAX_SWEEP_STEPS) && (low_rpm_tcnt > end_tcnt))
+    // Get number of frequency doublings, rounding 
+    total_stages = (uint8_t)ceil(logf((float)tmp_high_rpm/(float)tmp_low_rpm)/logf(2));
+    if (SweepSteps)
+      free(SweepSteps);
+    SweepSteps = build_sweep_steps(&low_rpm_tcnt,&high_rpm_tcnt,&total_stages); 
+
+    for (uint8_t i = 0 ; i< total_stages; i++)
     {
-      check_and_adjust_tcnt_limits(&SweepSteps[i].prescaler_bits, &low_rpm_tcnt,&high_rpm_tcnt);
-      if (high_rpm_tcnt < end_tcnt) /* Prevent overshoot */
-        high_rpm_tcnt = end_tcnt;
-      /* Get the RPM endpoints for this step */
-      this_step_low_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*low_rpm_tcnt));
-      this_step_high_rpm = (uint16_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler*high_rpm_tcnt));
-      /* Get TCNT PER RPM at low and high points */
-      /* RPM changer per ISR run is sweep_rate/1000
-       * Scale up by 1 million so no need for FP math
-       */
-      scaled_low_rpm_tcnt_diff = ((float)sweep_rate/1000.0)*(1000000.0*(8000000.0/(float)(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm))) - (1000000.0*(8000000.0/(float)(Wheels[selected_wheel].rpm_scaler*(this_step_low_rpm + 1.0)))));
-      scaled_high_rpm_tcnt_diff = ((float)sweep_rate/1000.0)*(1000000*(8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm - 1))) - (1000000*(8000000.0/(Wheels[selected_wheel].rpm_scaler*(this_step_high_rpm)))));
-      /* How many ISR iterations needed for this step */
-      isr_iterations = (uint16_t)1000.0*((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate);
-      /* The amont to decrease or increase the incrementor by each loop to
-       * maintain linearity during the sweep process
-       */
-      /* So for each stage we start by setting TCNT to the beginning value
-       * then  start totalling from the initial low_rpm_tcnt_diff, and 
-       * subtracting the factor off the ADDER each time, so the adder is
-       * decreasing in size,
-       * So add adder to sum, reduce adder by factor
-       * while sum>1000000, sum-=100000; tcnt++;
-       */
+      this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i].beginning_ocr, &SweepSteps[i].prescaler_bits);
+      this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i].ending_ocr, &SweepSteps[i].prescaler_bits);
+      /* How much RPM changes this stage */
+      rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
+      /* How many TCNT changes this stage */
+      steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
+      per_isr_tcnt_change = (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/steps;
+      scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
+      SweepSteps[i].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
+      SweepSteps[i].remainder_per_isr = scaled_remainder;
 
-      if (SweepSteps[i].prescaler_bits == 4) {
-        //SweepSteps[i].oc_step /= 256;  /* Divide by 64 */
-        SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 8);  /* Divide by 256 */
-        SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 8);  /* Divide by 256 */
-        SweepSteps[i].low_rpm_tcnt_diff = (scaled_low_rpm_tcnt_diff >> 8);
-        SweepSteps[i].high_rpm_tcnt_diff = (scaled_high_rpm_tcnt_diff >> 8);
-        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/256.0);
-      } else if (SweepSteps[i].prescaler_bits == 3) {
-        //SweepSteps[i].oc_step /= 64;  /* Divide by 64 */
-        SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 6);  /* Divide by 64 */
-        SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 6);  /* Divide by 64 */
-        SweepSteps[i].low_rpm_tcnt_diff = (scaled_low_rpm_tcnt_diff >> 6);
-        SweepSteps[i].high_rpm_tcnt_diff = (scaled_high_rpm_tcnt_diff >> 6);
-        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/64.0);
-      } else if (SweepSteps[i].prescaler_bits == 2) {
-        //SweepSteps[i].oc_step /= 8;  /* Divide by 8 */
-        SweepSteps[i].beginning_ocr = (low_rpm_tcnt >> 3);  /* Divide by 8 */
-        SweepSteps[i].ending_ocr = (high_rpm_tcnt >> 3);  /* Divide by 8 */
-        SweepSteps[i].low_rpm_tcnt_diff = (scaled_low_rpm_tcnt_diff >> 3);
-        SweepSteps[i].high_rpm_tcnt_diff = (scaled_high_rpm_tcnt_diff >> 3);
-        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0)/8.0);
-      } else {
-        SweepSteps[i].beginning_ocr = low_rpm_tcnt;  /* Divide by 1 */
-        SweepSteps[i].ending_ocr = high_rpm_tcnt;  /* Divide by 1 */
-        SweepSteps[i].low_rpm_tcnt_diff = scaled_low_rpm_tcnt_diff;
-        SweepSteps[i].high_rpm_tcnt_diff = scaled_high_rpm_tcnt_diff;
-        oc_step_f = (float)((SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/(float)(((float)(this_step_high_rpm-this_step_low_rpm)/(float)sweep_rate) * 1000.0));
-      }
-      SweepSteps[i].factor = (uint32_t)((float)(SweepSteps[i].low_rpm_tcnt_diff - SweepSteps[i].high_rpm_tcnt_diff)/(float)isr_iterations);
-      if (SweepSteps[i].factor == 0)
-        SweepSteps[i].factor = 1;
-
+/*
       mySUI.print(F("sweep step: "));
       mySUI.println(i);
-      mySUI.print(F("scaled_low_rpm_tcnt_diff: "));
-      mySUI.println(SweepSteps[i].low_rpm_tcnt_diff);
-      mySUI.print(F("scaled_high_rpm_tcnt_diff: "));
-      mySUI.println(SweepSteps[i].high_rpm_tcnt_diff);
-      mySUI.print(F("isr iterations: "));
-      mySUI.println(isr_iterations);
-      mySUI.print(F("factor: "));
-      mySUI.println(SweepSteps[i].factor);
+      mySUI.print(F("steps: "));
+      mySUI.println(steps);
       mySUI.print(F("Beginning tcnt: "));
       mySUI.print(SweepSteps[i].beginning_ocr);
-      mySUI.print(F(" RPM: "));
+      mySUI.print(F(" for RPM: "));
       mySUI.println(this_step_low_rpm);
       mySUI.print(F("ending tcnt: "));
       mySUI.print(SweepSteps[i].ending_ocr);
-      mySUI.print(F(" RPM: "));
+      mySUI.print(F(" for RPM: "));
       mySUI.println(this_step_high_rpm);
       mySUI.print(F("prescaler bits: "));
       mySUI.println(SweepSteps[i].prescaler_bits);
+      mySUI.print(F("tcnt_per_isr: "));
+      mySUI.println(SweepSteps[i].tcnt_per_isr);
+      mySUI.print(F("scaled remainder_per_isr: "));
+      mySUI.println(SweepSteps[i].remainder_per_isr);
+      mySUI.print(F("FP TCNT per ISR: "));
+      mySUI.println(per_isr_tcnt_change,6);
       mySUI.print(F("End of step: "));
       mySUI.println(i);
-      /* Divide low and high_rpm_tcnt by two 
-      (right shift 1 bit) for next round */
-      high_rpm_tcnt >>= 1; //  SweepSteps[i].oc_step; reset for next round.
-      low_rpm_tcnt >>= 1; //  SweepSteps[i].oc_step; reset for next round.
-
-      //mySUI.print(F("Low RPM for next step: "));
-      //mySUI.println(this_step_high_rpm);
-      i++;
+      */
     }
-    total_sweep_stages = i;
+    total_sweep_stages = total_stages;
     //mySUI.print(F("Total sweep stages: "));
     //mySUI.println(total_sweep_stages);
   }
@@ -684,91 +652,91 @@ void sweep_rpm()
   sweep_stage = 0;
   sweep_direction = ASCENDING;
   sweep_reset_prescaler = true;
-  new_OCR1A = SweepSteps[0].beginning_ocr;  
-  partial = SweepSteps[0].low_rpm_tcnt_diff;
+  new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
+  oc_remainder = 0;
   mode = LINEAR_SWEPT_RPM;
+  sweep_high_rpm = tmp_high_rpm;
+  sweep_low_rpm = tmp_low_rpm;
   sweep_lock = false;
 }
 
-uint16_t check_and_adjust_tcnt_limits(volatile byte *prescale_bits, long *low_rpm_tcnt, long *high_rpm_tcnt) 
+
+//! Gets prescaler enum and bitshift based on OC value
+void get_prescaler_bits(uint32_t *potential_oc_value, uint8_t *prescaler, uint8_t *bitshift)
 {
-  /* Really Really LOW RPM */
-  if ((*low_rpm_tcnt >= 16777216) && (*high_rpm_tcnt >= 16777216))
+  if (*potential_oc_value >= 16777216)
   {
-     *prescale_bits = PRESCALE_1024; /* Very low RPM condition with low edge pattern */
-    return (uint16_t)(*low_rpm_tcnt/1024);
+    *prescaler = PRESCALE_1024;
+    *bitshift = 10;
   }
-  else if ((*low_rpm_tcnt >= 16777216) && (*high_rpm_tcnt >= 4194304) && (*high_rpm_tcnt < 16777216))
+  else if (*potential_oc_value >= 4194304)
   {
-    *high_rpm_tcnt = 16777215;
-    *prescale_bits = PRESCALE_1024;
-    return (uint16_t)(*low_rpm_tcnt/1024);
+    *prescaler = PRESCALE_256;
+    *bitshift = 8;
   }
-  else if ((*low_rpm_tcnt >= 4194304) && (*low_rpm_tcnt < 16777216) && (*high_rpm_tcnt >= 16777216))
+  else if (*potential_oc_value >= 524288)
   {
-    *low_rpm_tcnt = 16777215;
-    *prescale_bits = PRESCALE_1024;
-    return (uint16_t)(*low_rpm_tcnt/1024);
+    *prescaler = PRESCALE_64;
+    *bitshift = 6;
   }
-  else if ((*low_rpm_tcnt >= 4194304) && (*low_rpm_tcnt < 16777216) && (*high_rpm_tcnt >= 4194304) && (*high_rpm_tcnt < 16777216))
+  else if (*potential_oc_value >= 65536)
   {
-    *prescale_bits = PRESCALE_256; 
-    return (uint16_t)(*low_rpm_tcnt/256);
-  }
-  else if ((*low_rpm_tcnt >= 4194304) && (*low_rpm_tcnt < 16777216) && (*high_rpm_tcnt >= 524288) && (*high_rpm_tcnt < 4194304))
-  {
-    *high_rpm_tcnt = 524287;
-    *prescale_bits = PRESCALE_256; 
-    return (uint16_t)(*low_rpm_tcnt/256);
-  }
-  else if ((*low_rpm_tcnt >= 524288) && (*low_rpm_tcnt < 4194304) && (*high_rpm_tcnt >= 4194304) && (*high_rpm_tcnt < 16777216))
-  {
-    *low_rpm_tcnt = 524287;
-    *prescale_bits = PRESCALE_256; 
-    return (uint16_t)(*low_rpm_tcnt/256);
-  }
-  else if ((*low_rpm_tcnt >= 524288) && (*low_rpm_tcnt < 4194304) && (*high_rpm_tcnt >= 524288) && (*high_rpm_tcnt < 4194304))
-  {
-    *prescale_bits = PRESCALE_64; 
-    return (uint16_t)(*low_rpm_tcnt/64);
-  }
-  else if ((*low_rpm_tcnt >= 524288) && (*low_rpm_tcnt < 4194304) && (*high_rpm_tcnt >= 65536) && (*high_rpm_tcnt < 524288))
-  {
-    *high_rpm_tcnt = 524287;
-    *prescale_bits = PRESCALE_64; 
-    return (uint16_t)(*low_rpm_tcnt/64);
-  }
-  else if ((*low_rpm_tcnt >= 65536) && (*low_rpm_tcnt < 524288) && (*high_rpm_tcnt >= 524288) && (*high_rpm_tcnt < 4194304))
-  {
-    *low_rpm_tcnt = 524287;
-    *prescale_bits = PRESCALE_64; 
-    return (uint16_t)(*low_rpm_tcnt/64);
-  }
-  else if ((*low_rpm_tcnt >= 65536) && (*low_rpm_tcnt < 524288) && (*high_rpm_tcnt >= 65536) && (*high_rpm_tcnt < 524288))
-  {
-    *prescale_bits = PRESCALE_8; 
-    return (uint16_t)(*low_rpm_tcnt/8);
-  }
-  else if ((*low_rpm_tcnt >= 65536) && (*low_rpm_tcnt < 524288) && (*high_rpm_tcnt < 65536))
-  {
-    *high_rpm_tcnt = 65535;
-    *prescale_bits = PRESCALE_8; 
-    return (uint16_t)(*low_rpm_tcnt/8);
-  }
-  else if ((*low_rpm_tcnt < 65536) && (*high_rpm_tcnt >= 65536) && (*high_rpm_tcnt < 524288))
-  {
-    *low_rpm_tcnt = 65535;
-    *prescale_bits = PRESCALE_8; 
-    return (uint16_t)(*low_rpm_tcnt/8);
+    *prescaler = PRESCALE_8;
+    *bitshift = 3;
   }
   else
-    *prescale_bits = PRESCALE_1;
-  *prescale_bits = PRESCALE_1;
-  return (uint16_t)*low_rpm_tcnt;
+  {
+    *prescaler = PRESCALE_1;
+    *bitshift = 0;
+  }
 }
 
-/* In the passed low/high params, one of them will cause a prescaler overflow
- * so we need to determine a new limit that stays inside the prescaler limits
+
+//! Builds the SweepSteps[] structure
+/*!
+ * For sweeping we cannot just pick the TCNT value at hte beginning and ending
+ * and sweep linearily between them as it'll result in a VERY slow RPM change
+ * at the low end and a VERY FAST change at the high end due to the inverse
+ * relationship between RPM and TCNT. So we compromise and break up the RPM
+ * range into octaves (doubles of RPM), and use a linear TCNT change between
+ * those two points. It's not perfect, but computationally easy
+ *
+ * \param low_rpm_tcnt pointer to low rpm OC value, (not prescaled!)
+ * \param high_rpm_tcnt pointer to low rpm OC value, (not prescaled!)
+ * \param total_stages pointer to tell the number of structs to allocate
+ * \returns pointer to array of structures for each sweep stage.
  */
+sweep_step *build_sweep_steps(uint32_t *low_rpm_tcnt, uint32_t *high_rpm_tcnt, uint8_t *total_stages)
+{
+  sweep_step *steps;
+  uint8_t prescaler_bits;
+  uint8_t bitshift;
+  uint32_t tmp = *low_rpm_tcnt;
+  /* DEBUG
+  mySUI.print(*low_rpm_tcnt);
+  mySUI.print(F("<->"));
+  mySUI.println(*high_rpm_tcnt);
+   */
 
-
+  steps = (sweep_step *)malloc(sizeof(sweep_step)*(*total_stages));
+  for (uint8_t i = 0; i < (*total_stages); i++)
+  {
+    /* The low rpm value will ALWAYS have the highed TCNT value so use that
+    to determine the prescaler value
+    */
+    get_prescaler_bits(&tmp, &steps[i].prescaler_bits, &bitshift);
+    
+    steps[i].beginning_ocr = (uint16_t)(tmp >> bitshift);
+    if ((tmp >> 1) < (*high_rpm_tcnt))
+      steps[i].ending_ocr = (uint16_t)((*high_rpm_tcnt) >> bitshift);
+    else
+      steps[i].ending_ocr = (uint16_t)(tmp >> (bitshift + 1)); // Half the begin value
+    tmp = tmp >> 1; /* Divide by 2 */
+    /* DEBUG
+    mySUI.print(steps[i].beginning_ocr);
+    mySUI.print(F("<->"));
+    mySUI.println(steps[i].ending_ocr);
+    */
+  }
+  return steps;
+}

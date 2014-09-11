@@ -22,6 +22,9 @@
 #define __SERIAL_MENU_H__
  
 #include <SerialUI.h>
+//#include "structures.h"
+
+/* Structures */
 
 /* Prototypes */
 void serial_setup();
@@ -33,8 +36,6 @@ void select_wheel();
 void set_rpm();
 void sweep_rpm();
 void reverse_wheel_direction();
-int check_and_adjust_tcnt_limits(long *, long *) ;  
-void reset_new_OCR1A(uint16_t);
 /* Prototypes */
 
 SUI_DeclareString(greeting,"+++ Welcome to the ArduStim +++\r\nEnter ? for help");
