@@ -28,6 +28,7 @@
 #include "structures.h"
 #include "wheel_defs.h"
 
+/* External Globla Variables */
 extern SUI::SerialUI mySUI;
 extern sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 extern wheels Wheels[];
@@ -38,6 +39,7 @@ extern uint16_t sweep_low_rpm;
 extern uint16_t sweep_high_rpm;
 extern uint16_t sweep_rate;
 
+/* Volatile variables (USED in ISR's) */
 extern volatile uint8_t selected_wheel;
 extern volatile uint8_t sweep_direction;
 extern volatile uint8_t sweep_stage;
@@ -48,8 +50,11 @@ extern volatile uint16_t edge_counter;
 extern volatile uint16_t new_OCR1A;
 extern volatile uint32_t oc_remainder;
 
-/* 
- * Setup the initial menu structure and callbacks
+//! Initializes the serial port and sets up the Menu
+/*!
+ * Sets up the serial port and menu for the serial user interface
+ * Sets user input timeout to 20 seconds and overall interactivity timeout at 30
+ * at which point it'll disconnect the user
  */
 void serial_setup()
 {
@@ -72,14 +77,19 @@ void serial_setup()
 }
 
 /* Helper function to spit out amount of ram remainig */
-int freeRam () {                                                                
+//! Returns the amount of freeRAM
+/*!
+ * Figures out the amount of free RAM remaining nad returns it to the caller
+ * \return amount of free memory
+ */
+uint16_t freeRam () {
   extern int __heap_start, *__brkval; 
   int v; 
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
-
 /* SerialUI Callbacks */
+//! Inverts the polarity of the primary output signal
 void toggle_invert_primary()
 {
   extern uint8_t output_invert_mask;
@@ -92,6 +102,7 @@ void toggle_invert_primary()
     mySUI.println_P(space_normal);
 }
 
+//! Inverts the polarity of the secondary output signal
 void toggle_invert_secondary()
 {
   extern uint8_t output_invert_mask;
@@ -104,9 +115,9 @@ void toggle_invert_secondary()
     mySUI.println_P(space_normal);
 }
 
+//! Returns info about status, mode and free RAM
 void show_info()
 {
-
   mySUI.println_P(info_title);
   mySUI.print_P(free_ram);
   mySUI.print(freeRam());
@@ -130,6 +141,15 @@ void show_info()
   }
 }
 
+
+//! Prompts user for new wheel ID
+/*!
+ * Presents user with a numeric data prompt, waits for input, then verifies
+ * they inputted a valid choice, then changes the running wheel pattern to the
+ * user selected one and reruns the RPM calc (As oit's pattern specific) and then
+ * resets the wheel position to 0 to avoid starting in a position off the end of 
+ * the wheel pattern array
+ */
 void select_wheel()
 {
   mySUI.showEnterNumericDataPrompt();
@@ -141,16 +161,24 @@ void select_wheel()
   reset_new_OCR1A(wanted_rpm);
 
   mySUI.println_P(new_wheel_chosen);
-  mySUI.print(selected_wheel+1);
+  mySUI.print(newWheel);
   mySUI.print_P(colon_space);
   mySUI.print_P(Wheels[selected_wheel].decoder_name);
   mySUI.print_P(space_at_space);
   mySUI.print(wanted_rpm);
   mySUI.println_P(space_RPM);
   mySUI.returnOK();
-  edge_counter = 0;
+  edge_counter = 0; // Reset to beginning of the wheel pattern */
 }
 
+
+//! Changes hte RPM based on user input
+/*!
+ * Prompts user for new RPM, reads it, validates it's within range, sets lock to
+ * prevent a race condition with the sweeper, free's memory of SweepSteps 
+ * structure IF allocated, sets the mode to fixed RPM, recalculates the new OCR1A 
+ * value based on hte user specificaed RPM and sets it and then removes the lock
+ */ 
 void set_rpm()
 {
   mySUI.showEnterNumericDataPrompt();
@@ -172,6 +200,11 @@ void set_rpm()
   sweep_lock = false;
 }
 
+
+//! Returns a list of user selectable wheel patterns
+/*!
+ * Iterates through the list of wheel patterns and prints them back to the user
+ */
 void list_wheels()
 {
   byte i = 0;
@@ -184,6 +217,13 @@ void list_wheels()
   mySUI.returnOK();
 }
 
+
+//! Selects the next wheel in the list
+/*!
+ * Selects the next wheel, if at the end, wrap to the beginning of the list,
+ * re-calculate the OCR1A value (RPM) and reset, return user information on the
+ * selected wheel and current RPM
+ */
 void select_next_wheel()
 {
   if (selected_wheel == (MAX_WHEELS-1))
@@ -203,6 +243,13 @@ void select_next_wheel()
   mySUI.returnOK();
 }
 
+//
+//! Selects the previous wheel in the list
+/*!
+ * Selects the nex, if at the beginning, wrap to the end of the list,
+ * re-calculate the OCR1A value (RPM) and reset, return user information on the
+ * selected wheel and current RPM
+ */
 void select_previous_wheel()
 {
   if (selected_wheel == 0)
@@ -222,6 +269,12 @@ void select_previous_wheel()
   mySUI.returnOK();
 }
 
+
+//! Toggle the wheel direction, useful for debugging
+/*!
+ * Reverses the emitting wheel pattern direction.  Used mainly as a debugging aid
+ * in case the wheel pattern was coded incorrectly in reverse.
+ */
 void reverse_wheel_direction()
 {
     if (normal)
