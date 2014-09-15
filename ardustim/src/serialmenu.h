@@ -31,6 +31,8 @@ void serial_setup();
 void show_info();
 void select_next_wheel();
 void select_previous_wheel();
+void toggle_invert_primary();
+void toggle_invert_secondary();
 void list_wheels();
 void select_wheel();
 void set_rpm();

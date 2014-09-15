@@ -18,22 +18,11 @@
  * along with any ArduStim software.  If not, see http://www.gnu.org/licenses/
  *
  */
-#ifndef __ARDUSTIM_H__
-#define __ARDUSTIM_H__
+#ifndef __DEFINES_H__
+#define __DEFINES_H__
  
-#include <SerialUI.h>
-#include "structures.h"
-
-/* Structures */
-
-/* Prototypes */
-int check_and_adjust_tcnt_limits(uint32_t *, uint32_t *);  
-sweep_step * build_sweep_steps(uint32_t *, uint32_t *, uint8_t *);
-void reset_new_OCR1A(uint32_t);
-uint16_t get_rpm_from_tcnt(uint16_t *, uint8_t *);
-uint8_t get_bitshift_from_prescaler(uint8_t *);
-void get_prescaler_bits(uint32_t *, uint8_t *, uint8_t *);
-
-/* Prototypes */
+/* defines */
+#define SWEEP_ISR_RATE 1000
+#define FACTOR_THRESHOLD 1000000
 
 #endif
