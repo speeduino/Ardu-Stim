@@ -85,5 +85,6 @@ SUI_DeclareString(space_inverted, " Inverted");
 SUI_DeclareString(space_normal, " Normal");
 SUI_DeclareString(primary, "Primary");
 SUI_DeclareString(secondary, "Secondary");
+SUI_DeclareString(range_error,"Range error !(10-50000,10-50000,1-50000)!");
 
 #endif

@@ -159,6 +159,7 @@ void set_rpm()
     mySUI.returnError("Invalid RPM, RPM too low");
     return;
   }
+  sweep_lock = true;
   if (SweepSteps)
     free(SweepSteps);
   mode = FIXED_RPM;
@@ -168,6 +169,7 @@ void set_rpm()
   mySUI.print_P(new_rpm_chosen);
   mySUI.println(wanted_rpm);
   mySUI.returnOK();
+  sweep_lock = false;
 }
 
 void list_wheels()
@@ -286,12 +288,13 @@ void sweep_rpm()
   mySUI.println(sweep_rate);
   // Validate input ranges
   if ((count == 3) && 
-      (tmp_low_rpm >= 25) &&
+      (tmp_low_rpm >= 10) &&
       (tmp_high_rpm < 51200) &&
-      (sweep_rate > 10) &&
+      (sweep_rate >= 1) &&
       (sweep_rate < 51200) &&
       (tmp_low_rpm < tmp_high_rpm))
   {
+    sweep_lock = true;
     // Get OC Register values for begin/end points
     low_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_low_rpm)*Wheels[selected_wheel].rpm_scaler));
     high_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_high_rpm)*Wheels[selected_wheel].rpm_scaler));
@@ -315,37 +318,37 @@ void sweep_rpm()
       SweepSteps[i].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
       SweepSteps[i].remainder_per_isr = scaled_remainder;
 
-/*
-      mySUI.print(F("sweep step: "));
-      mySUI.println(i);
-      mySUI.print(F("steps: "));
-      mySUI.println(steps);
-      mySUI.print(F("Beginning tcnt: "));
-      mySUI.print(SweepSteps[i].beginning_ocr);
-      mySUI.print(F(" for RPM: "));
-      mySUI.println(this_step_low_rpm);
-      mySUI.print(F("ending tcnt: "));
-      mySUI.print(SweepSteps[i].ending_ocr);
-      mySUI.print(F(" for RPM: "));
-      mySUI.println(this_step_high_rpm);
-      mySUI.print(F("prescaler bits: "));
-      mySUI.println(SweepSteps[i].prescaler_bits);
-      mySUI.print(F("tcnt_per_isr: "));
-      mySUI.println(SweepSteps[i].tcnt_per_isr);
-      mySUI.print(F("scaled remainder_per_isr: "));
-      mySUI.println(SweepSteps[i].remainder_per_isr);
-      mySUI.print(F("FP TCNT per ISR: "));
-      mySUI.println(per_isr_tcnt_change,6);
-      mySUI.print(F("End of step: "));
-      mySUI.println(i);
-      */
+      /*
+         mySUI.print(F("sweep step: "));
+         mySUI.println(i);
+         mySUI.print(F("steps: "));
+         mySUI.println(steps);
+         mySUI.print(F("Beginning tcnt: "));
+         mySUI.print(SweepSteps[i].beginning_ocr);
+         mySUI.print(F(" for RPM: "));
+         mySUI.println(this_step_low_rpm);
+         mySUI.print(F("ending tcnt: "));
+         mySUI.print(SweepSteps[i].ending_ocr);
+         mySUI.print(F(" for RPM: "));
+         mySUI.println(this_step_high_rpm);
+         mySUI.print(F("prescaler bits: "));
+         mySUI.println(SweepSteps[i].prescaler_bits);
+         mySUI.print(F("tcnt_per_isr: "));
+         mySUI.println(SweepSteps[i].tcnt_per_isr);
+         mySUI.print(F("scaled remainder_per_isr: "));
+         mySUI.println(SweepSteps[i].remainder_per_isr);
+         mySUI.print(F("FP TCNT per ISR: "));
+         mySUI.println(per_isr_tcnt_change,6);
+         mySUI.print(F("End of step: "));
+         mySUI.println(i);
+         */
     }
     total_sweep_stages = total_stages;
     //mySUI.print(F("Total sweep stages: "));
     //mySUI.println(total_sweep_stages);
   }
   else {
-    mySUI.returnError("Range error !(100-50000,100-50000,10-50000)!");
+    mySUI.returnError(range_error);
   } 
   mySUI.returnOK();
   /* Reset params for Timer2 ISR */
