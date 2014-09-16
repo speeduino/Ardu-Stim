@@ -28,13 +28,15 @@
 #include "structures.h"
 #include "wheel_defs.h"
 
+/* File local variables */
+static uint16_t wanted_rpm = 6000;
+
 /* External Globla Variables */
 extern SUI::SerialUI mySUI;
 extern sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 extern wheels Wheels[];
 extern uint8_t mode;
 extern uint8_t total_sweep_stages;
-extern uint16_t wanted_rpm;
 extern uint16_t sweep_low_rpm;
 extern uint16_t sweep_high_rpm;
 extern uint16_t sweep_rate;
@@ -62,18 +64,24 @@ void serial_setup()
   mySUI.setTimeout(20000);
   mySUI.setMaxIdleMs(30000);
   SUI::Menu *mainMenu = mySUI.topLevelMenu();
+  SUI::Menu *wheelMenu;
+  SUI::Menu *advMenu;
   /* Simple all on one menu... */
   mainMenu->setName(top_menu_title);
-  mainMenu->addCommand(info_key,show_info,info_help);
-  mainMenu->addCommand(next_key,select_next_wheel,next_help);
-  mainMenu->addCommand(previous_key,select_previous_wheel,previous_help);
-  mainMenu->addCommand(list_key,list_wheels,list_help);
-  mainMenu->addCommand(choose_key,select_wheel,choose_help);
-  mainMenu->addCommand(reverse_key,reverse_wheel_direction,reverse_help);
-  mainMenu->addCommand(rpm_key,set_rpm,rpm_help);
-  mainMenu->addCommand(sweep_key,sweep_rpm,sweep_help);
-  mainMenu->addCommand(pri_invert_key,toggle_invert_primary,pri_invert_help);
-  mainMenu->addCommand(sec_invert_key,toggle_invert_secondary,sec_invert_help);
+  mainMenu->addCommand(info_key,show_info_cb,info_help);
+  mainMenu->addCommand(rpm_key,set_rpm_cb,rpm_key);
+  mainMenu->addCommand(sweep_key,sweep_rpm_cb,sweep_help);
+  wheelMenu = mainMenu->subMenu(wheel_menu_key,wheel_menu_help);
+  wheelMenu->addCommand(next_key,select_next_wheel_cb,next_help);
+  wheelMenu->addCommand(previous_key,select_previous_wheel_cb,previous_help);
+  wheelMenu->addCommand(list_key,list_wheels_cb,list_help);
+  wheelMenu->addCommand(choose_key,select_wheel_cb,choose_help);
+  advMenu = mainMenu->subMenu(advanced_menu_key,advanced_menu_help);
+  advMenu->addCommand(reverse_key,reverse_wheel_direction_cb,reverse_help);
+  advMenu->addCommand(pri_invert_key,toggle_invert_primary_cb,pri_invert_help);
+  advMenu->addCommand(sec_invert_key,toggle_invert_secondary_cb,sec_invert_help);
+  //advMenu->addCommand(pri_glitch_key,primary_glitch_cb,pri_glitch_help);
+  //advMenu->addCommand(sec_glitch_key,secondary_glitch_cb,sec_glitch_help);
 }
 
 /* Helper function to spit out amount of ram remainig */
@@ -90,33 +98,32 @@ uint16_t freeRam () {
 
 /* SerialUI Callbacks */
 //! Inverts the polarity of the primary output signal
-void toggle_invert_primary()
+void toggle_invert_primary_cb()
 {
   extern uint8_t output_invert_mask;
   output_invert_mask ^= 0x01; /* Flip crank invert mask bit */
-  mySUI.print_P(primary);
-  mySUI.print_P(space_signal);
+  mySUI.print_P(primary_space_signal_colon_space);
   if (output_invert_mask & 0x01)
-    mySUI.println_P(space_inverted);
+    mySUI.println_P(inverted_);
   else
-    mySUI.println_P(space_normal);
+    mySUI.println_P(normal_);
 }
 
 //! Inverts the polarity of the secondary output signal
-void toggle_invert_secondary()
+void toggle_invert_secondary_cb()
 {
   extern uint8_t output_invert_mask;
   output_invert_mask ^= 0x02; /* Flip cam invert mask bit */
-  mySUI.print_P(secondary);
-  mySUI.print_P(space_signal);
+  mySUI.print_P(secondary_space_signal_colon_space);
   if (output_invert_mask & 0x02)
-    mySUI.println_P(space_inverted);
+    mySUI.println_P(inverted_);
   else
-    mySUI.println_P(space_normal);
+    mySUI.println_P(normal_);
 }
 
+
 //! Returns info about status, mode and free RAM
-void show_info()
+void show_info_cb()
 {
   mySUI.println_P(info_title);
   mySUI.print_P(free_ram);
@@ -133,12 +140,33 @@ void show_info()
   if (mode == LINEAR_SWEPT_RPM) {
     mySUI.print_P(swept_rpm_from);
     mySUI.print(sweep_low_rpm);
-    mySUI.print_P(space_to_colon_space);
+    mySUI.print_P(arrows);
     mySUI.print(sweep_high_rpm);
     mySUI.print_P(space_at_colon_space);
     mySUI.print(sweep_rate);
-    mySUI.println_P(rpm_per_second);
+    mySUI.println_P(space_rpm_per_sec);
   }
+}
+
+
+//! Display newly selected wheel information
+/*!
+ * Resets the output compare register for the newly changed wheel, then
+ * resets edge_counter (wheel array index) to 0 and displays the new
+ * wheel information to the end user
+ */
+void display_new_wheel()
+{
+  reset_new_OCR1A(wanted_rpm);
+  edge_counter = 0; // Reset to beginning of the wheel pattern */
+  mySUI.println_P(new_wheel_chosen);
+  mySUI.print(selected_wheel + 1);
+  mySUI.print_P(colon_space);
+  mySUI.print_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(space_at_colon_space);
+  mySUI.print(wanted_rpm);
+  mySUI.print_P(space);
+  mySUI.println_P(RPM);
 }
 
 
@@ -150,25 +178,50 @@ void show_info()
  * resets the wheel position to 0 to avoid starting in a position off the end of 
  * the wheel pattern array
  */
-void select_wheel()
+void select_wheel_cb()
 {
   mySUI.showEnterNumericDataPrompt();
   byte newWheel = mySUI.parseInt();
   if ((newWheel < 1) || (newWheel > (MAX_WHEELS+1))) {
     mySUI.returnError("Wheel ID out of range");
+    return;
   }
   selected_wheel = newWheel - 1; /* use 1-MAX_WHEELS range */
-  reset_new_OCR1A(wanted_rpm);
+  display_new_wheel();
+}
 
-  mySUI.println_P(new_wheel_chosen);
-  mySUI.print(newWheel);
-  mySUI.print_P(colon_space);
-  mySUI.print_P(Wheels[selected_wheel].decoder_name);
-  mySUI.print_P(space_at_space);
-  mySUI.print(wanted_rpm);
-  mySUI.println_P(space_RPM);
-  mySUI.returnOK();
-  edge_counter = 0; // Reset to beginning of the wheel pattern */
+
+//! Selects the next wheel in the list
+/*!
+ * Selects the next wheel, if at the end, wrap to the beginning of the list,
+ * re-calculate the OCR1A value (RPM) and reset, return user information on the
+ * selected wheel and current RPM
+ */
+void select_next_wheel_cb()
+{
+  if (selected_wheel == (MAX_WHEELS-1))
+    selected_wheel = 0;
+  else 
+    selected_wheel++;
+  
+  display_new_wheel();
+}
+
+//
+//! Selects the previous wheel in the list
+/*!
+ * Selects the nex, if at the beginning, wrap to the end of the list,
+ * re-calculate the OCR1A value (RPM) and reset, return user information on the
+ * selected wheel and current RPM
+ */
+void select_previous_wheel_cb()
+{
+  if (selected_wheel == 0)
+    selected_wheel = MAX_WHEELS-1;
+  else 
+    selected_wheel--;
+  
+  display_new_wheel();
 }
 
 
@@ -179,7 +232,7 @@ void select_wheel()
  * structure IF allocated, sets the mode to fixed RPM, recalculates the new OCR1A 
  * value based on hte user specificaed RPM and sets it and then removes the lock
  */ 
-void set_rpm()
+void set_rpm_cb()
 {
   mySUI.showEnterNumericDataPrompt();
   uint32_t newRPM = mySUI.parseULong();
@@ -196,7 +249,6 @@ void set_rpm()
 
   mySUI.print_P(new_rpm_chosen);
   mySUI.println(wanted_rpm);
-  mySUI.returnOK();
   sweep_lock = false;
 }
 
@@ -205,7 +257,7 @@ void set_rpm()
 /*!
  * Iterates through the list of wheel patterns and prints them back to the user
  */
-void list_wheels()
+void list_wheels_cb()
 {
   byte i = 0;
   for (i=0;i<MAX_WHEELS;i++)
@@ -214,59 +266,6 @@ void list_wheels()
     mySUI.print_P(colon_space);
     mySUI.println_P((Wheels[i].decoder_name));
   }
-  mySUI.returnOK();
-}
-
-
-//! Selects the next wheel in the list
-/*!
- * Selects the next wheel, if at the end, wrap to the beginning of the list,
- * re-calculate the OCR1A value (RPM) and reset, return user information on the
- * selected wheel and current RPM
- */
-void select_next_wheel()
-{
-  if (selected_wheel == (MAX_WHEELS-1))
-    selected_wheel = 0;
-  else 
-    selected_wheel++;
-  edge_counter = 0;
-  reset_new_OCR1A(wanted_rpm);
-  
-  mySUI.println_P(new_wheel_chosen);
-  mySUI.print(selected_wheel+1);
-  mySUI.print_P(colon_space);
-  mySUI.print_P(Wheels[selected_wheel].decoder_name);
-  mySUI.print_P(space_at_space);
-  mySUI.print(wanted_rpm);
-  mySUI.println_P(space_RPM);
-  mySUI.returnOK();
-}
-
-//
-//! Selects the previous wheel in the list
-/*!
- * Selects the nex, if at the beginning, wrap to the end of the list,
- * re-calculate the OCR1A value (RPM) and reset, return user information on the
- * selected wheel and current RPM
- */
-void select_previous_wheel()
-{
-  if (selected_wheel == 0)
-    selected_wheel = MAX_WHEELS-1;
-  else 
-    selected_wheel--;
-  edge_counter = 0;
-  reset_new_OCR1A(wanted_rpm);
-  
-  mySUI.println_P(new_wheel_chosen);
-  mySUI.print(selected_wheel+1);
-  mySUI.print_P(colon_space);
-  mySUI.print_P(Wheels[selected_wheel].decoder_name);
-  mySUI.print_P(space_at_space);
-  mySUI.print(wanted_rpm);
-  mySUI.println_P(space_RPM);
-  mySUI.returnOK();
 }
 
 
@@ -275,19 +274,19 @@ void select_previous_wheel()
  * Reverses the emitting wheel pattern direction.  Used mainly as a debugging aid
  * in case the wheel pattern was coded incorrectly in reverse.
  */
-void reverse_wheel_direction()
+void reverse_wheel_direction_cb()
 {
+    mySUI.print_P(wheel_direction_colon_space);
     if (normal)
     {
       normal = false;
-      mySUI.println_P(wheel_reverse);
+      mySUI.println_P(reversed_);
     }
     else
     {
       normal = true;
-      mySUI.println_P(wheel_forward);
+      mySUI.println_P(normal_);
     }
-    mySUI.returnOK();
 }
 
 
@@ -306,7 +305,7 @@ void reverse_wheel_direction()
  * we use this to keep things as quick as possible. This function takes
  * no parameters (it cannot due to SerialUI) and returns void
  */
-void sweep_rpm()
+void sweep_rpm_cb()
 {
   byte count;
   uint8_t total_stages;
@@ -327,17 +326,17 @@ void sweep_rpm()
   char sweep_buffer[20] = {0};
   mySUI.showEnterDataPrompt();
   count = mySUI.readBytesToEOL(sweep_buffer,20);
-  mySUI.print(F("Read: "));
+  mySUI.print_P(read_colon_space);
   mySUI.print(count);
-  mySUI.println(F(" characters from the user...")); 
+  mySUI.println_P(space_chars_from_user); 
   count = sscanf(sweep_buffer,"%i,%i,%i",&tmp_low_rpm,&tmp_high_rpm,&sweep_rate);
-  mySUI.print(F("Number of successfull matches (should be 3): "));
+  mySUI.print_P(number_of_matches);
   mySUI.println(count);
-  mySUI.print(F("low RPM: "));
+  mySUI.print_P(low_RPM_colon_space);
   mySUI.println(tmp_low_rpm);
-  mySUI.print(F("high RPM: "));
+  mySUI.print_P(high_RPM_colon_space);
   mySUI.println(tmp_high_rpm);
-  mySUI.print(F("RPM/sec: "));
+  mySUI.print_P(rpm_per_sec_colon_space);
   mySUI.println(sweep_rate);
   // Validate input ranges
   if ((count == 3) && 
@@ -403,7 +402,6 @@ void sweep_rpm()
   else {
     mySUI.returnError(range_error);
   } 
-  mySUI.returnOK();
   /* Reset params for Timer2 ISR */
   sweep_stage = 0;
   sweep_direction = ASCENDING;

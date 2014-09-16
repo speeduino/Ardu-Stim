@@ -29,7 +29,6 @@
 
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;
-volatile uint32_t wanted_rpm = 6000; 
 volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
 volatile uint32_t oc_remainder = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
