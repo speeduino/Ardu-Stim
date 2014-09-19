@@ -30,9 +30,14 @@
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;
 volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
+volatile uint16_t analog0; /* Coarse RPM */
+volatile uint16_t analog1; /* Fine RPM */
+volatile uint16_t analog_ocr1a; /* analog equivalent to RPM */
 volatile uint32_t oc_remainder = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
+volatile uint8_t analog_port = 0;
+volatile bool adc_read_complete = false;
 volatile bool reset_prescaler = false;
 volatile bool normal = true;
 volatile bool sweep_reset_prescaler = true; /* Force sweep to reset prescaler value */
@@ -48,6 +53,7 @@ volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 
 /* Less sensitive globals */
+uint8_t bitshift = 0;
 uint16_t sweep_low_rpm = 0;
 uint16_t sweep_high_rpm = 0;
 uint16_t sweep_rate = 0;
@@ -132,6 +138,46 @@ void setup() {
   TIMSK2 |= (1 << OCIE2A);
 
 
+  /* Configure ADC */
+  // clear ADLAR in ADMUX (0x7C) to right-adjust the result
+  // ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
+  ADMUX &= B11011111;
+  
+  // Set REFS1..0 in ADMUX (0x7C) to change reference voltage to the
+  // proper source (01)
+  ADMUX |= B01000000;
+  
+  // Clear MUX3..0 in ADMUX (0x7C) in preparation for setting the analog
+  // input
+  ADMUX &= B11110000;
+  
+  // Set MUX3..0 in ADMUX (0x7C) to read from AD8 (Internal temp)
+  // Do not set above 15! You will overrun other parts of ADMUX. A full
+  // list of possible inputs is available in Table 24-4 of the ATMega328
+  // datasheet
+  // ADMUX |= 8;
+  // ADMUX |= B00001000; // Binary equivalent
+  
+  // Set ADEN in ADCSRA (0x7A) to enable the ADC.
+  // Note, this instruction takes 12 ADC clocks to execute
+  ADCSRA |= B10000000;
+  
+  // Set ADATE in ADCSRA (0x7A) to enable auto-triggering.
+  ADCSRA |= B00100000;
+  
+  // Clear ADTS2..0 in ADCSRB (0x7B) to set trigger mode to free running.
+  // This means that as soon as an ADC has finished, the next will be
+  // immediately started.
+  ADCSRB &= B11111000;
+  
+  // Set the Prescaler to 128 (16000KHz/128 = 125KHz)
+  // Above 200KHz 10-bit results are not reliable.
+  ADCSRA |= B00000111;
+  
+  // Set ADIE in ADCSRA (0x7A) to enable the ADC interrupt.
+  // Without this, the internal interrupt will not trigger.
+  ADCSRA |= B00001000;
+
   pinMode(7, OUTPUT); /* Debug pin for Saleae to track sweep ISR execution speed */
   pinMode(8, OUTPUT); /* Primary (crank usually) output */
   pinMode(9, OUTPUT); /* Secondary (cam usually) output */
@@ -139,6 +185,30 @@ void setup() {
 
   sei(); // Enable interrupts
 } // End setup
+
+
+//! ADC ISR for alternatin between ADC pins 0 and 1
+/*!
+ * Reads ADC ports 0 and 1 alternately. Port 0 is coarse RPM with
+ * about 64 RPM resolution
+ * Port 1 is fine RPM and is used to calculate a more precise rpm signal
+ */
+ISR(ADC_vect){
+  if (analog_port == 0)
+  {
+    analog0 = ADCL | (ADCH << 8);
+    analog_port = 1;
+	adc_read_complete = false;
+  }
+  else
+  {
+    analog1 = ADCL | (ADCH << 8);
+    analog_port = 0;
+	adc_read_complete = true;
+  }
+  ADMUX &= B11110000; /* Reset bits 0-3 (ADC port selection) */
+  ADMUX |= analog_port;
+}
 
 
 /* This is the "low speed" 1000x/second sweeper interrupt routine
@@ -296,6 +366,11 @@ void loop() {
       mySUI.handleRequests();
     }
   }
+  if (adc_read_complete == true)
+  {
+    reset_new_OCR1A(analog0 << 6 + (analog1 >> 4));
+    adc_read_complete = false;
+  }
 }
 
 
@@ -346,7 +421,7 @@ uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
  */
 uint16_t get_rpm_from_tcnt(uint16_t *tcnt, uint8_t *prescaler_bits)
 {
-  uint8_t bitshift = get_bitshift_from_prescaler(prescaler_bits);
+  bitshift = get_bitshift_from_prescaler(prescaler_bits);
   return (uint16_t)((float)(8000000 >> bitshift)/(Wheels[selected_wheel].rpm_scaler*(*tcnt)));
 }
 

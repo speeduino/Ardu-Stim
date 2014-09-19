@@ -21,6 +21,7 @@
 
 #include <avr/pgmspace.h>
 #include <SerialUI.h>
+#include <util/delay.h>
 #include "ardustim.h"
 #include "defines.h"
 #include "enums.h"
@@ -240,6 +241,9 @@ void set_rpm_cb()
     mySUI.returnError("Invalid RPM, RPM too low");
     return;
   }
+  /* Spinlock */
+  while (sweep_lock)
+    _delay_us(1);
   sweep_lock = true;
   if (SweepSteps)
     free(SweepSteps);
@@ -346,7 +350,11 @@ void sweep_rpm_cb()
       (sweep_rate < 51200) &&
       (tmp_low_rpm < tmp_high_rpm))
   {
-    sweep_lock = true;
+	/* Spin until unlocked */
+	while (sweep_lock)
+	 _delay_us(1);
+  
+	sweep_lock = true;
     // Get OC Register values for begin/end points
     low_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_low_rpm)*Wheels[selected_wheel].rpm_scaler));
     high_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_high_rpm)*Wheels[selected_wheel].rpm_scaler));
