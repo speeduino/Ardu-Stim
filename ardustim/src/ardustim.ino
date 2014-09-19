@@ -31,8 +31,6 @@
 volatile uint8_t fraction = 0;
 volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
 volatile uint16_t analog0; /* Coarse RPM */
-volatile uint16_t analog1; /* Fine RPM */
-volatile uint16_t analog_ocr1a; /* analog equivalent to RPM */
 volatile uint32_t oc_remainder = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
@@ -184,6 +182,8 @@ void setup() {
   pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
 
   sei(); // Enable interrupts
+  // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
+  ADCSRA |=B01000000;
 } // End setup
 
 
@@ -197,17 +197,8 @@ ISR(ADC_vect){
   if (analog_port == 0)
   {
     analog0 = ADCL | (ADCH << 8);
-    analog_port = 1;
-	adc_read_complete = false;
-  }
-  else
-  {
-    analog1 = ADCL | (ADCH << 8);
-    analog_port = 0;
 	adc_read_complete = true;
   }
-  ADMUX &= B11110000; /* Reset bits 0-3 (ADC port selection) */
-  ADMUX |= analog_port;
 }
 
 
@@ -368,7 +359,7 @@ void loop() {
   }
   if (adc_read_complete == true)
   {
-    reset_new_OCR1A(analog0 << 6 + (analog1 >> 4));
+    reset_new_OCR1A(analog0 << 4);
     adc_read_complete = false;
   }
 }
@@ -379,7 +370,7 @@ void reset_new_OCR1A(uint32_t new_rpm)
   uint32_t tmp;
   uint8_t bitshift;
   uint8_t tmp_prescaler_bits;
-  tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)new_rpm));
+  tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
 /*  mySUI.print(F("new_OCR1a: "));
   mySUI.println(tmpl);
   */
