@@ -24,5 +24,6 @@
 /* defines */
 #define SWEEP_ISR_RATE 1000
 #define FACTOR_THRESHOLD 1000000
+#define MORE_LINEAR_SWEEP 1
 
 #endif

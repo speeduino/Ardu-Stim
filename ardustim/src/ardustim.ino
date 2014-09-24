@@ -475,7 +475,12 @@ sweep_step *build_sweep_steps(uint32_t *low_rpm_tcnt, uint32_t *high_rpm_tcnt, u
    */
 
   steps = (sweep_step *)malloc(sizeof(sweep_step)*(*total_stages));
+
+#ifdef MORE_LINEAR_SWEEP
+  for (uint8_t i = 0; i < (*total_stages); i+=2)
+#else
   for (uint8_t i = 0; i < (*total_stages); i++)
+#endif
   {
     /* The low rpm value will ALWAYS have the highed TCNT value so use that
     to determine the prescaler value

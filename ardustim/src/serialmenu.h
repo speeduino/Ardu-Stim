@@ -103,5 +103,6 @@ SUI_DeclareString(low_RPM_colon_space, "Low RPM: ");
 SUI_DeclareString(high_RPM_colon_space, "High RPM: ");
 SUI_DeclareString(range_error,"Range error !(10-50000,10-50000,1-50000)!");
 SUI_DeclareString(number_of_matches,"Number of successful matches (should be 3): ");
+SUI_DeclareString(sweeping_from_colon_space,"Sweeping from: ");
 
 #endif
