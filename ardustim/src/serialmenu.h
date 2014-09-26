@@ -43,6 +43,7 @@ void reverse_wheel_direction_cb();
 /* General functions */
 void serial_setup();
 void display_new_wheel();
+void compute_sweep_stages(uint16_t *, uint16_t *);
 /* General functions */
 
 /* Prototypes */

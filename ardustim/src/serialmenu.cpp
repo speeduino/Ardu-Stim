@@ -158,8 +158,6 @@ void show_info_cb()
  */
 void display_new_wheel()
 {
-  reset_new_OCR1A(wanted_rpm);
-  edge_counter = 0; // Reset to beginning of the wheel pattern */
   mySUI.println_P(new_wheel_chosen);
   mySUI.print(selected_wheel + 1);
   mySUI.print_P(colon_space);
@@ -168,6 +166,11 @@ void display_new_wheel()
   mySUI.print(wanted_rpm);
   mySUI.print_P(space);
   mySUI.println_P(RPM);
+  if (mode != LINEAR_SWEPT_RPM)
+    reset_new_OCR1A(wanted_rpm);
+  else
+    compute_sweep_stages(&sweep_low_rpm, &sweep_high_rpm);
+  edge_counter = 0; // Reset to beginning of the wheel pattern */
 }
 
 
@@ -311,23 +314,11 @@ void reverse_wheel_direction_cb()
  */
 void sweep_rpm_cb()
 {
-  uint8_t j;
-  uint8_t total_stages;
   uint16_t tmp_low_rpm;
   uint16_t tmp_high_rpm;
-  uint16_t end_tcnt;
-  uint32_t low_rpm_tcnt;
-  uint32_t high_rpm_tcnt;
-  uint16_t this_step_low_rpm;
-  uint16_t this_step_high_rpm;
-  uint16_t divisor;
-  uint16_t steps;
-  uint32_t scaled_remainder;
-  uint16_t rpm_span_this_stage;
-  float per_isr_tcnt_change;
-  float rpm_per_isr;
-
+  uint8_t j;
   char sweep_buffer[20] = {0};
+
   mySUI.showEnterDataPrompt();
   j = mySUI.readBytesToEOL(sweep_buffer,20);
   /* Debugging
@@ -351,94 +342,118 @@ void sweep_rpm_cb()
   mySUI.print_P(space_at_colon_space);
   mySUI.print(sweep_rate);
   mySUI.println_P(space_rpm_per_sec);
-    /* Spin until unlocked */
-    while (sweep_lock)
-      _delay_us(1);
 
-    sweep_lock = true;
-    // Get OC Register values for begin/end points
-    low_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_low_rpm)*Wheels[selected_wheel].rpm_scaler));
-    high_rpm_tcnt = (uint32_t)(8000000.0/(((float)tmp_high_rpm)*Wheels[selected_wheel].rpm_scaler));
-
-    // Get number of frequency doublings, rounding 
-#ifdef MORE_LINEAR_SWEEP
-    total_stages = 2*(uint8_t)ceil(logf((float)tmp_high_rpm/(float)tmp_low_rpm)/logf(2));
-#else
-    total_stages = (uint8_t)ceil(logf((float)tmp_high_rpm/(float)tmp_low_rpm)/logf(2));
-#endif
-    if (SweepSteps)
-      free(SweepSteps);
-    j = 0;
-    SweepSteps = build_sweep_steps(&low_rpm_tcnt,&high_rpm_tcnt,&total_stages); 
-
-#ifdef MORE_LINEAR_SWEEP
-    for (uint8_t i = 0 ; i < total_stages; i+=2)
-    {
-      SweepSteps[i+1].prescaler_bits = SweepSteps[i].prescaler_bits;
-      SweepSteps[i+1].ending_ocr = SweepSteps[i].ending_ocr;
-      SweepSteps[i].ending_ocr =  (0.38 * (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)) + SweepSteps[i].ending_ocr;
-      SweepSteps[i+1].beginning_ocr = SweepSteps[i].ending_ocr;
-
-      for (j = 0; j < 2 ; j++)
-      {
-#else
-        for (uint8_t i = 0 ; i < total_stages; i++)
-        {
-#endif
-          this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].beginning_ocr, &SweepSteps[i+j].prescaler_bits);
-          this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].ending_ocr, &SweepSteps[i+j].prescaler_bits);
-          /* How much RPM changes this stage */
-          rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
-          /* How many TCNT changes this stage */
-          steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
-          per_isr_tcnt_change = (float)(SweepSteps[i+j].beginning_ocr - SweepSteps[i+j].ending_ocr)/steps;
-          scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
-          SweepSteps[i+j].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
-          SweepSteps[i+j].remainder_per_isr = scaled_remainder;
-
-          /* Debugging
-             mySUI.print(F("sweep step: "));
-             mySUI.println(i+j);
-             mySUI.print(F("steps: "));
-             mySUI.println(steps);
-             mySUI.print(F("Beginning tcnt: "));
-             mySUI.print(SweepSteps[i+j].beginning_ocr);
-             mySUI.print(F(" for RPM: "));
-             mySUI.println(this_step_low_rpm);
-             mySUI.print(F("ending tcnt: "));
-             mySUI.print(SweepSteps[i+j].ending_ocr);
-             mySUI.print(F(" for RPM: "));
-             mySUI.println(this_step_high_rpm);
-             mySUI.print(F("prescaler bits: "));
-             mySUI.println(SweepSteps[i+j].prescaler_bits);
-             mySUI.print(F("tcnt_per_isr: "));
-             mySUI.println(SweepSteps[i+j].tcnt_per_isr);
-             mySUI.print(F("scaled remainder_per_isr: "));
-             mySUI.println(SweepSteps[i+j].remainder_per_isr);
-             mySUI.print(F("FP TCNT per ISR: "));
-             mySUI.println(per_isr_tcnt_change,6);
-             mySUI.print(F("End of step: "));
-             mySUI.println(i+j);
-             */
-#ifdef MORE_LINEAR_SWEEP
-        }
-#endif
-      }
-      total_sweep_stages = total_stages;
-      //mySUI.print(F("Total sweep stages: "));
-      //mySUI.println(total_sweep_stages);
-    }
-    else {
-      mySUI.returnError(range_error);
-    } 
-    /* Reset params for Timer2 ISR */
-    sweep_stage = 0;
-    sweep_direction = ASCENDING;
-    sweep_reset_prescaler = true;
-    new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
-    oc_remainder = 0;
-    mode = LINEAR_SWEPT_RPM;
-    sweep_high_rpm = tmp_high_rpm;
-    sweep_low_rpm = tmp_low_rpm;
-    sweep_lock = false;
+  compute_sweep_stages(&tmp_low_rpm, &tmp_high_rpm);
   }
+  else {
+    mySUI.returnError(range_error);
+  } 
+}
+
+
+void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
+{
+  uint8_t j;
+  uint8_t total_stages;
+  uint16_t end_tcnt;
+  uint32_t low_rpm_tcnt;
+  uint32_t high_rpm_tcnt;
+  uint16_t this_step_low_rpm;
+  uint16_t this_step_high_rpm;
+  uint16_t divisor;
+  uint16_t steps;
+  uint32_t scaled_remainder;
+  uint16_t rpm_span_this_stage;
+  float per_isr_tcnt_change;
+  float rpm_per_isr;
+
+  /* Spin until unlocked, then lock */
+  while (sweep_lock)
+    _delay_us(1);
+  sweep_lock = true;
+
+  // Get OC Register values for begin/end points
+  low_rpm_tcnt = (uint32_t)(8000000.0/(((float)(*tmp_low_rpm))*Wheels[selected_wheel].rpm_scaler));
+  high_rpm_tcnt = (uint32_t)(8000000.0/(((float)(*tmp_high_rpm))*Wheels[selected_wheel].rpm_scaler));
+
+  // Get number of frequency doublings, rounding 
+#ifdef MORE_LINEAR_SWEEP
+  total_stages = 2*(uint8_t)ceil(logf((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/logf(2));
+#else
+  total_stages = (uint8_t)ceil(logf((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/logf(2));
+#endif
+  if (SweepSteps)
+    free(SweepSteps);
+  j = 0;
+  SweepSteps = build_sweep_steps(&low_rpm_tcnt,&high_rpm_tcnt,&total_stages); 
+
+#ifdef MORE_LINEAR_SWEEP
+  for (uint8_t i = 0 ; i < total_stages; i+=2)
+  {
+    SweepSteps[i+1].prescaler_bits = SweepSteps[i].prescaler_bits;
+    SweepSteps[i+1].ending_ocr = SweepSteps[i].ending_ocr;
+    SweepSteps[i].ending_ocr =  (0.38 * (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)) + SweepSteps[i].ending_ocr;
+    SweepSteps[i+1].beginning_ocr = SweepSteps[i].ending_ocr;
+
+    for (j = 0; j < 2 ; j++)
+    {
+#else
+      for (uint8_t i = 0 ; i < total_stages; i++)
+      {
+#endif
+        this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].beginning_ocr, &SweepSteps[i+j].prescaler_bits);
+        this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].ending_ocr, &SweepSteps[i+j].prescaler_bits);
+        /* How much RPM changes this stage */
+        rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
+        /* How many TCNT changes this stage */
+        steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
+        per_isr_tcnt_change = (float)(SweepSteps[i+j].beginning_ocr - SweepSteps[i+j].ending_ocr)/steps;
+        scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
+        SweepSteps[i+j].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
+        SweepSteps[i+j].remainder_per_isr = scaled_remainder;
+
+        /* Debugging
+           mySUI.print(F("sweep step: "));
+           mySUI.println(i+j);
+           mySUI.print(F("steps: "));
+           mySUI.println(steps);
+           mySUI.print(F("Beginning tcnt: "));
+           mySUI.print(SweepSteps[i+j].beginning_ocr);
+           mySUI.print(F(" for RPM: "));
+           mySUI.println(this_step_low_rpm);
+           mySUI.print(F("ending tcnt: "));
+           mySUI.print(SweepSteps[i+j].ending_ocr);
+           mySUI.print(F(" for RPM: "));
+           mySUI.println(this_step_high_rpm);
+           mySUI.print(F("prescaler bits: "));
+           mySUI.println(SweepSteps[i+j].prescaler_bits);
+           mySUI.print(F("tcnt_per_isr: "));
+           mySUI.println(SweepSteps[i+j].tcnt_per_isr);
+           mySUI.print(F("scaled remainder_per_isr: "));
+           mySUI.println(SweepSteps[i+j].remainder_per_isr);
+           mySUI.print(F("FP TCNT per ISR: "));
+           mySUI.println(per_isr_tcnt_change,6);
+           mySUI.print(F("End of step: "));
+           mySUI.println(i+j);
+           */
+#ifndef MORE_LINEAR_SWEEP
+      }
+#else
+    }
+  }
+#endif
+  //mySUI.print(F("Total sweep stages: "));
+  //mySUI.println(total_sweep_stages);
+  total_sweep_stages = total_stages;
+  /* Reset params for Timer2 ISR */
+  sweep_stage = 0;
+  sweep_direction = ASCENDING;
+  sweep_reset_prescaler = true;
+  new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
+  oc_remainder = 0;
+  mode = LINEAR_SWEPT_RPM;
+  sweep_high_rpm = *tmp_high_rpm;
+  sweep_low_rpm = *tmp_low_rpm;
+  sweep_lock = false;
+}
+
