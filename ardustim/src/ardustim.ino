@@ -19,13 +19,13 @@
  *
  */
 
+#include "defines.h"
 #include "ardustim.h"
 #include "enums.h"
+#include "serialmenu.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <SerialUI.h>
-#include "serialmenu.h"
-#include "defines.h"
 
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;

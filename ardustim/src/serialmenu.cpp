@@ -19,15 +19,15 @@
  *
  */
 
-#include <avr/pgmspace.h>
-#include <SerialUI.h>
-#include <util/delay.h>
-#include "ardustim.h"
 #include "defines.h"
+#include "ardustim.h"
 #include "enums.h"
 #include "serialmenu.h"
 #include "structures.h"
 #include "wheel_defs.h"
+#include <avr/pgmspace.h>
+#include <util/delay.h>
+#include <SerialUI.h>
 
 /* File local variables */
 static uint16_t wanted_rpm = 6000;
