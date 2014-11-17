@@ -26,6 +26,7 @@
 #include "structures.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
+#include <math.h>
 #include <util/delay.h>
 #include <SerialUI.h>
 
