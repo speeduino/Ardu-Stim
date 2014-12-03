@@ -96,6 +96,7 @@ wheels Wheels[MAX_WHEELS] = {
   { gm_four_tooth_with_cam_friendly_name, gm_four_tooth_with_cam, 0.06666, 8 },
   { gm_six_tooth_with_cam_friendly_name, gm_six_tooth_with_cam, 0.1, 12 },
   { gm_eight_tooth_with_cam_friendly_name, gm_eight_tooth_with_cam, 0.13333, 16 },
+  { volvo_d12a_c_and_d_friendly_name, volvo_d12a_c_and_d, 2.0, 240 },
 };
 
 /* Initialization */

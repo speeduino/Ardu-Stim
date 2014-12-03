@@ -95,6 +95,7 @@
    GM_FOUR_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    GM_SIX_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    GM_EIGHT_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
+   VOLVO_D12A_C_AND_D, /* Volvo Diesel d12[acd] (alex32 on forums.libreems.org */
    MAX_WHEELS,
  }WheelType;
 
@@ -133,6 +134,7 @@
  const char gm_four_tooth_with_cam_friendly_name[] PROGMEM = "GM 4 even-tooth crank with 1 tooth cam";
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
+ const char volvo_d12a_c_and_d_friendly_name[] PROGMEM = "Volvo 17-1-17-1-17-1 d12[acd] crank";
 
 
  /* Very simple 50% duty cycle */
@@ -686,4 +688,22 @@
      1,0,1,0,1,0,1,0,3,2,3,2,3,2,3,2 /* four pulses per crank revolution (one per cylinder) */
    };
    
+ const unsigned char volvo_d12a_c_and_d[] PROGMEM = 
+   { /* Volvo 6 cylinder dieslet  17-1-17-1-17-1 (60 overall teeth) */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 1-4 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 5-8 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 9-12 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 13-16 */
+	 1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1, /* Teeth 17-20 1 normal, 1 long (3 teeth wide) */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 21-24 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 25-28 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 29-32 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 33-36 */
+	 1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1, /* Teeth 37-40 1 normal, 1 long (3 teeth wide) */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 41-44 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 45-48 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 49-52 */
+	 1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0, /* Teeth 53-56 */
+	 1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1, /* Teeth 57-60 1 normal, 1 long (3 teeth wide) */
+   };
   #endif
