@@ -379,9 +379,9 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
 
   // Get number of frequency doublings, rounding 
 #ifdef MORE_LINEAR_SWEEP
-  total_stages = 2*(uint8_t)ceil(logf((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/logf(2));
+  total_stages = 2*(uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/LOG_2);
 #else
-  total_stages = (uint8_t)ceil(logf((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/logf(2));
+  total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/LOG_2);
 #endif
   if (SweepSteps)
     free(SweepSteps);
