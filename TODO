@@ -1,0 +1,84 @@
+
+Menu revision:
+Current:
+ - info
+ - next
+ - previous
+ - list
+ - chose
+ - reverse
+ - rpm
+ - sweep
+ - invert primary
+ - invert secondary
+
+Revised:
+ - info
+ - Fixed RPM
+ - Swept RPM
+ + Wheel
+   - next
+   - previous
+   - list
+   - choose
+ + Advanced
+   - Reverse Wheel Direction
+   - Invert Primary
+   - Invert Secondary
+   - Primary Glitch
+   - Secondary Glitch
+
+ 
+
+
+Can we leverage timer2 as a bitbang PWM on the remaining digital outputs?
+i.e. bang it at 1-10Khz, toggling outputs based on what? lookuptable?
+
+Or use an i2c DAC liek MCP4248 which gives 4 analog outs per chip
+uss 6 and you get 24 outputs.
+
+Or use TI DAC7678 i2c 8 channel dac..., thus only 3 needed to get 24 analog
+outputs.
+
+
+FLASH LIMITATIONS:
+Static tables for bitbanging are space expensive, flash reads are 1/2 ram speed
+as well, though that hasn't been too much of a problem yet...
+
+Need new ways to define patterns:
+1. for N and N-M and its variants a descriptive method may make sense
+	Crank pattern defined with a 'C' prefix, cam with a 'c' prefix, 
+	Pattern should start with the TDC tooth and follow the direction of 
+	rotation.
+
+	1.e,  36-1 50% tooth dutycycle
+	C36,1/2,35t,1m
+		Crank wheel, 36 normalized teeth per revolution
+		1/2 (50% duty cycle) (per tooth on/off ratio for non-missing teeth)
+		35 teeth,1 missing  (total of 36 nominal teeth)
+	C36,2/5,12t,2m,1t,2m,13t,2m,4t
+	    Crank wheel, 36 normalized teeth
+		tooth with is 2/5 of the space (40% dutycycle)
+		12 teeth, 2 missing, 1 tooth, 2 missing, 13 teeth, 2 missing, 4 teeth
+			The total of the above teeth and missing must match the 
+			normalized teeth number
+	c12,1/3,1m,2t,1m,2t,2m,1t,2m,1t
+	    Cam wheel, 12 normalized teeth
+		tooth width is 1/3 of the space (33% dutycycle)
+		1 missing, 2 teeth, 1 missing, 2 teeth, 2 missing, 1 tooth, 2 missing, 1		tooth
+			12 nominal teeth
+			Also need a way to orient this with the crank at a specific
+			position whether angular or by tooth number from the "origin"
+
+
+1. for "angular/screwey random looking patterns (LS1) an angle based 
+approach is potentially more space efficient, esp if repeating sections can
+be found and partitioned off.
+	How to define it?  On versus off times in degrees?
+	LS1 pattern
+	12m,3t,3m,12t,3m,12t,3m,12t,3m,12t,3m,12t,12m,3t,3m,12t,3m,12t,3m,12t,12m,3t,12m,3t,3m,12t,3m,12t,12m,3t,12m,3t,12m,3t,3m,12t,12m,3t,3m,12t,12m,3t,12m,3t,12m,3t,12m,3t
+		This can be broken down into 2 possible patterns arrange in groups
+		3m,12t Pattern 'A'
+		12m,3t Pattern 'B'
+		the above is compressed to: B,5A,B,3A,2B,2A,3B,A,B,A,4B 
+
