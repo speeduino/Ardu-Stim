@@ -451,7 +451,7 @@ void get_prescaler_bits(uint32_t *potential_oc_value, uint8_t *prescaler, uint8_
 
 //! Builds the SweepSteps[] structure
 /*!
- * For sweeping we cannot just pick the TCNT value at hte beginning and ending
+ * For sweeping we cannot just pick the TCNT value at the beginning and ending
  * and sweep linearily between them as it'll result in a VERY slow RPM change
  * at the low end and a VERY FAST change at the high end due to the inverse
  * relationship between RPM and TCNT. So we compromise and break up the RPM

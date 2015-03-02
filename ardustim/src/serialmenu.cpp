@@ -230,12 +230,12 @@ void select_previous_wheel_cb()
 }
 
 
-//! Changes hte RPM based on user input
+//! Changes the RPM based on user input
 /*!
  * Prompts user for new RPM, reads it, validates it's within range, sets lock to
  * prevent a race condition with the sweeper, free's memory of SweepSteps 
  * structure IF allocated, sets the mode to fixed RPM, recalculates the new OCR1A 
- * value based on hte user specificaed RPM and sets it and then removes the lock
+ * value based on the user specificaed RPM and sets it and then removes the lock
  */ 
 void set_rpm_cb()
 {
@@ -379,10 +379,13 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
 
   // Get number of frequency doublings, rounding 
 #ifdef MORE_LINEAR_SWEEP
-  total_stages = 2*(uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/LOG_2);
-#else
   total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/LOG_2);
+  //mySUI.print(F("MLS total stages: "));
+#else
+  total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/(2*LOG_2));
+  //mySUI.print(F("total stages: "));
 #endif
+  //mySUI.println(total_stages);
   if (SweepSteps)
     free(SweepSteps);
   j = 0;
@@ -406,7 +409,7 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
         this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].ending_ocr, &SweepSteps[i+j].prescaler_bits);
         /* How much RPM changes this stage */
         rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
-        /* How many TCNT changes this stage */
+        /* How much TCNT changes this stage */
         steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
         per_isr_tcnt_change = (float)(SweepSteps[i+j].beginning_ocr - SweepSteps[i+j].ending_ocr)/steps;
         scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
@@ -443,9 +446,11 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
     }
   }
 #endif
-  //mySUI.print(F("Total sweep stages: "));
-  //mySUI.println(total_sweep_stages);
   total_sweep_stages = total_stages;
+  /*
+  mySUI.print(F("Total sweep stages: "));
+  mySUI.println(total_sweep_stages);
+  */
   /* Reset params for Timer2 ISR */
   sweep_stage = 0;
   sweep_direction = ASCENDING;
