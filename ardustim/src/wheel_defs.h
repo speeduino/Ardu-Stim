@@ -96,6 +96,7 @@
    GM_SIX_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    GM_EIGHT_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    VOLVO_D12ACD_WITH_CAM, /* Volvo Diesel d12[acd] with cam (alex32 on forums.libreems.org */
+   MAZDA_THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_SIX_TOOTH_CAM,
    MAX_WHEELS,
  }WheelType;
 
@@ -135,6 +136,7 @@
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
+ const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
 
 
  /* Very simple 50% duty cycle */
@@ -721,4 +723,33 @@
 	 0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1, /* Teeth 53-56 */
 	 0,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1, /* Teeth 57-60 1 normal, 1 long (3 teeth wide) */
    };
+ const unsigned char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam[] PROGMEM = 
+   { /* Mazda 36-2-2-2 with 6 tooth cam */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 1-3*/
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 4-6*/
+     1,1,0,0,0, 1,3,2,2,2, 3,3,2,2,2, /* Teeth 7-9 , second trigger on tooth 9 */ 
+     3,1,0,0,0, 1,1,0,0,0, 0,0,0,0,0, /* Teeth 10,11, missing 12 */
+     0,0,0,0,0, 1,3,2,2,2, 2,2,2,2,2, /* Missing 13, 14, Missing 15 , second trigger on missing tooth 15 */
+     2,0,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Missing 16, 17-18m 2nd trigger ends on tooth 16 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 19-21 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 22-24 */
+     1,1,0,0,0, 1,3,2,2,2, 3,3,2,2,2, /* Teeth 25-27, second trigger on tooth 26-27 */
+     3,1,0,0,0, 1,1,0,0,0, 0,0,0,0,0, /* Teeth 28-29, missing 30 */
+     0,0,0,0,0, 1,3,2,2,2, 3,3,2,2,2, /* Missing 31, Tooth 32, 33, 2nd trigger within tooth 32 */
+     3,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 34-36, 2nd trigger ends just after tooth 32 starts*/
+     /* SECOND ROTATION */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 1-3 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 4-6 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 7-9 */
+     1,1,0,0,0, 1,1,0,0,0, 0,0,0,0,0, /* Teeth 10,11, missing 12 */
+     0,0,0,0,0, 1,3,2,2,2, 2,2,2,2,2, /* Missing 13, 14, Missing 15 , second trigger on 14-15 */
+     2,0,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Missing 16, 17-18 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 19-21 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 22-24 */
+     1,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 25-27 */
+     1,1,0,0,0, 1,1,0,0,0, 0,0,0,0,0, /* Teeth 28-29, missing 30 */
+     0,0,0,0,0, 1,3,2,2,2, 3,3,2,2,2, /* Missing 31,Tooth 32-33, 2nd trigger  on 32-33*/
+     3,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 34-36, 2nd trigger ends jsut after tooth 34 starts */
+};
+
   #endif

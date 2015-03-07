@@ -97,6 +97,7 @@ wheels Wheels[MAX_WHEELS] = {
   { gm_six_tooth_with_cam_friendly_name, gm_six_tooth_with_cam, 0.1, 12 },
   { gm_eight_tooth_with_cam_friendly_name, gm_eight_tooth_with_cam, 0.13333, 16 },
   { volvo_d12acd_with_cam_friendly_name, volvo_d12acd_with_cam, 4.0, 480 },
+  { mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name, mazda_thirty_six_minus_two_two_two_with_six_tooth_cam, 1.5, 360 },
 };
 
 /* Initialization */
