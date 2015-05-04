@@ -119,7 +119,7 @@ void setup() {
   TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
   // Set prescaler to 1
   TCCR1B |= (1 << CS10); /* Prescaler of 1 */
-  // Enable output compare interrupt ffor timer channel 1 (16 bit)
+  // Enable output compare interrupt for timer channel 1 (16 bit)
   TIMSK1 |= (1 << OCIE1A);
 
   // Set timer2 to run sweeper routine
@@ -178,7 +178,7 @@ void setup() {
   // Without this, the internal interrupt will not trigger.
   ADCSRA |= B00001000;
 
-  pinMode(7, OUTPUT); /* Debug pin for Saleae to track sweep ISR execution speed */
+//  pinMode(7, OUTPUT); /* Debug pin for Saleae to track sweep ISR execution speed */
   pinMode(8, OUTPUT); /* Primary (crank usually) output */
   pinMode(9, OUTPUT); /* Secondary (cam usually) output */
   pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
