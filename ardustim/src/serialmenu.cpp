@@ -31,7 +31,7 @@
 #include <SerialUI.h>
 
 /* File local variables */
-static uint16_t wanted_rpm = 6000;
+extern uint16_t wanted_rpm;
 
 /* External Globla Variables */
 extern SUI::SerialUI mySUI;

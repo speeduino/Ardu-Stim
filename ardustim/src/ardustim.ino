@@ -23,19 +23,21 @@
 #include "ardustim.h"
 #include "enums.h"
 #include "serialmenu.h"
+#include "user_defaults.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <SerialUI.h>
 
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;
-volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;
-volatile uint16_t analog0; /* Coarse RPM */
+volatile uint16_t adc0; /* POT RPM */
+volatile uint16_t adc1; /* Pot Wheel select */
 volatile uint32_t oc_remainder = 0;
 /* Setting rpm to any value over 0 will enabled sweeping by default */
 /* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
 volatile uint8_t analog_port = 0;
-volatile bool adc_read_complete = false;
+volatile bool adc0_read_complete = false;
+volatile bool adc1_read_complete = false;
 volatile bool reset_prescaler = false;
 volatile bool normal = true;
 volatile bool sweep_reset_prescaler = true; /* Force sweep to reset prescaler value */
@@ -138,7 +140,7 @@ void setup() {
   TIMSK2 |= (1 << OCIE2A);
 
 
-  /* Configure ADC */
+  /* Configure ADC as per http://www.glennsweeney.com/tutorials/interrupt-driven-analog-conversion-with-an-atmega328p */
   // clear ADLAR in ADMUX (0x7C) to right-adjust the result
   // ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
   ADMUX &= B11011111;
@@ -185,22 +187,42 @@ void setup() {
 
   sei(); // Enable interrupts
   // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
-  ADCSRA |=B01000000;
+  ADCSRA |= B01000000;
+  /* Make sure we are using the DEFAULT RPM on startup */
+  reset_new_OCR1A(wanted_rpm); 
+
 } // End setup
 
 
-//! ADC ISR for alternatin between ADC pins 0 and 1
+//! ADC ISR for alternating between ADC pins 0 and 1
 /*!
- * Reads ADC ports 0 and 1 alternately. Port 0 is coarse RPM with
- * about 64 RPM resolution
- * Port 1 is fine RPM and is used to calculate a more precise rpm signal
+ * Reads ADC ports 0 and 1 alternately. Port 0 is RPM, Port 1 is for
+ * future fun (possible wheel selection)
  */
 ISR(ADC_vect){
   if (analog_port == 0)
   {
-    analog0 = ADCL | (ADCH << 8);
-	adc_read_complete = true;
-  }
+    adc0 = ADCL | (ADCH << 8);
+	adc0_read_complete = true;
+    /* Flip to channel 1 */
+    //ADMUX |= B00000001;
+    //analog_port = 1;
+    /* Trigger another conversion */
+    //ADCSRA |= B01000000;
+    return;
+  } 
+//  if (analog_port == 1)
+//  {
+//    adc1 = ADCL | (ADCH << 8);
+//	adc1_read_complete = true;
+//    /* Flip to channel 0 */
+//    /* Tell it to read ADC0, clear MUX0..3 */
+//    ADMUX &= B11110000;
+//    analog_port = 0;
+//    /* Trigger another conversion */
+//    ADCSRA |= B01000000;
+//    return;
+//  }
 }
 
 
@@ -346,6 +368,7 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void loop() {
+  uint16_t tmp_rpm = 0;
   /* Just handle the Serial UI, everything else is in 
    * interrupt handlers or callbacks from SerialUI.
    */
@@ -359,10 +382,13 @@ void loop() {
       mySUI.handleRequests();
     }
   }
-  if (adc_read_complete == true)
+  if (adc0_read_complete == true)
   {
-    reset_new_OCR1A(analog0 << 4);
-    adc_read_complete = false;
+    adc0_read_complete = false;
+    tmp_rpm = adc0 << TMP_RPM_SHIFT;
+    if (tmp_rpm > TMP_RPM_CAP)
+      tmp_rpm = TMP_RPM_CAP;
+    reset_new_OCR1A(tmp_rpm);
   }
 }
 
