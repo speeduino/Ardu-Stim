@@ -51,17 +51,19 @@ Need new ways to define patterns:
 	Pattern should start with the TDC tooth and follow the direction of 
 	rotation.
 
-	1.e,  36-1 50% tooth dutycycle
+	i.e,  36-1 50% tooth DutyCycle
 	C36,1/2,35t,1m
 		Crank wheel, 36 normalized teeth per revolution
 		1/2 (50% duty cycle) (per tooth on/off ratio for non-missing teeth)
 		35 teeth,1 missing  (total of 36 nominal teeth)
+	i.e,  Crank 36-2-2-2 40% tooth DutyCycle Mazda MZR/Duratec
 	C36,2/5,12t,2m,1t,2m,13t,2m,4t
 	    Crank wheel, 36 normalized teeth
 		tooth with is 2/5 of the space (40% dutycycle)
 		12 teeth, 2 missing, 1 tooth, 2 missing, 13 teeth, 2 missing, 4 teeth
 			The total of the above teeth and missing must match the 
 			normalized teeth number
+	i.e,  Cam 12-1-1-2-2 33% tooth DutyCycle Mazda MZR/Duratec
 	c12,1/3,1m,2t,1m,2t,2m,1t,2m,1t
 	    Cam wheel, 12 normalized teeth
 		tooth width is 1/3 of the space (33% dutycycle)
