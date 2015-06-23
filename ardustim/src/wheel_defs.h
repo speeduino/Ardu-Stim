@@ -97,6 +97,7 @@
    GM_EIGHT_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    VOLVO_D12ACD_WITH_CAM, /* Volvo Diesel d12[acd] with cam (alex32 on forums.libreems.org */
    MAZDA_THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_SIX_TOOTH_CAM,
+   SIxTY_MINUS_TWO_WITH_4X_CAM, /* GM 4X cam */
    MAX_WHEELS,
  }WheelType;
 
@@ -136,7 +137,8 @@
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
- const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
+ const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooth cam";
+ const char sixty_minus_two_with_4X_cam_friendly_name[] PROGMEM = "GM 60-2 with 4X cam";
 
 
  /* Very simple 50% duty cycle */
@@ -751,5 +753,35 @@
      0,0,0,0,0, 1,3,2,2,2, 3,3,2,2,2, /* Missing 31,Tooth 32-33, 2nd trigger  on 32-33*/
      3,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 34-36, 2nd trigger ends jsut after tooth 34 starts */
 };
+ /* Bosch 60-2 pattern with 2nd trigger on rotation 2,
+  * GM 4X CAM */
+ const unsigned char sixty_minus_two_with_4X_cam[] PROGMEM =
+   { /* 60-2 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 1-5 */
+     3,2,3,2,3,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,3,2,3,2,3,2,  /* teeth 11-15 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 16-20 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 21-25 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 26-30 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 31-35 */
+     3,2,3,2,3,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
+     1,0,1,0,1,0,0,0,0,0,  /* teeth 56-58 and 59-60 MISSING */
+     1,0,1,0,3,2,3,2,3,2,  /* teeth 1-5 */
+     3,2,3,2,3,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,3,2,3,2,3,2,  /* teeth 31-35 */
+     3,2,3,2,3,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,3,2,3,2,3,2,  /* teeth 41-45 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 46-50 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 51-55 */
+     3,2,3,2,3,2,2,2,2,2   /* teeth 56-58 and 59-60 MISSING */
+   };
+
 
   #endif
