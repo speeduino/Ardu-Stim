@@ -190,7 +190,7 @@ void setup() {
 } // End setup
 
 
-//! ADC ISR for alternatin between ADC pins 0 and 1
+//! ADC ISR for alternating between ADC pins 0 and 1
 /*!
  * Reads ADC ports 0 and 1 alternately. Port 0 is coarse RPM with
  * about 64 RPM resolution
@@ -209,7 +209,7 @@ ISR(ADC_vect){
  * who's sole purpose in life is to reset the output compare value
  * for timer zero to change the output RPM.  In cases where the RPM
  * change per ISR is LESS than one LSB of the counter a set of modulus
- * variabels are used to handle fractional values.
+ * variables are used to handle fractional values.
  */
 ISR(TIMER2_COMPA_vect) {
 //  PORTD = (1 << 7);
@@ -317,9 +317,10 @@ ISR(TIMER2_COMPA_vect) {
  * in a very nice way
  */
 ISR(TIMER1_COMPA_vect) {
+  /* The tables are in flash so we need pgm_read_byte() */
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
   PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
-  /* Normal direction  overflow handling */
+  /* Normal direction: overflow handling */
   if (normal)
   {
     edge_counter++;
@@ -327,13 +328,12 @@ ISR(TIMER1_COMPA_vect) {
       edge_counter = 0;
     }
   }
-  else
+  else /* Reverse Rotation: overflow handling */
   {
     if (edge_counter == 0)
       edge_counter = Wheels[selected_wheel].wheel_max_edges;
     edge_counter--;
   }
-  /* The tables are in flash so we need pgm_read_byte() */
 
   /* Reset Prescaler only if flag is set */
   if (reset_prescaler)
