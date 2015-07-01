@@ -1,47 +1,5 @@
 
-Menu revision:
-Current:
- - info
- - next
- - previous
- - list
- - chose
- - reverse
- - rpm
- - sweep
- - invert primary
- - invert secondary
-
-Revised:
- - info
- - Fixed RPM
- - Swept RPM
- + Wheel
-   - next
-   - previous
-   - list
-   - choose
- + Advanced
-   - Reverse Wheel Direction
-   - Invert Primary
-   - Invert Secondary
-   - Primary Glitch
-   - Secondary Glitch
-
- 
-
-
-Can we leverage timer2 as a bitbang PWM on the remaining digital outputs?
-i.e. bang it at 1-10Khz, toggling outputs based on what? lookuptable?
-
-Or use an i2c DAC liek MCP4248 which gives 4 analog outs per chip
-uss 6 and you get 24 outputs.
-
-Or use TI DAC7678 i2c 8 channel dac..., thus only 3 needed to get 24 analog
-outputs.
-
-
-FLASH LIMITATIONS:
+FLASH SPACE LIMITATIONS:
 Static tables for bitbanging are space expensive, flash reads are 1/2 ram speed
 as well, though that hasn't been too much of a problem yet...
 
