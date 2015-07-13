@@ -97,6 +97,7 @@
    GM_EIGHT_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    VOLVO_D12ACD_WITH_CAM, /* Volvo Diesel d12[acd] with cam (alex32 on forums.libreems.org */
    MAZDA_THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_SIX_TOOTH_CAM,
+   DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM, /* Dodge Viper V-10 */
    MAX_WHEELS,
  }WheelType;
 
@@ -136,8 +137,8 @@
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
- const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
-
+ const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooth cam";
+ const char dodge_srt_v10_sixty_minus_two_with_cam_friendly_name[] PROGMEM = "Dodge Viper SRT V10 60-2 with 5 tooth cam";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -752,4 +753,36 @@
      3,1,0,0,0, 1,1,0,0,0, 1,1,0,0,0, /* Teeth 34-36, 2nd trigger ends jsut after tooth 34 starts */
 };
 
+ const unsigned char dodge_srt_v10_sixty_minus_two_with_cam[] PROGMEM = 
+ /* TDC is at tooth position 20 followed by 38 teeth, then missing 2 (240deg), 
+  * then 58, then missing 2 (600), then 20 gets us to 720deg
+  */
+{ /* 60-2 , rotation 1*/
+  1,0,1,0,1,0,1,0,3,2,  /* teeth 21-25, cam tooth begins at edge 9 for 18 */
+  3,2,3,2,3,2,3,2,3,2,  /* teeth 26-30 */
+  3,2,3,2,3,2,1,0,1,0,  /* teeth 31-35, cam tooth ends at edge 26*/
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 36-40 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+  1,0,1,0,3,2,3,2,3,2,  /* teeth 51-55, cam tooth starts at edge 65 for 10 */
+  3,2,3,2,1,0,0,0,0,0,  /* teeth 56-58, cam tooth ends at edge 74 and 59-60 MISSING */
+  /* Rotation 2 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+  1,0,3,2,3,2,3,2,3,2,  /* teeth 16-20, cam tooth begins at edge 113 for 10 */
+  3,2,1,0,1,0,1,0,1,0,  /* teeth 21-25, cam tooth ends at edge 122 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+  1,0,3,2,3,2,3,2,3,2,  /* teeth 36-40, cam tooth begins at edge 153 for 18 */
+  3,2,3,2,3,2,3,2,3,2,  /* teeth 41-45, cam tooth ends at egde 162 */
+  1,0,1,0,1,0,3,2,3,2,  /* teeth 46-50, cam tooth begins at edge 177 for 42 */
+  3,2,3,2,3,2,3,2,3,2,  /* teeth 51-55 */
+  3,2,3,2,3,2,2,2,2,2,  /* teeth 56-58 and 59-60 MISSING */
+  /* Wrap around last 20 teeth */
+  3,2,3,2,3,2,3,2,3,2,  /* teeth 1-5 */ 
+  3,2,3,2,3,2,3,2,1,0,  /* teeth 6-10, cam tooth ends at edge 18 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+  1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+};
   #endif
