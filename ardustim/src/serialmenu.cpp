@@ -33,12 +33,12 @@
 /* File local variables */
 extern uint16_t wanted_rpm;
 
-/* External Globla Variables */
+/* External Global Variables */
 extern SUI::SerialUI mySUI;
 extern sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
-extern wheels Wheels[];
-extern uint8_t mode;
-extern uint8_t total_sweep_stages;
+extern wheels Wheels[]; /* Array of wheel structures */
+extern uint8_t mode;	/* Sweep or fixed */
+extern uint8_t total_sweep_stages; 
 extern uint16_t sweep_low_rpm;
 extern uint16_t sweep_high_rpm;
 extern uint16_t sweep_rate;
@@ -63,12 +63,13 @@ extern volatile uint32_t oc_remainder;
 void serial_setup()
 {
   mySUI.begin(9600);
-  mySUI.setTimeout(20000);
-  mySUI.setMaxIdleMs(30000);
+  mySUI.setTimeout(20000);   /* Tiem to wait for input from druid4arduino */
+  mySUI.setMaxIdleMs(30000); /* disconnect if no response from host in 30 sec */
   SUI::Menu *mainMenu = mySUI.topLevelMenu();
   SUI::Menu *wheelMenu;
   SUI::Menu *advMenu;
   /* Simple all on one menu... */
+  /* Menu strungs are in the header file */
   mainMenu->setName(top_menu_title);
   mainMenu->addCommand(info_key,show_info_cb,info_help);
   mainMenu->addCommand(rpm_key,set_rpm_cb,rpm_key);
@@ -82,6 +83,7 @@ void serial_setup()
   advMenu->addCommand(reverse_key,reverse_wheel_direction_cb,reverse_help);
   advMenu->addCommand(pri_invert_key,toggle_invert_primary_cb,pri_invert_help);
   advMenu->addCommand(sec_invert_key,toggle_invert_secondary_cb,sec_invert_help);
+  /* Not implemented yet */
   //advMenu->addCommand(pri_glitch_key,primary_glitch_cb,pri_glitch_help);
   //advMenu->addCommand(sec_glitch_key,secondary_glitch_cb,sec_glitch_help);
 }
