@@ -142,25 +142,73 @@
  const char sixty_minus_two_with_4X_cam_friendly_name[] PROGMEM = "GM 60-2 with 4X cam";
  const char gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name[] PROGMEM = "Dodge Viper Gen IV SRT V10 60-2 with 5 tooth cam";
 
+
+/* New Wheel definition strings
+ * Syntax CS1/2,2  ("Crankshaft", Simple/symetric pattern, (1/2) 50% duty cycle, 
+ * 2 teeth per revolution (each tooth is 90 degrees high, 90 low))
+ *
+ * All patterns start with a "C" meaning "crankshaft"
+ * The second parameter determines the pattern style
+ *  "A" for an angular defined wheel (time on, time off in degrees, total time must equal 360 degrees)
+ *  "S" is for the simplest symetric, non-missing teeth wheels ONLY
+ *  "M" is for M-N or more complex M-N+N styles
+ *
+ * Third param (pattern tooth duty cycle) (1/2 == 50%, 1/4 == 25% and so on)
+ *  up to 5 charactors (xx/yy) to allow for really odd dutycycles
+ *
+ * Fourth param depends on 2nd param (A,S, or M)
+ *  For "A" (angular (complex or odd)) defined wheels the sequence is 
+ *   the number of degrees the tooth is "high" followed by low for each tooth, The total MUST equal 
+ *   360 for crank wheels and 720 for cam wheels
+ *   i.e. for a wheel that is 40 degrees high, 50 deg low with 4 teeth it would be:
+ *   40,50,40,50,40,50,40,50
+ *
+ *  For "S" symetric pattern, you just need the number of teeth that the wheel should generate in a revolution
+ *   i.e. 2  (dizzy 4 cylinder)
+ *
+ *  For M-N(-/+N...) (missing teeth pattern, any style)
+ *   List the number of teeth the wheel would have if it had NO MISSING teeth, then
+ *   the SEQUENTIAL present teeth followed by sequential missing teeth as follows until you complete the whole pattern
+ *   The total number of teeth and missing MUST equal the number the preceding number as shown
+ *   36t,1m  (36-1 pattern)
+ *   13t,2m,16t,2m,1t,2m (Mazda 36-2-2-2)
+ * 
+ * For Crank+Cam setups the CRANK pattern is always defined FIRST, then a colon charactor ":" and the cam
+ * pattern followed by a lowercase "c" in the same style as above
+ *
+ * Example:
+ * 60-2 bosch wheel (crank only)
+ * CM1/2,60,58,2
+ * hypothetical wheel with 60-2 crank and half-moon single tooth cam
+ * CM1/2,60,58,2:cS1/2,1
+ *
+ *
+ */
+
+
  /* Very simple 50% duty cycle */
+// const unsigned char dizzy_four_cylinder[] PROGMEM = "CS1/2,2"; 
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
      1,0,1,0 /* two pulses per crank revolution (one per cylinder) */
    };
    
  /* Very simple 50% duty cycle */
+// const unsigned char dizzy_six_cylinder[] PROGMEM = "CS1/2,3"; 
  const unsigned char dizzy_six_cylinder[] PROGMEM = 
    { /* dizzy 6 cylinder */
      1,0,1,0,1,0 /* three pulses per crank revolution (one per cylinder) */
    };
    
  /* Very simple 50% duty cycle */
+// const unsigned char dizzy_eight_cylinder[] PROGMEM = "CS1/2,4"; 
  const unsigned char dizzy_eight_cylinder[] PROGMEM = 
    { /* dizzy 8 cyl */
      1,0,1,0,1,0,1,0 /* four pulses per crank revolution (one per cylinder) */
    };
    
  /* Standard bosch 60-2 pattern, 50% duty cyctle during normal teeth */
+// const unsigned char sixty_minus_two[] PROGMEM = "CM1/2,60,58t,2m"; 
  const unsigned char sixty_minus_two[] PROGMEM = 
    { /* 60-2 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
@@ -179,6 +227,7 @@
  
  /* Bosch 60-2 pattern with 2nd trigger on rotation 2, 
   * 50% duty cyctle during normal teeth */
+// const unsigned char sixty_minus_two_with_cam_on_36[] PROGMEM = "CM1/2,60,58t,2m:cM1/2,120,95m,1t,24m"; 
  const unsigned char sixty_minus_two_with_cam[] PROGMEM = 
    { /* 60-2 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
@@ -208,6 +257,7 @@
    };
  
  /* Standard ford/mazda and aftermarket 36-1 pattern, 50% duty cyctle during normal teeth */  
+// const unsigned char thirty_six_minus_one[] PROGMEM = "CM1/2,36,35t,1m";
  const unsigned char thirty_six_minus_one[] PROGMEM = 
    { /* 36-1 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */
@@ -221,6 +271,11 @@
    }; 
    
  /* 4-1 crank signal 50% duty cycle with Cam tooth enabled during the second rotation prior to tooth 2 */
+// const unsigned char four_minus_one_with_cam[] PROGMEM = "CM1/2,4,3t,1m:cM1/2,16,10m,1t,5m"
+// Angular version for cam
+// const unsigned char four_minus_one_with_cam[] PROGMEM = "CM1/2,4,3t,1m:cA0,450,45,135"
+// i.e. Crank 50% duty, 4 total teeth, 4 present, 1 missing
+// Cam, high for 0 degrees, low for 450, high for 45, low for 135
  const unsigned char four_minus_one_with_cam[] PROGMEM = 
    { /* 4-1 with cam */
      0,1,0,1,0,1,0,0,  /* Teeth 1-3, then MISSING */
@@ -229,6 +284,7 @@
    };
    
  /* Yamaha R6 crank trigger 8 teeth missing one, (22.5deg low, 22.5deg high) 50% duty cycle during normal teeth */
+// const unsigned char eight_minus_one[] PROGMEM = "CM1/2,8,7t,1m";
  const unsigned char eight_minus_one[] PROGMEM = 
    { /* 8-1 */
      0,1,0,1,0,1,0,1,  /* Teeth 1-4 */
@@ -236,6 +292,7 @@
    };
   
   /* 40deg low, 20 deg high per tooth, cam signal on second rotation during 40deg low portion of 3rd tooth */
+// const unsigned char six_minus_one_with_cam[] PROGMEM = "CM1/3,6,5t,1m:cA0,480,40,200"
  const unsigned char six_minus_one_with_cam[] PROGMEM = 
    { /* 6-1 with cam */
      0,0,1,0,0,1,0,0,1,  /* Teeth 1-3 */
@@ -245,6 +302,7 @@
    };
   
   /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 21 (9) */
+// const unsigned char twelve_minus_one_with_cam[] PROGMEM = "CM1/6,12,11t,1m:cA0,630,25,65";
  const unsigned char twelve_minus_one_with_cam[] PROGMEM = 
    { /* 12-1 with cam */
      0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 1 and 2 */
@@ -262,6 +320,7 @@
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
+// const unsigned char fourty_minus_one[] PROGMEM = "CM1/2,40,39t,1m";
  const unsigned char fourty_minus_one[] PROGMEM = 
    { /* 40-1 */
      0,1,0,1,0,1,0,1,0,1,  /* Teeth 1-5 */
@@ -275,12 +334,16 @@
    };
   
   /* 50deg off, 40 deg on dissy style signal */
+//  const unsigned char dizzy_four_trigger_return[] PROGMEM = "CS4/9,4"
+//  Angular version
+//  const unsigned char dizzy_four_trigger_return[] PROGMEM = "CA50,40,50,40,50,40,50,40"
   const unsigned char dizzy_four_trigger_return[] PROGMEM = 
     { /* dizzy trigger return */
-      0,0,0,0,0,1,1,1,1l  /* Simple off/on signal, 50deg off, 40 deg on */
+      0,0,0,0,0,1,1,1,1  /* Simple off/on signal, 50deg off, 40 deg on */
     };
    
-  /* Oddfire V twin  135/225 split */
+  /* Oddfire V twin  135/225 split cam wheel */
+//  const unsigned char oddfire_vr[] PROGMEM = "cA30,240,30,420"
   const unsigned char oddfire_vr[] PROGMEM = 
     { /* Oddfire VR */
       1,0,0,0,0,0,0,0,0,1,0,0, /* Tooth 1 and 2 at 0 deg and 135 deg, then 225 off */
@@ -288,6 +351,7 @@
     };
   
   /* GM LT1 360 and 8 wheel, see http://powerefi.com/files/opti-LT1-count.JPG */
+//  const unsigned char optispark_lt1[] PROGMEM = "cS1/2,360:cA0,23,22,43,2,28,17,43,2,33,12,43,2,38,7,43,2"
   const unsigned char optispark_lt1[] PROGMEM = 
     { /* Optispark 360 outside teeth, 8 varying inside teeth */
     /* 1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 */
@@ -329,6 +393,7 @@
       0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,2,3,2,3  /* 331-360 */
   };
   
+//  const unsigned char twelve_minus_three[] PROGMEM = "CM1/4,12,9t,3m";
   const unsigned char twelve_minus_three[] PROGMEM = 
     { /* 12-3, http://www.msextra.com/doc/triggers/12_3_wheel_133.jpg */
       1,0,0,0,1,0,0,0,  /* Teeth 1-2 */
@@ -339,6 +404,7 @@
       0,0,0,0,0,0,0,0   /* MISSING Teeth 11-12 */
     };
   
+//  const unsigned char thirty_six_minus_two_two_two[] PROGMEM = "CM1/2,36,1t,2m,1t,2m,16t,2m,12t";
   const unsigned char thirty_six_minus_two_two_two[] PROGMEM = 
     { /* 36-2-2-2  */
       1,0,0,0,0,0,1,0,0,0, /* Tooth 1, then MISSING 2 and 3, then 4 and MISSING 5 */
@@ -351,6 +417,7 @@
       1,0                  /* 36th Tooth */
     };
   
+//  const unsigned char thirty_six_minus_two_two_two_with_cam[] PROGMEM = "CM1/2,36,1t,2m,1t,2m,16t,2m,12t:cA0,15,5,55,5,640";
   const unsigned char thirty_six_minus_two_two_two_with_cam[] PROGMEM = 
     { /* 36-2-2-2 with cam  */
       1,0,0,2,0,0,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
@@ -371,6 +438,7 @@
       1,0                  /* 36th Tooth */
     };
   
+//  const unsigned char fourty_two_hundred_wheel[] PROGMEM = "CA55,5,55,5,5,5,45,5,55,5,65,5,45,5";
   const unsigned char fourty_two_hundred_wheel[] PROGMEM = 
     { /* 4200 wheel http://msextra.com/doc/triggers/4200_timing.pdf */
 		/* 55 deg high, 5 deg low, 55 deg high, 5 deg low,
@@ -388,6 +456,7 @@
   };
 
  /* Mazda F3 36-1 with cam */
+// const unsigned char thirty_six_minus_one_with_cam_fe3[] PROGMEM = "CM1/2,36,35t,1m:cA0,90,15,315,15,15,15,255";
  const unsigned char thirty_six_minus_one_with_cam_fe3[] PROGMEM = 
    { /* 36-1 with cam, 3 cam teeth, 2 180deg from each other */
      1,0,1,0,1,0,1,0,1,0,1,0, /* 0-55 deg */
@@ -405,12 +474,13 @@
    }; 
   
   /* Mitsubishi 6g72 crank/cam */
-  const unsigned char six_g_seventy_two_with_cam[] PROGMEM = 
+// const unsigned char six_g_seventy_two_with_cam[] PROGMEM = "CA50,70,50,70,50,70:cA70,80,40,150,40,130,40,155,15";
+ const unsigned char six_g_seventy_two_with_cam[] PROGMEM = 
     { /* Mitsubishi 6g72 */
 	  /* Crank signal's are 50 deg wide, and one per cylinder
-	   * Cam signals have 3 40 deg wide teeh and one 85 deg wide tooth
+	   * Cam signals have 3 40 deg wide teeth and one 85 deg wide tooth
 	   * Counting both From TDC#1
-	   * Crank: 40 deg high, 70 deg low (repeats whole cycle)
+	   * Crank: 50 deg high, 70 deg low (repeats whole cycle)
 	   * Cam: 70 deg high, 80 deg low, 40 deg high, 150 deg low,
 	   * 40 deg high, 130 deg low, 40 deg high, 155 deg low 
 	   */
@@ -431,6 +501,7 @@
       0,2,2,3
     };
    
+//  const unsigned char buell_oddfire_cam[] PROGMEM = "cA36,54,36,54,36,189,36,54,36,54,36,99"
   const unsigned char buell_oddfire_cam[] PROGMEM = 
     { /* Buell oddfire cam wheel */
 	  /* Wheel is a cam wheel (degress are in crank degrees 
@@ -452,6 +523,7 @@
 	  0,0,0,0,0,0,0,0,0,0  /* Tail of 99 deg space */
     };
   
+//  const unsigned char gm_ls1_crank_and_cam[] PROGMEM = "CA0,12,3,3,12,3,12,3,12,3,12,3,12,12,3,3,12,3,12,3,12,12,3,12,3,3,12,3,12,12,3,12,3,12,3,12,3,3,12,12,3,3,12,12,3,12,3,12,3:cS1/2,1";
   const unsigned char gm_ls1_crank_and_cam[] PROGMEM = 
     { /* GM LS1 24 tooth crank snd 1 tooth cam */
 	  /* 12 deg low, 3 deg high, 3 deg low,

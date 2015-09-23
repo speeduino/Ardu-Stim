@@ -23,7 +23,7 @@
  
 #include "wheel_defs.h"
 
-uint16_t wanted_rpm = 6000;                                                     
-volatile uint8_t selected_wheel = YAMAHA_EIGHT_TOOTH_WITH_CAM;                  
+uint16_t wanted_rpm = 1000;                                                     
+volatile uint8_t selected_wheel = GEN4_DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM;                  
 
 #endif
