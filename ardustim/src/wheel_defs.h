@@ -90,7 +90,7 @@
    WEBER_IAW_WITH_CAM, /* From jimstim IAW weber-marelli */
    FIAT_ONE_POINT_EIGHT_SIXTEEN_VALVE_WITH_CAM, /* Fiat 1.8 16V from jimstim */
    THREE_SIXTY_NISSAN_CAS, /*from jimstim 360 tooth cas with 6 slots */
-   TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER, /* Mazda CAS 24-1 inner ring single pulse outer ring */
+   TWENTY_FOUR_MINUS_TWO_WITH_SECOND_TRIGGER, /* Mazda CAS 24-2 (two 12-1's end to end) inner ring single pulse outer ring */
    YAMAHA_EIGHT_TOOTH_WITH_CAM, /* 02-03 Yamaha R1, seank */
    GM_FOUR_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
    GM_SIX_TOOTH_WITH_CAM, /* GM 4 even crank with half moon cam */
