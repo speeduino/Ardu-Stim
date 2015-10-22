@@ -144,10 +144,10 @@
 
 
 /* New Wheel definition strings
- * Syntax CS1/2,2  ("Crankshaft", Simple/symetric pattern, (1/2) 50% duty cycle, 
+ * Syntax CS1/2,2  ("Crankshaft", Simple/symmetric pattern, (1/2) 50% duty cycle, 
  * 2 teeth per revolution (each tooth is 90 degrees high, 90 low))
  *
- * All patterns start with a "C" meaning "crankshaft"
+ * All patterns start with a "C" meaning "crankshaft" or "c" (camshaft)
  * The second parameter determines the pattern style
  *  "A" for an angular defined wheel (time on, time off in degrees, total time must equal 360 degrees)
  *  "S" is for the simplest symetric, non-missing teeth wheels ONLY
@@ -170,17 +170,17 @@
  *   List the number of teeth the wheel would have if it had NO MISSING teeth, then
  *   the SEQUENTIAL present teeth followed by sequential missing teeth as follows until you complete the whole pattern
  *   The total number of teeth and missing MUST equal the number the preceding number as shown
- *   36t,1m  (36-1 pattern)
- *   13t,2m,16t,2m,1t,2m (Mazda 36-2-2-2)
+ *   36,35t,1m  (36-1 pattern)
+ *   36,13t,2m,16t,2m,1t,2m (Mazda 36-2-2-2)
  * 
  * For Crank+Cam setups the CRANK pattern is always defined FIRST, then a colon charactor ":" and the cam
  * pattern followed by a lowercase "c" in the same style as above
  *
  * Example:
  * 60-2 bosch wheel (crank only)
- * CM1/2,60,58,2
+ * CM1/2,60,58t,2m
  * hypothetical wheel with 60-2 crank and half-moon single tooth cam
- * CM1/2,60,58,2:cS1/2,1
+ * CM1/2,60,58t,2m:cS1/2,1
  *
  *
  */
