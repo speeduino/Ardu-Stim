@@ -29,9 +29,10 @@
 #include <math.h>
 #include <util/delay.h>
 #include <SerialUI.h>
+#include "sweep.h"
 
 /* File local variables */
-extern uint16_t wanted_rpm;
+static uint16_t wanted_rpm;
 
 /* External Global Variables */
 extern SUI::SerialUI mySUI;

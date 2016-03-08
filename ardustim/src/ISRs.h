@@ -1,9 +1,9 @@
-/* vim: set syntax=c expandtab sw=2 softtabstop=2 autoindent smartindent smarttab : */
+/* vim: set syntax=c expandtab sw=2 softtabstop=2 autoindent smartindent smarttab : */                                      
 /*
- * Arbritrary wheel pattern generator wheel definitions
+ * Arbritrary wheel pattern generator
  *
- * copyright 2015 David J. Andruczyk
- * 
+ * copyright 2014 David J. Andruczyk
+ *
  * Ardu-Stim software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,12 +18,15 @@
  * along with any ArduStim software.  If not, see http://www.gnu.org/licenses/
  *
  */
-#ifndef __USER_DEFAULTS_H__
-#define __USER_DEFAULTS_H__
- 
-#include "wheel_defs.h"
 
-#define DEFAULT_RPM 1000
-#define DEFAULT_WHEEL GEN4_DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM
+#ifndef __ISRS_H__
+#define __ISRS_H__
+
+#include "ardustim.h"
+
+ISR(ADC_vect);         /* Analog pot for analog RPM control with no UI */
+ISR(TIMER1_COMPA_vect) /* High speed pattern output */
+ISR(TIMER2_COMPA_vect) /* Sweeper */
+
 
 #endif
