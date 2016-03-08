@@ -20,6 +20,9 @@
  */
 #ifndef __STRUCTURES_H__
 #define __STRUCTURES_H__
+
+#include <inttypes.h>
+#include <avr/pgmspace.h>
  
 /* Structures */
 typedef struct _sweep_step sweep_step;

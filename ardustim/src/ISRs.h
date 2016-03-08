@@ -22,11 +22,11 @@
 #ifndef __ISRS_H__
 #define __ISRS_H__
 
-#include "ardustim.h"
+#include <inttypes.h>
+#include <avr/io.h>
 
 ISR(ADC_vect);         /* Analog pot for analog RPM control with no UI */
-ISR(TIMER1_COMPA_vect) /* High speed pattern output */
-ISR(TIMER2_COMPA_vect) /* Sweeper */
-
+ISR(TIMER1_COMPA_vect); /* High speed pattern output */
+ISR(TIMER2_COMPA_vect); /* Sweeper */
 
 #endif

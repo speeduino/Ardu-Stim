@@ -19,8 +19,9 @@
  *
  */
 
-#include "ardustim.h"
+#include "enums.h"
 #include "sweep.h"
+#include <stdlib.h>
 
 
 //! Builds the SweepSteps[] structure
@@ -77,3 +78,60 @@ sweep_step *build_sweep_steps(uint32_t *low_rpm_tcnt, uint32_t *high_rpm_tcnt, u
   return steps;
 }
 
+
+//! Gets prescaler enum and bitshift based on OC value
+void get_prescaler_bits(uint32_t *potential_oc_value, uint8_t *prescaler, uint8_t *bitshift)
+{
+  if (*potential_oc_value >= 16777216)
+  {
+    *prescaler = PRESCALE_1024;
+    *bitshift = 10;
+  }
+  else if (*potential_oc_value >= 4194304)
+  {
+    *prescaler = PRESCALE_256;
+    *bitshift = 8;
+  }
+  else if (*potential_oc_value >= 524288)
+  {
+    *prescaler = PRESCALE_64;
+    *bitshift = 6;
+  }
+  else if (*potential_oc_value >= 65536)
+  {
+    *prescaler = PRESCALE_8;
+    *bitshift = 3;
+  }
+  else
+  {
+    *prescaler = PRESCALE_1;
+    *bitshift = 0;
+  }
+}         
+
+
+void reset_new_OCR1A(uint32_t new_rpm)
+{
+  extern volatile uint8_t selected_wheel;
+  extern wheels Wheels[];
+  extern volatile uint16_t new_OCR1A;
+  extern volatile uint8_t prescaler_bits;
+  extern volatile bool reset_prescaler;
+
+  uint32_t tmp;
+  uint8_t bitshift;
+  uint8_t tmp_prescaler_bits;
+
+  tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
+/*  mySUI.print(F("new_OCR1a: "));
+  mySUI.println(tmpl);
+  */
+  get_prescaler_bits(&tmp,&tmp_prescaler_bits,&bitshift);
+  /*
+  mySUI.print(F("new_OCR1a: "));
+  mySUI.println(tmp2);
+  */
+  new_OCR1A = (uint16_t)(tmp >> bitshift);
+  prescaler_bits = tmp_prescaler_bits;
+  reset_prescaler = true;
+}          

@@ -20,7 +20,6 @@
  */
 
 #include "defines.h"
-#include "ardustim.h"
 #include "enums.h"
 #include "serialmenu.h"
 #include "structures.h"
@@ -464,5 +463,45 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
   sweep_high_rpm = *tmp_high_rpm;
   sweep_low_rpm = *tmp_low_rpm;
   sweep_lock = false;
+}
+
+
+//! Gets RPM from the TCNT value
+/*!
+ * Gets the RPM value based on the passed TCNT and prescaler
+ * \param tcnt pointer to Output Compare register value
+ * \param prescaler_bits point to prescaler bits enum
+ */
+uint16_t get_rpm_from_tcnt(uint16_t *tcnt, uint8_t *prescaler_bits)
+{
+  extern wheels Wheels[];
+  uint8_t bitshift;
+  bitshift = get_bitshift_from_prescaler(prescaler_bits);
+  return (uint16_t)((float)(8000000 >> bitshift)/(Wheels[selected_wheel].rpm_scaler*(*tcnt)));
+}
+
+
+//! Gets bitshift value from prescaler enumeration
+/*!
+ * Gets the bit shift value based on the prescaler enumeration passed
+ * \param prescaler_bits the enumeration to analyze
+ * \returns the necessary bitshift associated with the prescale value
+ */
+uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
+{
+  switch (*prescaler_bits)
+  {
+    case PRESCALE_1024:
+    return 10;
+    case PRESCALE_256:
+    return 8;
+    case PRESCALE_64:
+    return 6;
+    case PRESCALE_8:
+    return 3;
+    case PRESCALE_1:
+    return 0;
+  }
+  return 0;
 }
 

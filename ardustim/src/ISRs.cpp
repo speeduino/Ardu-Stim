@@ -19,11 +19,13 @@
  *
  */
 
-#include "ardustim.h"
 #include "defines.h"
 #include "enums.h"
+#include "structures.h"
+#include "sweep.h"
 #include "user_defaults.h"
-#include "wheels.h"
+#include <inttypes.h>
+#include <Arduino.h>
 
 /* Sensistive stuff used in ISR's */
 extern volatile uint8_t fraction;
@@ -57,6 +59,49 @@ extern uint16_t sweep_high_rpm;
 extern uint16_t sweep_rate;
 
 extern sweep_step *SweepSteps; /* Global pointer for the sweep steps */
+
+wheels Wheels[MAX_WHEELS] = {
+  /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
+  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 },
+  { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
+  { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
+  { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
+  { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240 },
+  { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72 },
+  { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16 },
+  { eight_minus_one_friendly_name, eight_minus_one, 0.13333, 16 },
+  { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36 },
+  { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144 },
+  { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80 },
+  { dizzy_four_trigger_return_friendly_name, dizzy_four_trigger_return, 0.075, 9 },
+  { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24 },
+  { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720 },
+  { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48 },
+  { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72 },
+  { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 144 },
+  { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72 },
+  { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144 },
+  { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144 },
+  { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80 },
+  { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 3.0, 720 },
+  { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.3, 72 },
+  { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48 },
+  { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144 },
+  { thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name, thirty_six_minus_one_plus_one_with_cam_ngc4, 3.0, 720 },
+  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144 },
+  { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720 },
+  { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720 },
+  { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72 },
+  { yamaha_eight_tooth_with_cam_friendly_name, yamaha_eight_tooth_with_cam, 0.26667, 64 },
+  { gm_four_tooth_with_cam_friendly_name, gm_four_tooth_with_cam, 0.03333, 8 },
+  { gm_six_tooth_with_cam_friendly_name, gm_six_tooth_with_cam, 0.05, 12 },
+  { gm_eight_tooth_with_cam_friendly_name, gm_eight_tooth_with_cam, 0.06667, 16 },
+  { volvo_d12acd_with_cam_friendly_name, volvo_d12acd_with_cam, 2.0, 480 },
+  { mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name, mazda_thirty_six_minus_two_two_two_with_six_tooth_cam, 1.5, 360 },
+  { sixty_minus_two_with_4X_cam_friendly_name, sixty_minus_two_with_4X_cam, 1.0, 240 },
+  { gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name, gen4_dodge_srt_v10_sixty_minus_two_with_cam, 1.0, 240 },
+};
+
 
 //! ADC ISR for alternating between ADC pins 0 and 1
 /*!
@@ -231,4 +276,3 @@ ISR(TIMER1_COMPA_vect) {
   /* Reset next compare value for RPM changes */
   OCR1A = new_OCR1A;  /* Apply new "RPM" from Timer2 ISR, i.e. speed up/down the virtual "wheel" */
 }
-

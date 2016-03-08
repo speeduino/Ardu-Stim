@@ -20,9 +20,9 @@
  */
 
 #include "defines.h"
-#include "ardustim.h"
 #include "enums.h"
 #include "serialmenu.h"
+#include "sweep.h"
 #include "wheel_defs.h"
 #include "user_defaults.h"
 #include <avr/pgmspace.h>
@@ -153,88 +153,3 @@ void setup() {
   reset_new_OCR1A(DEFAULT_RPM); 
 
 } // End setup
-
-
-void reset_new_OCR1A(uint32_t new_rpm)
-{
-  uint32_t tmp;
-  uint8_t bitshift;
-  uint8_t tmp_prescaler_bits;
-  extern wheels Wheels[];
-  tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
-/*  mySUI.print(F("new_OCR1a: "));
-  mySUI.println(tmpl);
-  */
-  get_prescaler_bits(&tmp,&tmp_prescaler_bits,&bitshift);
-  /*
-  mySUI.print(F("new_OCR1a: "));
-  mySUI.println(tmp2);
-  */
-  new_OCR1A = (uint16_t)(tmp >> bitshift); 
-  prescaler_bits = tmp_prescaler_bits;
-  reset_prescaler = true; 
-}
-
-
-uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
-{
-  switch (*prescaler_bits)
-  {
-    case PRESCALE_1024:
-    return 10;
-    case PRESCALE_256:
-    return 8;
-    case PRESCALE_64:
-    return 6;
-    case PRESCALE_8:
-    return 3;
-    case PRESCALE_1:
-    return 0;
-  }
-  return 0;
-}
-
-
-//! Gets RPM from the TCNT value
-/*!
- * Gets the RPM value based on the passed TCNT and prescaler
- * \param tcnt pointer to Output Compare register value
- * \param prescaler_bits point to prescaler bits enum
- */
-uint16_t get_rpm_from_tcnt(uint16_t *tcnt, uint8_t *prescaler_bits)
-{
-  extern wheels Wheels[];
-  bitshift = get_bitshift_from_prescaler(prescaler_bits);
-  return (uint16_t)((float)(8000000 >> bitshift)/(Wheels[selected_wheel].rpm_scaler*(*tcnt)));
-}
-
-
-//! Gets prescaler enum and bitshift based on OC value
-void get_prescaler_bits(uint32_t *potential_oc_value, uint8_t *prescaler, uint8_t *bitshift)
-{
-  if (*potential_oc_value >= 16777216)
-  {
-    *prescaler = PRESCALE_1024;
-    *bitshift = 10;
-  }
-  else if (*potential_oc_value >= 4194304)
-  {
-    *prescaler = PRESCALE_256;
-    *bitshift = 8;
-  }
-  else if (*potential_oc_value >= 524288)
-  {
-    *prescaler = PRESCALE_64;
-    *bitshift = 6;
-  }
-  else if (*potential_oc_value >= 65536)
-  {
-    *prescaler = PRESCALE_8;
-    *bitshift = 3;
-  }
-  else
-  {
-    *prescaler = PRESCALE_1;
-    *bitshift = 0;
-  }
-}

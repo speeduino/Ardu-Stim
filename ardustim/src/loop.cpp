@@ -1,7 +1,8 @@
 
-#include "ardustim.h"
+#include <SerialUI.h>
 #include "defines.h"
 #include "loop.h"
+#include "sweep.h"
 
 extern SUI::SerialUI mySUI;
 

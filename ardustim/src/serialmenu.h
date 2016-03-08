@@ -44,6 +44,9 @@ void reverse_wheel_direction_cb();
 void serial_setup();
 void display_new_wheel();
 void compute_sweep_stages(uint16_t *, uint16_t *);
+uint16_t get_rpm_from_tcnt(uint16_t *, uint8_t *);
+uint8_t get_bitshift_from_prescaler(uint8_t *);
+
 /* General functions */
 
 /* Prototypes */
