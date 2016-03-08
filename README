@@ -1,4 +1,4 @@
-Copyright (C) 2014 David J. Andruczyk
+Copyright (C) 2014-2016 David J. Andruczyk
 License: http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
 
 This is a work-in-progress on making a wheel simulator with an Arduino 
@@ -22,3 +22,12 @@ and you will hold the author and the rest of the life on this and any other
 planet blameless for your own actions.
 
 Be safe out there...
+
+To build with "inotool" http://inotool.org/ do the following:
+1. Create a symlink called "src" pointing to ardustim.
+   i.e.  ln -sf ardustim src
+2. Download and install the SerialUI Arduino library someplace
+2a symlink the SerialUI library into the "lib" directory
+   i.e. cd lib ; ln -sf /path/to/SerialUI SerialUI
+
+run "ino build" to compile the code (no arduino gui needed)

@@ -2,5 +2,6 @@
 .TODO.swo
 .TODO.swp
 Sweep_Notes
-ardustim/ardustim
 wheels_default.jsw
+src
+lib/*
