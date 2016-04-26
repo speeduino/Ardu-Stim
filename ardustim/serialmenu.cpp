@@ -21,17 +21,18 @@
 
 #include "defines.h"
 #include "enums.h"
-#include "serialmenu.h"
-#include "structures.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <math.h>
 #include <util/delay.h>
 #include <SerialUI.h>
+#include "serialmenu.h"
+#include "structures.h"
 #include "sweep.h"
+#include "user_defaults.h"
 
 /* File local variables */
-static uint16_t wanted_rpm;
+static uint16_t wanted_rpm = DEFAULT_RPM;
 
 /* External Global Variables */
 extern SUI::SerialUI mySUI;
