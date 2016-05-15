@@ -21,16 +21,15 @@
 
 #include "defines.h"
 #include "enums.h"
-#include "serialmenu.h"
-#include "structures.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <math.h>
 #include <util/delay.h>
 #include <SerialUI.h>
+#include "serialmenu.h"
+#include "structures.h"
 #include "sweep.h"
 #include "user_defaults.h"
-
 
 /* External Global Variables */
 unsigned long wanted_rpm = DEFAULT_RPM;
