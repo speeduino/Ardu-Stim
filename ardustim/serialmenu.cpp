@@ -29,11 +29,11 @@
 #include <util/delay.h>
 #include <SerialUI.h>
 #include "sweep.h"
+#include "user_defaults.h"
 
-/* File local variables */
-static uint16_t wanted_rpm;
 
 /* External Global Variables */
+unsigned long wanted_rpm = DEFAULT_RPM;
 extern SUI::SerialUI mySUI;
 extern sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 extern wheels Wheels[]; /* Array of wheel structures */
@@ -83,9 +83,11 @@ void serial_setup()
   advMenu->addCommand(reverse_key,reverse_wheel_direction_cb,reverse_help);
   advMenu->addCommand(pri_invert_key,toggle_invert_primary_cb,pri_invert_help);
   advMenu->addCommand(sec_invert_key,toggle_invert_secondary_cb,sec_invert_help);
+  mainMenu->addCommand(exit_key, do_exit, exit_help);
   /* Not implemented yet */
   //advMenu->addCommand(pri_glitch_key,primary_glitch_cb,pri_glitch_help);
   //advMenu->addCommand(sec_glitch_key,secondary_glitch_cb,sec_glitch_help);
+  mySUI.trackState(RPM_label, &wanted_rpm);
 }
 
 /* Helper function to spit out amount of ram remainig */
@@ -505,3 +507,11 @@ uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
   return 0;
 }
 
+void do_exit() {                                                                                               
+  // though you can always just use the "quit" command from
+  // the top level menu, this demonstrates using exit(), which
+  // will automatically close the Druid4Arduino GUI, if
+  // being used.
+  mySUI.print(F("Exit requested, terminating GUI if present"));
+  mySUI.exit();
+}

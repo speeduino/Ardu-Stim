@@ -24,6 +24,6 @@
 #include "wheel_defs.h"
 
 #define DEFAULT_RPM 1000
-#define DEFAULT_WHEEL GEN4_DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM
+#define DEFAULT_WHEEL OPTISPARK_LT1
 
 #endif

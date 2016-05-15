@@ -23,7 +23,7 @@ void loop() {
       mySUI.handleRequests();
     }
   }
-  if (adc0_read_complete == true)
+/*  if (adc0_read_complete == true)
   {
     adc0_read_complete = false;
     tmp_rpm = adc0 << TMP_RPM_SHIFT;
@@ -31,5 +31,6 @@ void loop() {
       tmp_rpm = TMP_RPM_CAP;
     reset_new_OCR1A(tmp_rpm);
   }
+  */
 }
 

@@ -65,6 +65,7 @@ sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 
 /* Initialization */
 void setup() {
+  extern unsigned long wanted_rpm;
   serial_setup();
 
   cli(); // stop interrupts
@@ -150,6 +151,6 @@ void setup() {
   // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
   ADCSRA |= B01000000;
   /* Make sure we are using the DEFAULT RPM on startup */
-  reset_new_OCR1A(DEFAULT_RPM); 
+  reset_new_OCR1A(wanted_rpm); 
 
 } // End setup
