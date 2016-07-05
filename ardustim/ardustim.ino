@@ -146,6 +146,11 @@ void setup() {
   pinMode(8, OUTPUT); /* Primary (crank usually) output */
   pinMode(9, OUTPUT); /* Secondary (cam usually) output */
   pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
+  //If using a Mega 2560 based arduino, the default pins will be different
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+  pinMode(53, OUTPUT); /* Primary (crank usually) output */
+  pinMode(52, OUTPUT); /* Secondary (cam usually) output */
+#endif
 
   sei(); // Enable interrupts
   // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
