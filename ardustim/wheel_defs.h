@@ -99,6 +99,7 @@
    MAZDA_THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_SIX_TOOTH_CAM,
    SIXTY_MINUS_TWO_WITH_4X_CAM, /* GM 4X cam */
    GEN4_DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM, /* Gen IV Dodge Viper V-10 */
+   MITSUBISHI_4G63_FOUR_TWO, /* 4g63 crank and cam */
    MAX_WHEELS,
  }WheelType;
 
@@ -141,6 +142,7 @@
  const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooth cam";
  const char sixty_minus_two_with_4X_cam_friendly_name[] PROGMEM = "GM 60-2 with 4X cam";
  const char gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name[] PROGMEM = "Dodge Viper Gen IV SRT V10 60-2 with 5 tooth cam";
+ const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
 
 
 /* New Wheel definition strings
@@ -889,4 +891,21 @@
   1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
   1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
 };
+
+ /* Mitsubish 4g63 aka 4/2 crank and cam */
+ const unsigned char mitsubishi_4g63_4_2[] PROGMEM = 
+   { //Split into 5 degree blocks (12 per line)
+      2,2,2,2,2,2,2,2,2,2,2,0,
+      0,0,0,0,0,0,0,0,0,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,2,2,2,3,3,3,
+      3,3,3,3,3,3,3,3,1,1,1,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,2,3,3,3,
+      3,3,3,3,3,3,3,3,3,3,3,2
+   };
   #endif

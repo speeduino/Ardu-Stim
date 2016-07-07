@@ -100,6 +100,7 @@ wheels Wheels[MAX_WHEELS] = {
   { mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name, mazda_thirty_six_minus_two_two_two_with_six_tooth_cam, 1.5, 360 },
   { sixty_minus_two_with_4X_cam_friendly_name, sixty_minus_two_with_4X_cam, 1.0, 240 },
   { gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name, gen4_dodge_srt_v10_sixty_minus_two_with_cam, 1.0, 240 },
+  { mitsubishi_4g63_4_2_friendly_name, mitsubishi_4g63_4_2, 0.6, 144 },
 };
 
 
