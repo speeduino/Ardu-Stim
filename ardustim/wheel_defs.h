@@ -101,6 +101,7 @@
    GEN4_DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM, /* Gen IV Dodge Viper V-10 */
    MITSUBISHI_4G63_FOUR_TWO, /* 4g63 crank and cam */
    AUDI_135_WITH_CAM, /* 135 tooth even crank with single cam pulse */
+   HONDA_D17_NO_CAM, /* Honda 12+1 crank */
    MAX_WHEELS,
  }WheelType;
 
@@ -145,6 +146,8 @@
  const char gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name[] PROGMEM = "Dodge Viper Gen IV SRT V10 60-2 with 5 tooth cam";
  const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
  const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
+ const char honda_d17_no_cam_friendly_name[] PROGMEM = "Honda D17 Crank (12+1)";
+ 
 
 
 /* New Wheel definition strings
@@ -950,5 +953,26 @@
      0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
      1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
      0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,2,
+   }; 
+
+  /*  Honda D17 12+1. 5 degree per entry
+   *  All teeth evenly spaced with an additional 13th tooth to mark TDC
+  */
+ const unsigned char honda_d17_no_cam[] PROGMEM = 
+   { //0 - 360 degrees
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,1,0,0,0,
+     
+     //360 - 720
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,0,0,0,0,
+     1,0,0,0,0,0,1,0,1,0,0,0 
    }; 
   #endif
