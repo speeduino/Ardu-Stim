@@ -101,6 +101,7 @@ wheels Wheels[MAX_WHEELS] = {
   { sixty_minus_two_with_4X_cam_friendly_name, sixty_minus_two_with_4X_cam, 1.0, 240 },
   { gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name, gen4_dodge_srt_v10_sixty_minus_two_with_cam, 1.0, 240 },
   { mitsubishi_4g63_4_2_friendly_name, mitsubishi_4g63_4_2, 0.6, 144 },
+  { audi_135_with_cam_friendly_name, audi_135_with_cam, 0.6, 540 },
 };
 
 

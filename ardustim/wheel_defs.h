@@ -100,6 +100,7 @@
    SIXTY_MINUS_TWO_WITH_4X_CAM, /* GM 4X cam */
    GEN4_DODGE_SRT_V10_SIXTY_MINUS_TWO_WITH_CAM, /* Gen IV Dodge Viper V-10 */
    MITSUBISHI_4G63_FOUR_TWO, /* 4g63 crank and cam */
+   AUDI_135_WITH_CAM, /* 135 tooth even crank with single cam pulse */
    MAX_WHEELS,
  }WheelType;
 
@@ -143,6 +144,7 @@
  const char sixty_minus_two_with_4X_cam_friendly_name[] PROGMEM = "GM 60-2 with 4X cam";
  const char gen4_dodge_srt_v10_sixty_minus_two_with_cam_friendly_name[] PROGMEM = "Dodge Viper Gen IV SRT V10 60-2 with 5 tooth cam";
  const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
+ const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
 
 
 /* New Wheel definition strings
@@ -908,4 +910,45 @@
       0,0,0,0,0,0,0,0,2,3,3,3,
       3,3,3,3,3,3,3,3,3,3,3,2
    };
+
+ /*  Audi 135 with cam
+  *  135 evenly spaced teeth per 720 degrees of the crank
+  *  Single cam tooth per 720 degrees
+  *  Each tooth has a duration of 2.666. degrees
+  */
+ const unsigned char audi_135_with_cam[] PROGMEM = 
+   { //0 - 360 degrees
+     3,3,2,2,3,3,2,2,3,3,2,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     
+     //360 - 720
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,
+     1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,
+     0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,2,
+   }; 
   #endif
