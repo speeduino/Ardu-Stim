@@ -23,7 +23,7 @@
  
 #include "wheel_defs.h"
 
-#define DEFAULT_RPM 1000
-#define DEFAULT_WHEEL OPTISPARK_LT1
+#define DEFAULT_RPM 6000
+#define DEFAULT_WHEEL FOUR_G_SIXTY_THREE_WITH_CAM
 
 #endif

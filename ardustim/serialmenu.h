@@ -42,6 +42,7 @@ void do_exit(void);
 /* Callbacks */
 
 /* General functions */
+void display_rpm_info(void);
 void serial_setup(void);
 void display_new_wheel(void);
 void compute_sweep_stages(uint16_t *, uint16_t *);
@@ -80,11 +81,11 @@ SUI_DeclareString(pri_invert_key, "Invert Primary");
 SUI_DeclareString(pri_invert_help, "Invert Primary (crank) signal polarity");
 SUI_DeclareString(sec_invert_key, "Invert Secondary");
 SUI_DeclareString(sec_invert_help, "Invert Secondary (cam) signal polarity");
-SUI_DeclareString(RPM_label, "RPM:");
 
 /* Info callback */
 SUI_DeclareString(info_title, "Welcome to ArduStim, written by David J. Andruczyk");
 SUI_DeclareString(free_ram, "Free RAM: ");
+SUI_DeclareString(colon, ":");
 SUI_DeclareString(colon_space, ": ");
 SUI_DeclareString(space, " ");
 SUI_DeclareString(RPM, "RPM");
@@ -96,7 +97,7 @@ SUI_DeclareString(space_chars_from_user, " charactors from the user");
 SUI_DeclareString(new_wheel_chosen, "New Wheel chosen: ");
 SUI_DeclareString(new_rpm_chosen, "New RPM chosen: ");
 SUI_DeclareString(current_pattern, "Currently selected Wheel pattern: ");
-SUI_DeclareString(fixed_current_rpm, "Fixed RPM mode, Current RPM: ");
+SUI_DeclareString(fixed_current_rpm, "Fixed RPM mode, Currently: ");
 SUI_DeclareString(swept_rpm_from, "Swept RPM mode From: ");
 SUI_DeclareString(wheel_direction_colon_space, "Wheel Direction: ");
 SUI_DeclareString(signal, "Signal");
@@ -112,5 +113,7 @@ SUI_DeclareString(high_RPM_colon_space, "High RPM: ");
 SUI_DeclareString(range_error,"Range error !(10-50000,10-50000,1-50000)!");
 SUI_DeclareString(number_of_matches,"Number of successful matches (should be 3): ");
 SUI_DeclareString(sweeping_from_colon_space,"Sweeping from: ");
+SUI_DeclareString(swept_RPM_mode,"Swept RPM Mode");
+SUI_DeclareString(fixed_RPM_mode,"Fixed RPM Mode");
 
 #endif

@@ -1,4 +1,5 @@
-/* ex: filetype=c expandtab shiftwidth=2 tabstop=2 softtabstop=2: */                                                        
+/* vim: filetype=c expandtab shiftwidth=2 tabstop=2 softtabstop=2: 
+ */                                                        
 /*
  * Arbritrary crank/cam wheel pattern generator
  *

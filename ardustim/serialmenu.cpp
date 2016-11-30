@@ -53,6 +53,9 @@ extern volatile uint16_t edge_counter;
 extern volatile uint16_t new_OCR1A;
 extern volatile uint32_t oc_remainder;
 
+/* Local globals for serialUI state tracking */
+bool fixed = true;
+bool swept = false;
 //! Initializes the serial port and sets up the Menu
 /*!
  * Sets up the serial port and menu for the serial user interface
@@ -86,7 +89,9 @@ void serial_setup()
   /* Not implemented yet */
   //advMenu->addCommand(pri_glitch_key,primary_glitch_cb,pri_glitch_help);
   //advMenu->addCommand(sec_glitch_key,secondary_glitch_cb,sec_glitch_help);
-  mySUI.trackState(RPM_label, &wanted_rpm);
+//  mySUI.trackState(RPM, &wanted_rpm);
+  mySUI.trackState(fixed_RPM_mode, &fixed);
+  mySUI.trackState(swept_RPM_mode, &swept);
 }
 
 /* Helper function to spit out amount of ram remainig */
@@ -134,13 +139,22 @@ void show_info_cb()
   mySUI.print_P(free_ram);
   mySUI.print(freeRam());
   mySUI.println_P(bytes);
-  mySUI.print_P(current_pattern);
+  mySUI.println_P(current_pattern);
   mySUI.print(selected_wheel+1);
-  mySUI.print_P(colon_space);
+  mySUI.print_P(colon);
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
+  display_rpm_info();
+}
+
+
+//! Displays RPM output depending on mode
+void display_rpm_info()
+{
   if (mode == FIXED_RPM) {
     mySUI.print_P(fixed_current_rpm);
-    mySUI.println(wanted_rpm);
+    mySUI.print(wanted_rpm);
+    mySUI.print_P(space);
+    mySUI.println_P(RPM);
   } 
   if (mode == LINEAR_SWEPT_RPM) {
     mySUI.print_P(swept_rpm_from);
@@ -152,8 +166,6 @@ void show_info_cb()
     mySUI.println_P(space_rpm_per_sec);
   }
 }
-
-
 //! Display newly selected wheel information
 /*!
  * Resets the output compare register for the newly changed wheel, then
@@ -162,19 +174,16 @@ void show_info_cb()
  */
 void display_new_wheel()
 {
-  mySUI.println_P(new_wheel_chosen);
-  mySUI.print(selected_wheel + 1);
-  mySUI.print_P(colon_space);
-  mySUI.print_P(Wheels[selected_wheel].decoder_name);
-  mySUI.print_P(space_at_colon_space);
-  mySUI.print(wanted_rpm);
-  mySUI.print_P(space);
-  mySUI.println_P(RPM);
   if (mode != LINEAR_SWEPT_RPM)
     reset_new_OCR1A(wanted_rpm);
   else
     compute_sweep_stages(&sweep_low_rpm, &sweep_high_rpm);
   edge_counter = 0; // Reset to beginning of the wheel pattern */
+  mySUI.println_P(new_wheel_chosen);
+  mySUI.print(selected_wheel + 1);
+  mySUI.print_P(colon_space);
+  mySUI.println_P(Wheels[selected_wheel].decoder_name);
+  display_rpm_info();
 }
 
 
@@ -255,6 +264,8 @@ void set_rpm_cb()
   if (SweepSteps)
     free(SweepSteps);
   mode = FIXED_RPM;
+  fixed = true;
+  swept = false;
   reset_new_OCR1A(newRPM);
   wanted_rpm = newRPM;
 
@@ -381,74 +392,63 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
   high_rpm_tcnt = (uint32_t)(8000000.0/(((float)(*tmp_high_rpm))*Wheels[selected_wheel].rpm_scaler));
 
   // Get number of frequency doublings, rounding 
-#ifdef MORE_LINEAR_SWEEP
-  total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/LOG_2);
-  //mySUI.print(F("MLS total stages: "));
-#else
   total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/(2*LOG_2));
-  //mySUI.print(F("total stages: "));
-#endif
-  //mySUI.println(total_stages);
   if (SweepSteps)
     free(SweepSteps);
-  j = 0;
+  /* Debugging 
+  mySUI.print(F("low TCNT: "));
+  mySUI.println(low_rpm_tcnt);
+  mySUI.print(F("high rpm raw TCNT: "));
+  mySUI.println(high_rpm_tcnt);
+  */
   SweepSteps = build_sweep_steps(&low_rpm_tcnt,&high_rpm_tcnt,&total_stages); 
 
-#ifdef MORE_LINEAR_SWEEP
-  for (uint8_t i = 0 ; i < total_stages; i+=2)
-  {
+  /* VERY BROKEN CODE 
     SweepSteps[i+1].prescaler_bits = SweepSteps[i].prescaler_bits;
     SweepSteps[i+1].ending_ocr = SweepSteps[i].ending_ocr;
     SweepSteps[i].ending_ocr =  (0.38 * (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)) + SweepSteps[i].ending_ocr;
     SweepSteps[i+1].beginning_ocr = SweepSteps[i].ending_ocr;
-
-    for (j = 0; j < 2 ; j++)
-    {
-#else
-      for (uint8_t i = 0 ; i < total_stages; i++)
-      {
-#endif
-        this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].beginning_ocr, &SweepSteps[i+j].prescaler_bits);
-        this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].ending_ocr, &SweepSteps[i+j].prescaler_bits);
-        /* How much RPM changes this stage */
-        rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
-        /* How much TCNT changes this stage */
-        steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
-        per_isr_tcnt_change = (float)(SweepSteps[i+j].beginning_ocr - SweepSteps[i+j].ending_ocr)/steps;
-        scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
-        SweepSteps[i+j].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
-        SweepSteps[i+j].remainder_per_isr = scaled_remainder;
-
-        /* Debugging
-           mySUI.print(F("sweep step: "));
-           mySUI.println(i+j);
-           mySUI.print(F("steps: "));
-           mySUI.println(steps);
-           mySUI.print(F("Beginning tcnt: "));
-           mySUI.print(SweepSteps[i+j].beginning_ocr);
-           mySUI.print(F(" for RPM: "));
-           mySUI.println(this_step_low_rpm);
-           mySUI.print(F("ending tcnt: "));
-           mySUI.print(SweepSteps[i+j].ending_ocr);
-           mySUI.print(F(" for RPM: "));
-           mySUI.println(this_step_high_rpm);
-           mySUI.print(F("prescaler bits: "));
-           mySUI.println(SweepSteps[i+j].prescaler_bits);
-           mySUI.print(F("tcnt_per_isr: "));
-           mySUI.println(SweepSteps[i+j].tcnt_per_isr);
-           mySUI.print(F("scaled remainder_per_isr: "));
-           mySUI.println(SweepSteps[i+j].remainder_per_isr);
-           mySUI.print(F("FP TCNT per ISR: "));
-           mySUI.println(per_isr_tcnt_change,6);
-           mySUI.print(F("End of step: "));
-           mySUI.println(i+j);
-           */
-#ifndef MORE_LINEAR_SWEEP
-      }
-#else
-    }
   }
-#endif
+  */
+
+  for (uint8_t i = 0 ; i < total_stages; i++)
+  {
+    this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i].beginning_ocr, &SweepSteps[i].prescaler_bits);
+    this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i].ending_ocr, &SweepSteps[i].prescaler_bits);
+    /* How much RPM changes this stage */
+    rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
+    /* How much TCNT changes this stage */
+    steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
+    per_isr_tcnt_change = (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/steps;
+    scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
+    SweepSteps[i].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
+    SweepSteps[i].remainder_per_isr = scaled_remainder;
+
+    /* Debugging
+    mySUI.print(F("sweep step: "));
+    mySUI.println(i);
+    mySUI.print(F("steps: "));
+    mySUI.println(steps);
+    mySUI.print(F("Beginning tcnt: "));
+    mySUI.print(SweepSteps[i].beginning_ocr);
+    mySUI.print(F(" for RPM: "));
+    mySUI.println(this_step_low_rpm);
+    mySUI.print(F("ending tcnt: "));
+    mySUI.print(SweepSteps[i].ending_ocr);
+    mySUI.print(F(" for RPM: "));
+    mySUI.println(this_step_high_rpm);
+    mySUI.print(F("prescaler bits: "));
+    mySUI.println(SweepSteps[i].prescaler_bits);
+    mySUI.print(F("tcnt_per_isr: "));
+    mySUI.println(SweepSteps[i].tcnt_per_isr);
+    mySUI.print(F("scaled remainder_per_isr: "));
+    mySUI.println(SweepSteps[i].remainder_per_isr);
+    mySUI.print(F("FP TCNT per ISR: "));
+    mySUI.println(per_isr_tcnt_change,6);
+    mySUI.print(F("End of step: "));
+    mySUI.println(i);
+    */
+  }
   total_sweep_stages = total_stages;
   /*
   mySUI.print(F("Total sweep stages: "));
@@ -461,6 +461,8 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
   new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
   oc_remainder = 0;
   mode = LINEAR_SWEPT_RPM;
+  fixed = false;
+  swept = true;
   sweep_high_rpm = *tmp_high_rpm;
   sweep_low_rpm = *tmp_low_rpm;
   sweep_lock = false;

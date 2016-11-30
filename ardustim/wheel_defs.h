@@ -2,7 +2,7 @@
 /*
  * Arbritrary wheel pattern generator wheel definitions
  *
- * copyright 2014 David J. Andruczyk
+ * Copyright 2014-2016 David J. Andruczyk
  * 
  * Ardu-Stim software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,6 +102,8 @@
    MITSUBISHI_4G63_FOUR_TWO, /* 4g63 crank and cam */
    AUDI_135_WITH_CAM, /* 135 tooth even crank with single cam pulse */
    HONDA_D17_NO_CAM, /* Honda 12+1 crank */
+   TWENTY_FOUR_MINUS_ONE_WITH_CAM, /* Hayabusa 24-1 with 1xcam during missing tooth */
+   FOUR_G_SIXTY_THREE_WITH_CAM, /* Mitsubishi & Mazda 4x crank and 2x cam CAS 4G63 */
    MAX_WHEELS,
  }WheelType;
 
@@ -147,7 +149,8 @@
  const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
  const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
  const char honda_d17_no_cam_friendly_name[] PROGMEM = "Honda D17 Crank (12+1)";
- 
+ const char twenty_four_minus_one_with_cam_friendly_name[] PROGMEM = "Suzuki GSX-1300R 24-1 crank and 1 tooth cam during missing crank tooth";
+ const char four_g_sixty_three_with_cam_friendly_name[] PROGMEM = "Mitsubishi & Mazda 4g63 with cam";
 
 
 /* New Wheel definition strings
@@ -975,4 +978,46 @@
      1,0,0,0,0,0,1,0,0,0,0,0,
      1,0,0,0,0,0,1,0,1,0,0,0 
    }; 
+
+ const unsigned char twenty_four_minus_one_with_cam[] PROGMEM = 
+{
+     3,2,1,0,1,0,1,0,1,0,1,0, /* Missing with cam then 5 teeth */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* 7-12 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* 13-18 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* 19-24 */
+     0,0,1,0,1,0,1,0,1,0,1,0, /* Second rotation, missing tooth + 5 regulars */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* 7-12 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* 13-18 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* 19-24 */
+};
+
+  /* Mitsubishi & Mazda 4g63 CAS 4x crank/2x cam */
+// const unsigned char four_g_sixty_three_with_cam[] PROGMEM = "CA70,110,70,110,70,110:cA180,185,90,265";
+ const unsigned char four_g_sixty_three_with_cam[] PROGMEM = 
+    { /* Mitsubishi & Mazda 4g63 CAS */
+	  /* Crank signals are 70 degrees high then 110 degrees low.
+	   * There are four crank signals per 720 degrees.
+	   *
+	   * Cam signals are 180 degrees high then 185 degrees low,
+	   * then 90 degrees high then 265 degrees low.
+	   */
+      2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, /* 1-40 degrees */
+      2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3, /* 41-80 degrees */
+      3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3, /* 81-120 degrees */
+      3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, /* 121-160 degrees */
+      2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 161-200 degrees */
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 201-240 degrees */
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* 241-280 degrees */
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0, /* 281-320 degrees */
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 321-360 degrees */
+      0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, /* 361-400 degrees */
+      2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3, /* 401-440 degrees */
+      3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* 441-480 degrees */
+      1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 481-520 degrees */
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 521-560 degrees */
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 561-600 degrees */
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* 601-640 degrees */
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0, /* 641-680 degrees */
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  /* 681-720 degrees */
+    };
   #endif

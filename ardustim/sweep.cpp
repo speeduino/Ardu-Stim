@@ -31,7 +31,7 @@
  * at the low end and a VERY FAST change at the high end due to the inverse
  * relationship between RPM and TCNT. So we compromise and break up the RPM
  * range into octaves (doubles of RPM), and use a linear TCNT change between
- * those two points. It's not perfect, but computationally easy
+ * those two points. It's not perfect, but computationally easier
  *
  * \param low_rpm_tcnt pointer to low rpm OC value, (not prescaled!)
  * \param high_rpm_tcnt pointer to low rpm OC value, (not prescaled!)
@@ -52,13 +52,9 @@ sweep_step *build_sweep_steps(uint32_t *low_rpm_tcnt, uint32_t *high_rpm_tcnt, u
 
   steps = (sweep_step *)malloc(sizeof(sweep_step)*(*total_stages));
 
-#ifdef MORE_LINEAR_SWEEP
-  for (uint8_t i = 0; i < (*total_stages); i+=2)
-#else
   for (uint8_t i = 0; i < (*total_stages); i++)
-#endif
   {
-    /* The low rpm value will ALWAYS have the highed TCNT value so use that
+    /* The low rpm value will ALWAYS have the higher TCNT value so use that
     to determine the prescaler value
     */
     get_prescaler_bits(&tmp, &steps[i].prescaler_bits, &bitshift);

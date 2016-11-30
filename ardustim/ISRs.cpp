@@ -103,6 +103,8 @@ wheels Wheels[MAX_WHEELS] = {
   { mitsubishi_4g63_4_2_friendly_name, mitsubishi_4g63_4_2, 0.6, 144 },
   { audi_135_with_cam_friendly_name, audi_135_with_cam, 0.6, 540 },
   { honda_d17_no_cam_friendly_name, honda_d17_no_cam, 1.0, 144 },
+  { twenty_four_minus_one_with_cam_friendly_name, twenty_four_minus_one_with_cam, 0.4 , 96 },
+  { four_g_sixty_three_with_cam_friendly_name, four_g_sixty_three_with_cam, 0.4, 720 },
 };
 
 
