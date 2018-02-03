@@ -37,8 +37,8 @@ enum {
 };
 
 enum {
-  FIXED_RPM,
   LINEAR_SWEPT_RPM,
+  FIXED_RPM,
 };
 
 #endif

@@ -20,24 +20,25 @@
  */
 
 #include "defines.h"
+#include "ardustim.h"
 #include "enums.h"
+#include "serialmenu.h"
+#include "structures.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <math.h>
 #include <util/delay.h>
 #include <SerialUI.h>
-#include "serialmenu.h"
-#include "structures.h"
-#include "sweep.h"
-#include "user_defaults.h"
 
-/* External Global Variables */
-unsigned long wanted_rpm = DEFAULT_RPM;
+/* File local variables */
+extern uint16_t wanted_rpm;
+
+/* External Globla Variables */
 extern SUI::SerialUI mySUI;
 extern sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
-extern wheels Wheels[]; /* Array of wheel structures */
-extern uint8_t mode;	/* Sweep or fixed */
-extern uint8_t total_sweep_stages; 
+extern wheels Wheels[];
+extern uint8_t mode;
+extern uint8_t total_sweep_stages;
 extern uint16_t sweep_low_rpm;
 extern uint16_t sweep_high_rpm;
 extern uint16_t sweep_rate;
@@ -53,9 +54,6 @@ extern volatile uint16_t edge_counter;
 extern volatile uint16_t new_OCR1A;
 extern volatile uint32_t oc_remainder;
 
-/* Local globals for serialUI state tracking */
-bool fixed = true;
-bool swept = false;
 //! Initializes the serial port and sets up the Menu
 /*!
  * Sets up the serial port and menu for the serial user interface
@@ -65,13 +63,12 @@ bool swept = false;
 void serial_setup()
 {
   mySUI.begin(9600);
-  mySUI.setTimeout(20000);   /* Tiem to wait for input from druid4arduino */
-  mySUI.setMaxIdleMs(30000); /* disconnect if no response from host in 30 sec */
+  mySUI.setTimeout(20000);
+  mySUI.setMaxIdleMs(30000);
   SUI::Menu *mainMenu = mySUI.topLevelMenu();
   SUI::Menu *wheelMenu;
   SUI::Menu *advMenu;
   /* Simple all on one menu... */
-  /* Menu strungs are in the header file */
   mainMenu->setName(top_menu_title);
   mainMenu->addCommand(info_key,show_info_cb,info_help);
   mainMenu->addCommand(rpm_key,set_rpm_cb,rpm_key);
@@ -85,13 +82,8 @@ void serial_setup()
   advMenu->addCommand(reverse_key,reverse_wheel_direction_cb,reverse_help);
   advMenu->addCommand(pri_invert_key,toggle_invert_primary_cb,pri_invert_help);
   advMenu->addCommand(sec_invert_key,toggle_invert_secondary_cb,sec_invert_help);
-  mainMenu->addCommand(exit_key, do_exit, exit_help);
-  /* Not implemented yet */
   //advMenu->addCommand(pri_glitch_key,primary_glitch_cb,pri_glitch_help);
   //advMenu->addCommand(sec_glitch_key,secondary_glitch_cb,sec_glitch_help);
-//  mySUI.trackState(RPM, &wanted_rpm);
-  mySUI.trackState(fixed_RPM_mode, &fixed);
-  mySUI.trackState(swept_RPM_mode, &swept);
 }
 
 /* Helper function to spit out amount of ram remainig */
@@ -139,22 +131,13 @@ void show_info_cb()
   mySUI.print_P(free_ram);
   mySUI.print(freeRam());
   mySUI.println_P(bytes);
-  mySUI.println_P(current_pattern);
+  mySUI.print_P(current_pattern);
   mySUI.print(selected_wheel+1);
-  mySUI.print_P(colon);
+  mySUI.print_P(colon_space);
   mySUI.println_P(Wheels[selected_wheel].decoder_name);
-  display_rpm_info();
-}
-
-
-//! Displays RPM output depending on mode
-void display_rpm_info()
-{
   if (mode == FIXED_RPM) {
     mySUI.print_P(fixed_current_rpm);
-    mySUI.print(wanted_rpm);
-    mySUI.print_P(space);
-    mySUI.println_P(RPM);
+    mySUI.println(wanted_rpm);
   } 
   if (mode == LINEAR_SWEPT_RPM) {
     mySUI.print_P(swept_rpm_from);
@@ -166,6 +149,8 @@ void display_rpm_info()
     mySUI.println_P(space_rpm_per_sec);
   }
 }
+
+
 //! Display newly selected wheel information
 /*!
  * Resets the output compare register for the newly changed wheel, then
@@ -174,16 +159,19 @@ void display_rpm_info()
  */
 void display_new_wheel()
 {
+  mySUI.println_P(new_wheel_chosen);
+  mySUI.print(selected_wheel + 1);
+  mySUI.print_P(colon_space);
+  mySUI.print_P(Wheels[selected_wheel].decoder_name);
+  mySUI.print_P(space_at_colon_space);
+  mySUI.print(wanted_rpm);
+  mySUI.print_P(space);
+  mySUI.println_P(RPM);
   if (mode != LINEAR_SWEPT_RPM)
     reset_new_OCR1A(wanted_rpm);
   else
     compute_sweep_stages(&sweep_low_rpm, &sweep_high_rpm);
   edge_counter = 0; // Reset to beginning of the wheel pattern */
-  mySUI.println_P(new_wheel_chosen);
-  mySUI.print(selected_wheel + 1);
-  mySUI.print_P(colon_space);
-  mySUI.println_P(Wheels[selected_wheel].decoder_name);
-  display_rpm_info();
 }
 
 
@@ -264,8 +252,6 @@ void set_rpm_cb()
   if (SweepSteps)
     free(SweepSteps);
   mode = FIXED_RPM;
-  fixed = true;
-  swept = false;
   reset_new_OCR1A(newRPM);
   wanted_rpm = newRPM;
 
@@ -392,63 +378,74 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
   high_rpm_tcnt = (uint32_t)(8000000.0/(((float)(*tmp_high_rpm))*Wheels[selected_wheel].rpm_scaler));
 
   // Get number of frequency doublings, rounding 
+#ifdef MORE_LINEAR_SWEEP
+  total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/LOG_2);
+  //mySUI.print(F("MLS total stages: "));
+#else
   total_stages = (uint8_t)ceil(log((float)(*tmp_high_rpm)/(float)(*tmp_low_rpm))/(2*LOG_2));
+  //mySUI.print(F("total stages: "));
+#endif
+  //mySUI.println(total_stages);
   if (SweepSteps)
     free(SweepSteps);
-  /* Debugging 
-  mySUI.print(F("low TCNT: "));
-  mySUI.println(low_rpm_tcnt);
-  mySUI.print(F("high rpm raw TCNT: "));
-  mySUI.println(high_rpm_tcnt);
-  */
+  j = 0;
   SweepSteps = build_sweep_steps(&low_rpm_tcnt,&high_rpm_tcnt,&total_stages); 
 
-  /* VERY BROKEN CODE 
+#ifdef MORE_LINEAR_SWEEP
+  for (uint8_t i = 0 ; i < total_stages; i+=2)
+  {
     SweepSteps[i+1].prescaler_bits = SweepSteps[i].prescaler_bits;
     SweepSteps[i+1].ending_ocr = SweepSteps[i].ending_ocr;
     SweepSteps[i].ending_ocr =  (0.38 * (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)) + SweepSteps[i].ending_ocr;
     SweepSteps[i+1].beginning_ocr = SweepSteps[i].ending_ocr;
-  }
-  */
 
-  for (uint8_t i = 0 ; i < total_stages; i++)
-  {
-    this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i].beginning_ocr, &SweepSteps[i].prescaler_bits);
-    this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i].ending_ocr, &SweepSteps[i].prescaler_bits);
-    /* How much RPM changes this stage */
-    rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
-    /* How much TCNT changes this stage */
-    steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
-    per_isr_tcnt_change = (float)(SweepSteps[i].beginning_ocr - SweepSteps[i].ending_ocr)/steps;
-    scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
-    SweepSteps[i].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
-    SweepSteps[i].remainder_per_isr = scaled_remainder;
+    for (j = 0; j < 2 ; j++)
+    {
+#else
+      for (uint8_t i = 0 ; i < total_stages; i++)
+      {
+#endif
+        this_step_low_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].beginning_ocr, &SweepSteps[i+j].prescaler_bits);
+        this_step_high_rpm = get_rpm_from_tcnt(&SweepSteps[i+j].ending_ocr, &SweepSteps[i+j].prescaler_bits);
+        /* How much RPM changes this stage */
+        rpm_span_this_stage = this_step_high_rpm - this_step_low_rpm;
+        /* How much TCNT changes this stage */
+        steps = (uint16_t)(1000*(float)rpm_span_this_stage / (float)sweep_rate);
+        per_isr_tcnt_change = (float)(SweepSteps[i+j].beginning_ocr - SweepSteps[i+j].ending_ocr)/steps;
+        scaled_remainder = (uint32_t)(FACTOR_THRESHOLD*(per_isr_tcnt_change - (uint16_t)per_isr_tcnt_change));
+        SweepSteps[i+j].tcnt_per_isr = (uint16_t)per_isr_tcnt_change;
+        SweepSteps[i+j].remainder_per_isr = scaled_remainder;
 
-    /* Debugging
-    mySUI.print(F("sweep step: "));
-    mySUI.println(i);
-    mySUI.print(F("steps: "));
-    mySUI.println(steps);
-    mySUI.print(F("Beginning tcnt: "));
-    mySUI.print(SweepSteps[i].beginning_ocr);
-    mySUI.print(F(" for RPM: "));
-    mySUI.println(this_step_low_rpm);
-    mySUI.print(F("ending tcnt: "));
-    mySUI.print(SweepSteps[i].ending_ocr);
-    mySUI.print(F(" for RPM: "));
-    mySUI.println(this_step_high_rpm);
-    mySUI.print(F("prescaler bits: "));
-    mySUI.println(SweepSteps[i].prescaler_bits);
-    mySUI.print(F("tcnt_per_isr: "));
-    mySUI.println(SweepSteps[i].tcnt_per_isr);
-    mySUI.print(F("scaled remainder_per_isr: "));
-    mySUI.println(SweepSteps[i].remainder_per_isr);
-    mySUI.print(F("FP TCNT per ISR: "));
-    mySUI.println(per_isr_tcnt_change,6);
-    mySUI.print(F("End of step: "));
-    mySUI.println(i);
-    */
+        /* Debugging
+           mySUI.print(F("sweep step: "));
+           mySUI.println(i+j);
+           mySUI.print(F("steps: "));
+           mySUI.println(steps);
+           mySUI.print(F("Beginning tcnt: "));
+           mySUI.print(SweepSteps[i+j].beginning_ocr);
+           mySUI.print(F(" for RPM: "));
+           mySUI.println(this_step_low_rpm);
+           mySUI.print(F("ending tcnt: "));
+           mySUI.print(SweepSteps[i+j].ending_ocr);
+           mySUI.print(F(" for RPM: "));
+           mySUI.println(this_step_high_rpm);
+           mySUI.print(F("prescaler bits: "));
+           mySUI.println(SweepSteps[i+j].prescaler_bits);
+           mySUI.print(F("tcnt_per_isr: "));
+           mySUI.println(SweepSteps[i+j].tcnt_per_isr);
+           mySUI.print(F("scaled remainder_per_isr: "));
+           mySUI.println(SweepSteps[i+j].remainder_per_isr);
+           mySUI.print(F("FP TCNT per ISR: "));
+           mySUI.println(per_isr_tcnt_change,6);
+           mySUI.print(F("End of step: "));
+           mySUI.println(i+j);
+           */
+#ifndef MORE_LINEAR_SWEEP
+      }
+#else
+    }
   }
+#endif
   total_sweep_stages = total_stages;
   /*
   mySUI.print(F("Total sweep stages: "));
@@ -461,58 +458,8 @@ void compute_sweep_stages(uint16_t *tmp_low_rpm, uint16_t *tmp_high_rpm)
   new_OCR1A = SweepSteps[sweep_stage].beginning_ocr;  
   oc_remainder = 0;
   mode = LINEAR_SWEPT_RPM;
-  fixed = false;
-  swept = true;
   sweep_high_rpm = *tmp_high_rpm;
   sweep_low_rpm = *tmp_low_rpm;
   sweep_lock = false;
 }
 
-
-//! Gets RPM from the TCNT value
-/*!
- * Gets the RPM value based on the passed TCNT and prescaler
- * \param tcnt pointer to Output Compare register value
- * \param prescaler_bits point to prescaler bits enum
- */
-uint16_t get_rpm_from_tcnt(uint16_t *tcnt, uint8_t *prescaler_bits)
-{
-  extern wheels Wheels[];
-  uint8_t bitshift;
-  bitshift = get_bitshift_from_prescaler(prescaler_bits);
-  return (uint16_t)((float)(8000000 >> bitshift)/(Wheels[selected_wheel].rpm_scaler*(*tcnt)));
-}
-
-
-//! Gets bitshift value from prescaler enumeration
-/*!
- * Gets the bit shift value based on the prescaler enumeration passed
- * \param prescaler_bits the enumeration to analyze
- * \returns the necessary bitshift associated with the prescale value
- */
-uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
-{
-  switch (*prescaler_bits)
-  {
-    case PRESCALE_1024:
-    return 10;
-    case PRESCALE_256:
-    return 8;
-    case PRESCALE_64:
-    return 6;
-    case PRESCALE_8:
-    return 3;
-    case PRESCALE_1:
-    return 0;
-  }
-  return 0;
-}
-
-void do_exit() {                                                                                               
-  // though you can always just use the "quit" command from
-  // the top level menu, this demonstrates using exit(), which
-  // will automatically close the Druid4Arduino GUI, if
-  // being used.
-  mySUI.print(F("Exit requested, terminating GUI if present"));
-  mySUI.exit();
-}

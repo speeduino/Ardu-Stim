@@ -28,27 +28,22 @@
 
 /* Prototypes */
 /* Callbacks */
-void show_info_cb(void);
-void select_next_wheel_cb(void);
-void select_previous_wheel_cb(void);
-void toggle_invert_primary_cb(void);
-void toggle_invert_secondary_cb(void);
-void list_wheels_cb(void);
-void select_wheel_cb(void);
-void set_rpm_cb(void);
-void sweep_rpm_cb(void);
-void reverse_wheel_direction_cb(void);
-void do_exit(void);
+void show_info_cb();
+void select_next_wheel_cb();
+void select_previous_wheel_cb();
+void toggle_invert_primary_cb();
+void toggle_invert_secondary_cb();
+void list_wheels_cb();
+void select_wheel_cb();
+void set_rpm_cb();
+void sweep_rpm_cb();
+void reverse_wheel_direction_cb();
 /* Callbacks */
 
 /* General functions */
-void display_rpm_info(void);
-void serial_setup(void);
-void display_new_wheel(void);
+void serial_setup();
+void display_new_wheel();
 void compute_sweep_stages(uint16_t *, uint16_t *);
-uint16_t get_rpm_from_tcnt(uint16_t *, uint8_t *);
-uint8_t get_bitshift_from_prescaler(uint8_t *);
-
 /* General functions */
 
 /* Prototypes */
@@ -61,8 +56,6 @@ SUI_DeclareString(info_help, "Retrieve data and current settings");
 SUI_DeclareString(rpm_key, "Set Fixed RPM");
 SUI_DeclareString(sweep_key, "Set Swept RPM");
 SUI_DeclareString(sweep_help, "Sweep the RPM (min,max,rate(rpm/sec))");
-SUI_DeclareString(exit_key, "Exit");
-SUI_DeclareString(exit_help, "Exit (and terminate Druid)");  
 SUI_DeclareString(wheel_menu_key, "Wheel Options");
 SUI_DeclareString(wheel_menu_help, "Wheel Options, (list,choose,select)");
 SUI_DeclareString(next_key, "Next wheel");
@@ -85,7 +78,6 @@ SUI_DeclareString(sec_invert_help, "Invert Secondary (cam) signal polarity");
 /* Info callback */
 SUI_DeclareString(info_title, "Welcome to ArduStim, written by David J. Andruczyk");
 SUI_DeclareString(free_ram, "Free RAM: ");
-SUI_DeclareString(colon, ":");
 SUI_DeclareString(colon_space, ": ");
 SUI_DeclareString(space, " ");
 SUI_DeclareString(RPM, "RPM");
@@ -97,7 +89,7 @@ SUI_DeclareString(space_chars_from_user, " charactors from the user");
 SUI_DeclareString(new_wheel_chosen, "New Wheel chosen: ");
 SUI_DeclareString(new_rpm_chosen, "New RPM chosen: ");
 SUI_DeclareString(current_pattern, "Currently selected Wheel pattern: ");
-SUI_DeclareString(fixed_current_rpm, "Fixed RPM mode, Currently: ");
+SUI_DeclareString(fixed_current_rpm, "Fixed RPM mode, Current RPM: ");
 SUI_DeclareString(swept_rpm_from, "Swept RPM mode From: ");
 SUI_DeclareString(wheel_direction_colon_space, "Wheel Direction: ");
 SUI_DeclareString(signal, "Signal");
@@ -113,7 +105,5 @@ SUI_DeclareString(high_RPM_colon_space, "High RPM: ");
 SUI_DeclareString(range_error,"Range error !(10-50000,10-50000,1-50000)!");
 SUI_DeclareString(number_of_matches,"Number of successful matches (should be 3): ");
 SUI_DeclareString(sweeping_from_colon_space,"Sweeping from: ");
-SUI_DeclareString(swept_RPM_mode,"Swept RPM Mode");
-SUI_DeclareString(fixed_RPM_mode,"Fixed RPM Mode");
 
 #endif

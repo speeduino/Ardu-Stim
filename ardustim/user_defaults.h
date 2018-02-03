@@ -23,7 +23,8 @@
  
 #include "wheel_defs.h"
 
-#define DEFAULT_RPM 6000
-#define DEFAULT_WHEEL FOUR_G_SIXTY_THREE_WITH_CAM
+uint16_t wanted_rpm = 6000;                                                     
+//volatile uint8_t selected_wheel = SIXTY_MINUS_TWO; 
+volatile uint8_t selected_wheel = SIXTY_MINUS_TWO_WITH_CAM;
 
 #endif

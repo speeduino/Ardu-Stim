@@ -26,7 +26,7 @@
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
 #define TMP_RPM_CAP 16384 /* MAX RPM via pot control */
 #define FACTOR_THRESHOLD 1000000
-#define MORE_LINEAR_SWEEP 1 
+#define MORE_LINEAR_SWEEP 1
 #define SUI_NO_INCLUDE_EXTRA_SAFETYCHECKS
 #define LOG_2 0.30102999566
 
