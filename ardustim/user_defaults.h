@@ -24,7 +24,6 @@
 #include "wheel_defs.h"
 
 uint16_t wanted_rpm = 6000;                                                     
-//volatile uint8_t selected_wheel = SIXTY_MINUS_TWO; 
-volatile uint8_t selected_wheel = SIXTY_MINUS_TWO_WITH_CAM;
+volatile uint8_t selected_wheel = TWELVE_WITH_CAM; //SIXTY_MINUS_TWO_WITH_CAM;
 
 #endif

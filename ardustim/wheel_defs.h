@@ -104,6 +104,7 @@
    MAZDA_323_AU,
    DAIHATSU_3CYL,
    MIATA_9905,
+   TWELVE_WITH_CAM, //12 evenly spaced crank teeth and a single cam tooth
    MAX_WHEELS,
  }WheelType;
 
@@ -151,6 +152,7 @@
  const char mazda_323_au_friendly_name[] PROGMEM = "Mazda 323 AU version";
  const char daihatsu_3cyl_friendly_name[] PROGMEM = "Daihatsu 3+1 distributor (3 cylinders)";
  const char miata_9905_friendly_name[] PROGMEM = "Miata 99-05";
+ const char twelve_with_cam_friendly_name[] PROGMEM = "12/1 (12 crank with cam)";
 
 
  /* Very simple 50% duty cycle */
@@ -276,15 +278,15 @@
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 5 and 6 */
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 7 and 8 */
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 9 and 10 */
-	 //0,0,0,0,0,1,0,0,0,0,0,0, /* Tooth 11 and MISSING twelth */
-   0,0,0,0,0,1,0,0,0,0,0,1, /* Tooth 11 and WITHOUT MISSING twelth */
+	 0,0,0,0,0,1,0,0,0,0,0,0, /* Tooth 11 and MISSING twelth */
+   //0,0,0,0,0,1,0,0,0,0,0,1, /* Tooth 11 and WITHOUT MISSING twelth */
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* 2nd rotation: Teeth 13 and 14 */
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 15 and 16 */
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 17 and 18 */
 	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 19 and 20 */
 	 0,0,0,0,0,1,2,2,2,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
-	 //0,0,0,0,0,1,0,0,0,0,0,0  /* Totth 23 and MISSING 24th */
-   0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and WITHOUT MISSING 24th */
+	 0,0,0,0,0,1,0,0,0,0,0,0  /* Totth 23 and MISSING 24th */
+   //0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and WITHOUT MISSING 24th */
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
@@ -962,6 +964,23 @@
       0,0,0,0,0,0,0,0,0,0,0,0, //No pulse
       0,0,0,0,0,0,0,1,1,0,0,0, //Pulse at 640
       0,0,0,0,0,0,0,0,0,1,1,0  //Pulse at 710
+   };
+
+   /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 21 (9) */
+ const unsigned char twelve_with_cam[] PROGMEM = 
+   { /* 12-1 with cam */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 1 and 2 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 3 and 4 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 5 and 6 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 7 and 8 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 9 and 10 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Tooth 11 and 12 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* 2nd rotation: Teeth 13 and 14 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 15 and 16 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 17 and 18 */
+     0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 19 and 20 */
+     0,0,0,0,0,1,2,2,2,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
+     0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and 24th */
    };
 
   #endif
