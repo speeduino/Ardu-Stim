@@ -64,7 +64,7 @@ sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 
 wheels Wheels[MAX_WHEELS] = {
   /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
-  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4 },
+  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.003333, 4 },
   { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6 },
   { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8 },
   { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120 },
@@ -108,6 +108,7 @@ wheels Wheels[MAX_WHEELS] = {
   { daihatsu_3cyl_friendly_name, daihatsu_3cyl, 0.025, 144 },
   { miata_9905_friendly_name, miata_9905, 0.6, 144 },
   { twelve_with_cam_friendly_name, twelve_with_cam, 0.6, 144 },
+  { subaru_six_seven_name_friendly_name, subaru_six_seven, 3.0, 720 },
 };
 
 /* Initialization */

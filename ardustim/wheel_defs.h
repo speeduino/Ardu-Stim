@@ -105,6 +105,7 @@
    DAIHATSU_3CYL,
    MIATA_9905,
    TWELVE_WITH_CAM, //12 evenly spaced crank teeth and a single cam tooth
+   SUBARU_SIX_SEVEN,      /* Subaru 6 crank, 7 cam */
    MAX_WHEELS,
  }WheelType;
 
@@ -153,7 +154,7 @@
  const char daihatsu_3cyl_friendly_name[] PROGMEM = "Daihatsu 3+1 distributor (3 cylinders)";
  const char miata_9905_friendly_name[] PROGMEM = "Miata 99-05";
  const char twelve_with_cam_friendly_name[] PROGMEM = "12/1 (12 crank with cam)";
-
+ const char subaru_six_seven_name_friendly_name[] PROGMEM = "Subaru 6/7 crank and cam";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -275,18 +276,18 @@
    { /* 12-1 with cam */
      0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 1 and 2 */
      0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 3 and 4 */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 5 and 6 */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 7 and 8 */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 9 and 10 */
-	 0,0,0,0,0,1,0,0,0,0,0,0, /* Tooth 11 and MISSING twelth */
-   //0,0,0,0,0,1,0,0,0,0,0,1, /* Tooth 11 and WITHOUT MISSING twelth */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* 2nd rotation: Teeth 13 and 14 */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 15 and 16 */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 17 and 18 */
-	 0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 19 and 20 */
-	 0,0,0,0,0,1,2,2,2,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
-	 0,0,0,0,0,1,0,0,0,0,0,0  /* Totth 23 and MISSING 24th */
-   //0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and WITHOUT MISSING 24th */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 5 and 6 */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 7 and 8 */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 9 and 10 */
+	   0,0,0,0,0,1,0,0,0,0,0,0, /* Tooth 11 and MISSING twelth */
+     //0,0,0,0,0,1,0,0,0,0,0,1, /* Tooth 11 and WITHOUT MISSING twelth */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* 2nd rotation: Teeth 13 and 14 */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 15 and 16 */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 17 and 18 */
+	   0,0,0,0,0,1,0,0,0,0,0,1, /* Teeth 19 and 20 */
+	   0,0,0,0,0,1,2,2,2,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
+	   0,0,0,0,0,1,0,0,0,0,0,0  /* Totth 23 and MISSING 24th */
+     //0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and WITHOUT MISSING 24th */
    };
    
   /* Ford V10 version of EDIS with 40 teeth instead of 36, 50% duty cycle during normal teeth.. */
@@ -581,7 +582,7 @@
      1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
-     1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
+     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-35 */
      0,0                  /* 36th MISSING tooth */
    }; 
    
@@ -809,7 +810,7 @@
  const unsigned char mitsubishi_4g63_4_2[] PROGMEM = 
    { //Split into 5 degree blocks (12 per line)
       2,2,2,2,2,2,2,2,2,2,2,0,
-      0,0,0,0,0,0,0,0,0,1,1,1,
+      0,0,0,0,0,0,0,0,0,1,1,1, //Start edge 6
       1,1,1,1,1,1,1,1,1,1,1,0,
       0,0,0,0,0,0,0,0,0,0,0,0,
       0,0,0,0,0,0,2,2,2,3,3,3,
@@ -982,5 +983,52 @@
      0,0,0,0,0,1,2,2,2,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
      0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and 24th */
    };
+
+  const unsigned char subaru_six_seven[] PROGMEM =
+   { /* 6/7 */
+    /* Cyl 1 TDC */
+      0,0,0,0,0,2,2,2,0,0, 0,2,2,2,0,0,0,2,2,2, /* 00-19 degrees - cam 1-2-3: 5* ATDC */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 20-39 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 40-59 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 60-20 degrees */
+      0,0,0,1,1,1,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 80-99 degrees - crank 1: 83* ATDC */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,1,1,1,0,0, /* 100 degrees - crank 2: 115* ATDC */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 120 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 140 degrees */
+      0,0,0,0,0,0,0,0,0,0, 1,1,1,0,0,0,0,0,0,0, /* 160 degrees - crank 3: 170* ATDC */
+
+    /* Cyl 2 TDC */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 180 degrees */
+      2,2,2,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 200 degrees - cam 4: 20* ATDC (200*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 220 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 240 degrees */
+      0,0,0,1,1,1,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 260 degrees - crank 4: 83* ATDC (263*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,1,1,1,0,0, /* 280 degrees - crank 5: 115* ATDC (295*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 300 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 320 degrees */
+      0,0,0,0,0,0,0,0,0,0, 1,1,1,0,0,0,0,0,0,0, /* 340 degrees - crank 6: 170* ATDC (350*) */
+
+    /* Cyl 3 TDC */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 360 degrees */
+      2,2,2,0,0,0,2,2,23,0, 0,0,0,0,0,0,0,0,0,0, /* 380 degrees - cam 5-6: 20* ATDC (380*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 400 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 420 degrees */
+      0,0,0,1,1,1,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 440 degrees - crank 1: 83* ATDC (443*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,1,1,1,0,0, /* 460 degrees - crank 2: 115* ATDC (475*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 480 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 500 degrees */
+      0,0,0,0,0,0,0,0,0,0, 1,1,1,0,0,0,0,0,0,0, /* 520 degrees - crank 3: 170* ATDC */
+
+    /* Cyl 4 TDC */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 540 degrees */
+      2,2,2,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 560 degrees - cam 7: 20* ATDC (560*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 580 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 600 degrees */
+      0,0,0,1,1,1,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 620 degrees - crank 4: 83* ATDC (623*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,1,1,1,0,0, /* 640 degrees - crank 5: 115* ATDC (655*) */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 660 degrees */
+      0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 680 degrees */
+      0,0,0,0,0,0,0,0,0,0, 1,1,1,0,0,0,0,0,0,0  /* 700 degrees - crank 6: 170* ATDC (710*) */
+    };
 
   #endif
