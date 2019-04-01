@@ -106,6 +106,7 @@
    MIATA_9905,
    TWELVE_WITH_CAM, //12 evenly spaced crank teeth and a single cam tooth
    SUBARU_SIX_SEVEN,      /* Subaru 6 crank, 7 cam */
+   GM_7X,                 /* GM 7X pattern. 6 even teeth with 1 extra uneven tooth */
    MAX_WHEELS,
  }WheelType;
 
@@ -155,6 +156,7 @@
  const char miata_9905_friendly_name[] PROGMEM = "Miata 99-05";
  const char twelve_with_cam_friendly_name[] PROGMEM = "12/1 (12 crank with cam)";
  const char subaru_six_seven_name_friendly_name[] PROGMEM = "Subaru 6/7 crank and cam";
+ const char gm_seven_x_friendly_name[] PROGMEM = "GM 7X";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1030,5 +1032,29 @@
       0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, /* 680 degrees */
       0,0,0,0,0,0,0,0,0,0, 1,1,1,0,0,0,0,0,0,0  /* 700 degrees - crank 6: 170* ATDC (710*) */
     };
+    
+ /* GM 7X for 6 cylinder engines */  
+ /* https://speeduino.com/forum/download/file.php?id=4743 */
+ const unsigned char gm_seven_x[] PROGMEM = 
+   { /* Every number represents 2 degrees */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40 */
+     0,1,1,0,0,0,0,0,0,0,  /* Degrees 40-60. Tooth #1 at 42* for 4* duration. These are actually 5* duration, but close enough */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 60-80 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 80-100 */
+     0,1,1,0,0,0,1,1,0,0,  /* Degrees 100-120. Tooth #2 at 102* for 4* duration. "Extra" tooth at 112* */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 120-140 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 140-160 */
+     0,1,1,0,0,0,0,0,0,0,  /* Degrees 160-180. Tooth #3 at 162* for 4* duration */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 180-200 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 200-220 */
+     0,1,1,0,0,0,0,0,0,0,  /* Degrees 220-240. Tooth #4 at 222* for 4* duration */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 240-260 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 260-280 */
+     0,1,1,0,0,0,0,0,0,0,  /* Degrees 280-300. Tooth #5 at 282* for 4* duration */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 300-320 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 320-340 */
+     0,1,1,0,0,0,0,0,0,0,  /* Degrees 340-360. Tooth #6 at 342* for 4* duration */
+   }; 
 
   #endif
