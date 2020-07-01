@@ -108,8 +108,10 @@ wheels Wheels[MAX_WHEELS] = {
   { daihatsu_3cyl_friendly_name, daihatsu_3cyl, 0.025, 144 },
   { miata_9905_friendly_name, miata_9905, 0.6, 144 },
   { twelve_with_cam_friendly_name, twelve_with_cam, 0.6, 144 },
+  { twenty_four_with_cam_friendly_name, twelve_with_cam, 0.6, 144 },
   { subaru_six_seven_name_friendly_name, subaru_six_seven, 3.0, 720 },
   { gm_seven_x_friendly_name, gm_seven_x, 1.0, 180 },
+  { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144 }
 };
 
 /* Initialization */

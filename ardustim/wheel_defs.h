@@ -105,8 +105,10 @@
    DAIHATSU_3CYL,
    MIATA_9905,
    TWELVE_WITH_CAM, //12 evenly spaced crank teeth and a single cam tooth
+   TWENTY_FOUR_WITH_CAM, //24 evenly spaced crank teeth and a single cam tooth
    SUBARU_SIX_SEVEN,      /* Subaru 6 crank, 7 cam */
    GM_7X,                 /* GM 7X pattern. 6 even teeth with 1 extra uneven tooth */
+   FOUR_TWENTY_A,         /* DSM 420a */
    MAX_WHEELS,
  }WheelType;
 
@@ -155,8 +157,10 @@
  const char daihatsu_3cyl_friendly_name[] PROGMEM = "Daihatsu 3+1 distributor (3 cylinders)";
  const char miata_9905_friendly_name[] PROGMEM = "Miata 99-05";
  const char twelve_with_cam_friendly_name[] PROGMEM = "12/1 (12 crank with cam)";
+ const char twenty_four_with_cam_friendly_name[] PROGMEM = "24/1 (24 crank with cam)";
  const char subaru_six_seven_name_friendly_name[] PROGMEM = "Subaru 6/7 crank and cam";
  const char gm_seven_x_friendly_name[] PROGMEM = "GM 7X";
+ const char four_twenty_a_friendly_name[] PROGMEM = "DSM 420a";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -986,6 +990,23 @@
      0,0,0,0,0,1,0,0,0,0,0,1  /* Totth 23 and 24th */
    };
 
+ /* 25 deg low, 5 deg high, #12 is missing,  cam is high for 25 deg on second crank rotation just after tooth 21 (9) */
+ const unsigned char twenty_four_with_cam[] PROGMEM = 
+   { /* 24/1 with cam */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 1 and 2 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 3 and 4 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 5 and 6 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 7 and 8 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 9 and 10 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Tooth 11 and 12 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* 2nd rotation: Teeth 13 and 14 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 15 and 16 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 17 and 18 */
+     0,0,1,0,0,1,0,0,1,0,0,1, /* Teeth 19 and 20 */
+     0,0,1,0,0,1,2,2,3,2,2,1, /* Tooth 21 and 22,  2nd trigger on cam between teeth 21 and 22 for 25 deg */
+     0,0,1,0,0,1,0,0,1,0,0,1  /* Totth 23 and 24th */
+   };
+
   const unsigned char subaru_six_seven[] PROGMEM =
    { /* 6/7 */
     /* Cyl 1 TDC */
@@ -1054,7 +1075,25 @@
      0,1,1,0,0,0,0,0,0,0,  /* Degrees 280-300. Tooth #5 at 282* for 4* duration */
      0,0,0,0,0,0,0,0,0,0,  /* Degrees 300-320 */
      0,0,0,0,0,0,0,0,0,0,  /* Degrees 320-340 */
-     0,1,1,0,0,0,0,0,0,0,  /* Degrees 340-360. Tooth #6 at 342* for 4* duration */
+     0,1,1,0,0,0,0,0,0,0  /* Degrees 340-360. Tooth #6 at 342* for 4* duration */
+   }; 
+
+  /* DSM 420a Eclipse */
+  /* https://github.com/noisymime/speeduino/issues/133 */
+  const unsigned char four_twenty_a[] PROGMEM = 
+   { /* Every number represents 5 degrees */
+      0,0,0,0,0,0,0,0,0,0,0,2,
+      2,2,2,2,2,2,2,2,2,3,3,2,
+      2,3,3,2,2,3,3,2,2,3,3,2,
+      2,2,2,2,2,0,0,0,0,0,0,1,
+      1,1,1,1,1,1,1,1,1,1,1,0,
+      0,1,1,0,0,1,1,0,0,1,1,0,
+      0,0,0,0,0,0,0,0,0,0,0,2,
+      2,2,2,2,2,2,2,2,2,3,3,2,
+      2,3,3,2,2,3,3,2,2,3,3,2,
+      2,2,2,2,2,2,2,2,2,2,2,3,
+      3,3,3,3,3,1,1,1,1,1,1,0,
+      0,1,1,0,0,1,1,0,0,1,1,0
    }; 
 
   #endif
