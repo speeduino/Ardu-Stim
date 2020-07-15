@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<!--
+	Astral by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Ardu-Stim (Speeduino fork)</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+		<script>
+			function updateCylinderInputs()
+			{
+				nCylinders = document.getElementsByName("nCylinders")[0].value;
+				for(x=1; x<=8; x++)
+				{
+					if(x <= nCylinders)
+					{
+						document.getElementById("firingOrder_" + x).disable = false;
+						console.log("Enabled firingOrder_" + x);
+					}
+					else
+					{
+						document.getElementById("firingOrder_" + x).disabled = true;
+						console.log("Disabled firingOrder_" + x);
+					}
+					
+				}
+			}
+			function updateIgnitionType()
+			{
+				//The firing order section is only enabled if sequential ignition type is selected
+				//(If you don't have sequential ignition we can't do cylinder ID and therefore there's no need to know the firing order)
+				if(document.getElementById("ignitionType").value != 1)
+				{
+					document.getElementById("firingOrder").style.display = "none";
+				}
+				else
+				{
+					document.getElementById("firingOrder").style.display = "flex";
+				}
+			}
+			function updateKnockFrequency()
+			{
+				bore = document.getElementById("bore").value;
+				knockFrequency = 1800 / (Math.PI * bore);
+
+				document.getElementById("knockFrequency").value = knockFrequency;
+				console.log("Nearest frequency = " + closest(bandpassFrequencies, knockFrequency));
+			}
+		</script>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper-->
+			<div id="wrapper">
+
+				<!-- Nav -->
+					<nav id="nav">
+						<a href="#connect" class="icon fa-plug"><span>Connect</span></a>
+						<a href="#live" class="icon fa-tachometer"><span>Dashboard</span></a>
+						<a href="#config" class="icon fa-sliders-h"><span>Config</span></a>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+							<article id="connect" class="panel ">
+								<header><h1>Select Serial Port</h1></header>
+								Available Ports:<br />
+								<span id="serialDetectError"></span>
+								<select name="ports" class="select" id="portsSelect" size="10" width="20"></select>
+								<ul class="actions">
+										<li><input type='button' value="Refresh" onclick="refreshSerialPorts();" /></li>
+										<li><input type='button' value="Connect" id="btnConnect" onclick="openSerialPort();" /></li>
+								</ul>
+								
+							</article>
+
+						<!-- Live -->
+							<article id="live" class="panel">
+								<header>
+									<h1>Live view</h1>
+								</header>
+								<canvas id="liveChart"></canvas>
+							</article>
+
+						<!-- Config / Settings -->
+							<article id="config" class="panel">
+								<section>
+									<div class="row">
+										<h3>Stim Configuration</h3>
+									</div>
+									<div class="row">
+										<div class="col-6 col-4-medium col-12-small">Simluated Pattern: </div>
+										<div class="col-1 col-6-medium col-12-small tooltip">
+											<select id="ignitionType" onChange="updatePattern()">
+												<option value="1">Sequential</option>
+												<option value="2">Wasted spark</option>
+												<option value="3">Distributor</option>
+											</select>
+										</div>
+									</div>
+									<div class="row" id="firingOrder">
+										<div class="col-6 col-4-medium col-12-small">Firing Order: </div>
+										<div class="col-0"><input type="number" id="firingOrder_1" name="firingOrder_1" min="1" max="8" value="1"></div>
+										<div class="col-0"><input type="number" id="firingOrder_2" name="firingOrder_2" min="1" max="8" value="2"></div>
+										<div class="col-0"><input type="number" id="firingOrder_3" name="firingOrder_3" min="1" max="8" value="3"></div>
+										<div class="col-0"><input type="number" id="firingOrder_4" name="firingOrder_4" min="1" max="8" value="4"></div>
+										<div class="col-0"><input type="number" id="firingOrder_5" name="firingOrder_5" min="1" max="8" value="5"></div>
+										<div class="col-0"><input type="number" id="firingOrder_6" name="firingOrder_6" min="1" max="8" value="6"></div>
+										<div class="col-0"><input type="number" id="firingOrder_7" name="firingOrder_7" min="1" max="8" value="7"></div>
+										<div class="col-0"><input type="number" id="firingOrder_8" name="firingOrder_8" min="1" max="8" value="8"></div>
+									</div>
+									<div class="row">
+										<h4>Enter either the bore size or desired knock frequency</h4>
+									</div>
+									<div class="row">
+										<div class="col-6 col-4-medium col-12-small">Bore size (mm): </div>
+										<div class="col-1 col-6-medium col-12-small"><input type="number" id="bore" min="10" max="200" step="0.1" value="85.0" onChange="updateKnockFrequency()"></div>
+									</div>
+									<div class="row">
+										<div class="col-6 col-4-medium col-12-small">Knock Frequency (kHz): </div>
+										<div class="col-1 col-6-medium col-12-small"><input type="number" id="knockFrequency" min="1.22" max="19.98" step="0.01" value=""></div>
+									</div>	
+
+
+									<div class="row">
+										<h3>Knock timing</h3>
+									</div>
+									<div class="row">
+										<div class="col-6 col-6-medium col-12-small">
+											Knock window duration (Degrees): 
+										</div>
+										<div class="col-1 tooltip">
+											<input type="number" name="quantity" min="5" max="80" value="40">
+											<span class="tooltiptext">The number of degrees that the knock window will be open for</span>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-6 col-6-medium col-12-small">Knock window delay (Degrees): </div>
+										<div class="col-1 tooltip">
+											<input type="number" name="quantity" min="1" max="40" value="10">
+											<span class="tooltiptext">The number of degrees after ignition that the knock window will open</span>
+										</div>
+									</div>
+                  
+                  
+								</section>
+							</article>
+
+						<!-- Contact -->
+							<article id="contact" class="panel">
+								<header></header>
+								<form action="#" method="post">
+									<div>
+										<div class="row">
+											<div class="col-6 col-12-medium">
+												<input type="text" name="name" placeholder="Name" />
+											</div>
+											<div class="col-6 col-12-medium">
+												<input type="text" name="email" placeholder="Email" />
+											</div>
+											<div class="col-12">
+												<input type="text" name="subject" placeholder="Subject" />
+											</div>
+											<div class="col-12">
+												<textarea name="message" placeholder="Message" rows="6"></textarea>
+											</div>
+											<div class="col-12">
+												<input type="submit" value="Send Message" />
+											</div>
+										</div>
+									</div>
+								</form>
+							</article>
+
+					</div>
+
+				<!-- Footer -->
+					<div id="footer">
+						<ul class="copyright">
+							<li>&copy; Untitled.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/moment.js"></script>
+			<script src="assets/js/Chart.js"></script>
+			<script src="assets/js/chartjs-plugin-streaming.js"></script>
+			<script src="assets/js/chartjs-plugin-dragData.min.js"></script>
+			<script src="renderer.js"></script>
+			<script src="constants.js"></script>
+		<script>if (window.module) module = window.module;</script>
+
+	</body>
+</html>

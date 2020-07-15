@@ -1,0 +1,73 @@
+{
+  "name": "Ardu-Stim",
+  "version": "0.0.1",
+  "description": "Ardu-Stim engine simulator",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "install": "electron-rebuild -f",
+    "package-mac": "electron-build --mac",
+    "package-win": "electron-build --win",
+    "package-linux": "electron-packager . SpeedyLoader --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/speeduino/Ardu-Stim"
+  },
+  "author": "Josh Stewart",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/speeduino/Ardu-Stim/Issues"
+  },
+  "homepage": "https://github.com/speeduino/Ardu-Stim",
+  "devDependencies": {
+    "electron": "^4.1.1",
+    "electron-packager": "^13.1.1",
+    "electron-rebuild": "^1.8.4"
+  },
+  "dependencies": {
+    "electron-dl": "^1.13.0",
+    "marked": "^0.6.1",
+    "request": "^2.88.0",
+    "serialport": "^7.1.4"
+  },
+  "build": {
+    "appId": "Test",
+    "buildDependenciesFromSource": false,
+    "npmRebuild": false,
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+      "bin"
+    ],
+    "win": {
+      "icon": "assets/icons/win/icon.ico",
+      "target": [
+        "portable"
+      ]
+    },
+    "linux": {
+      "icon": "build/images/icon.png",
+      "target": [
+        "pacman"
+      ]
+    },
+    "mac": {
+      "icon": "assets/icons/mac/icon.icns",
+      "target": [
+        "dmg"
+      ]
+    }
+  }
+}
