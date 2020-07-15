@@ -571,13 +571,34 @@ input, select, textarea {
 		box-sizing: inherit;
 	}
 
+  /*
 	body {
 		background-image: url("images/overlay.png"), url("images/bg.jpg");
 		background-repeat: repeat, no-repeat;
 		background-size: auto, 100% 100%;
 		background-attachment: fixed;
 		overflow-y: scroll;
-	}
+  }
+  */
+  body {
+    background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to bottom, #292E49, #536976);
+    /*
+    Alternative background gradients:
+    background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+    background: linear-gradient(to right, #182848, #4b6cb7);
+    */
+
+
+
+
+
+
+    background-repeat: repeat, no-repeat;
+		background-size: auto, 100% 100%;
+		background-attachment: fixed;
+		overflow-y: scroll;
+  }
 
 		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
 			-moz-animation: none !important;
@@ -1208,7 +1229,7 @@ input, select, textarea {
 			transition: opacity 0.25s ease-in-out;
 			margin-bottom: 0;
 			position: relative;
-			padding: 1.0em 2.0em 2.0em 2.0em;
+			padding: 1.0em 1.0em 1.0em 2.0em;
 			width: 100%;
 		}
 
@@ -1391,7 +1412,7 @@ input, select, textarea {
 	#footer {
 		color: rgba(255, 255, 255, 0.45);
 		text-align: center;
-		padding: 2em 0 0 0;
+		padding: 0em 0 0 0;
 		font-size: 0.75em;
 	}
 

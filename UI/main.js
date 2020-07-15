@@ -12,7 +12,7 @@ var avrdudeIsRunning = false;
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 1024, height: 768, backgroundColor: '#312450', 
+  win = new BrowserWindow({ width: 1024, height: 700, backgroundColor: '#312450', 
                             webPreferences: { nodeIntegration: true }
                           })
 

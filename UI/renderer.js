@@ -235,90 +235,75 @@ function uploadFW()
 
 }
 
+function refreshPatternList()
+{
+  //Read the available patterns from the arduino
+}
 
-function onRefresh(chart) {
+function readPattern()
+{
+  //Read the 0/1/2/3 sequence for the current pattern from the arduino
+
+  
+}
+
+function updatePattern()
+{
+  //Change the active pattern on the stim
+  var currentPattern = toothPatterns[document.getElementById('patternSelect').value];
+  redrawGears(currentPattern);
+  
+}
+
+function updatePRM()
+{
+  //Send a new fixed RPM value back to the arduino
+}
+
+function setRPMMode()
+{
+  //Change between pot, fixed and sweep RPM modes
+}
+
+function redrawGears(pattern)
+{
+  var teeth, depth, radius, width;
+  //teeth =  toothPattern.length / 2;
+  depth = 10;
+  radius = 150;
+  width = Number("100");
+  line = 1;
+  var halfspeed = true;
+  //var halfspeed = false;
+
+  draw_crank(pattern, depth, radius, width, line, halfspeed);
+  draw_cam(pattern, depth, radius, width, line);
+}
+
+var timers = [];
+function animateGauges() {
+  document.gauges.forEach(function(gauge) {
+      timers.push(setInterval(function() {
+          gauge.value = Math.random() *
+              (gauge.options.maxValue - gauge.options.minValue) / 4 +
+              gauge.options.minValue / 4;
+      }, gauge.animation.duration + 50));
+  });
+}
+
+
+function onRefresh(chart) 
+{
     if(port.isOpen == false) { return; }
 
     port.write("G1"); //Sends the command to get live data
 
 }
 
-var chartColors = {
-	red: 'rgb(255, 99, 132)',
-	orange: 'rgb(255, 159, 64)',
-	yellow: 'rgb(255, 205, 86)',
-	green: 'rgb(75, 192, 192)',
-	blue: 'rgb(54, 162, 235)',
-	purple: 'rgb(153, 102, 255)',
-	grey: 'rgb(201, 203, 207)'
-}; 
-var color = Chart.helpers.color;
-
-var liveChartConfig = {
-	type: 'line',
-	data: {
-		datasets: [{
-			label: 'Knock threshold',
-			backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
-			borderColor: chartColors.red,
-			fill: false,
-			lineTension: 0,
-			borderDash: [8, 4],
-            data: [],
-            pointRadius: 0
-		}, {
-			label: 'Knock reading',
-			backgroundColor: color(chartColors.blue).alpha(0.5).rgbString(),
-			borderColor: chartColors.green,
-			fill: false,
-			cubicInterpolationMode: 'monotone',
-            data: [],
-            pointRadius: 0
-		}]
-	},
-	options: {
-		title: {
-			display: false,
-			text: 'Live knock readings'
-		},
-		scales: {
-			xAxes: [{
-				type: 'realtime',
-				realtime: {
-					duration: 20000,
-					refresh: 400,
-					delay: 800,
-					onRefresh: onRefresh
-				}
-			}],
-			yAxes: [{
-				scaleLabel: {
-					display: true,
-					labelString: 'Knock'
-				}
-			}]
-		},
-		tooltips: {
-			mode: 'nearest',
-			intersect: false
-		},
-		hover: {
-			mode: 'nearest',
-			intersect: false
-		}
-	}
-};
-
-window.onload = function () {
+window.onload = function () 
+{
     refreshSerialPorts();
-
-
-    var ctx = document.getElementById('liveChart').getContext('2d');
-    var ctx1 = document.getElementById('thresholdChart').getContext('2d');
-    liveChart = new Chart(ctx, liveChartConfig);
-
-    //Pause the live chart (Get's unpaused when connection is established)
-    liveChartConfig.options.scales.xAxes[0].realtime.pause = true;
-	window.liveChart.update({duration: 0});
+    redrawGears(toothPatterns[0]);
+    animateGauges();
 };
 

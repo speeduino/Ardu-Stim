@@ -83,10 +83,39 @@
 
 						<!-- Live -->
 							<article id="live" class="panel">
-								<header>
-									<h1>Live view</h1>
-								</header>
-								<canvas id="liveChart"></canvas>
+								<div class="row">
+                  <div class="col-2 col-4-medium col-12-small">RPM Mode: </div>
+                  <div class="col-1 col-6-medium col-12-small">
+                    <select id="rpmSelect" onChange="setRPMMode()">
+                      <option value="0">Use potentiometer</option>
+                      <option value="1">Fixed RPM</option>
+                      <option value="2">Sweep</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-2 col-4-medium col-12-small">Fixed RPM: </div>
+                  <div class="col-1 col-6-medium col-12-small">
+                    <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500.0" onChange="updateRPM()">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-2 col-4-medium col-12-small">RPM Sweep range: </div>
+                  <div class="col-1 col-6-medium col-12-small">
+                    <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100.0" onChange="updateSweepRPM()">
+                  </div>
+                  <div class="col-1 col-6-medium col-12-small">
+                    <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="updateSweepRPM()">
+                  </div>
+                </div>
+                
+                <canvas data-type="radial-gauge"
+                        data-units="RPM"
+                        data-min-value="0"
+                        data-max-value="9000"
+                        data-major-ticks="0,1000,2000,3000,4000,5000,6000,7000,8000,9000"
+                        data-value-dec="0"
+                ></canvas>
 							</article>
 
 						<!-- Config / Settings -->
@@ -98,55 +127,24 @@
 									<div class="row">
 										<div class="col-6 col-4-medium col-12-small">Simluated Pattern: </div>
 										<div class="col-1 col-6-medium col-12-small tooltip">
-											<select id="ignitionType" onChange="updatePattern()">
-												<option value="1">Sequential</option>
-												<option value="2">Wasted spark</option>
-												<option value="3">Distributor</option>
+											<select id="patternSelect" onChange="updatePattern()">
+												<option value="0">36-1</option>
+												<option value="1">4cyl Distributor</option>
+                        <option value="2">420a</option>
+                        <option value="3">4G63</option>
+                        <option value="4">36-1 with Cam</option>
 											</select>
 										</div>
 									</div>
-									<div class="row" id="firingOrder">
-										<div class="col-6 col-4-medium col-12-small">Firing Order: </div>
-										<div class="col-0"><input type="number" id="firingOrder_1" name="firingOrder_1" min="1" max="8" value="1"></div>
-										<div class="col-0"><input type="number" id="firingOrder_2" name="firingOrder_2" min="1" max="8" value="2"></div>
-										<div class="col-0"><input type="number" id="firingOrder_3" name="firingOrder_3" min="1" max="8" value="3"></div>
-										<div class="col-0"><input type="number" id="firingOrder_4" name="firingOrder_4" min="1" max="8" value="4"></div>
-										<div class="col-0"><input type="number" id="firingOrder_5" name="firingOrder_5" min="1" max="8" value="5"></div>
-										<div class="col-0"><input type="number" id="firingOrder_6" name="firingOrder_6" min="1" max="8" value="6"></div>
-										<div class="col-0"><input type="number" id="firingOrder_7" name="firingOrder_7" min="1" max="8" value="7"></div>
-										<div class="col-0"><input type="number" id="firingOrder_8" name="firingOrder_8" min="1" max="8" value="8"></div>
-									</div>
-									<div class="row">
-										<h4>Enter either the bore size or desired knock frequency</h4>
-									</div>
-									<div class="row">
-										<div class="col-6 col-4-medium col-12-small">Bore size (mm): </div>
-										<div class="col-1 col-6-medium col-12-small"><input type="number" id="bore" min="10" max="200" step="0.1" value="85.0" onChange="updateKnockFrequency()"></div>
-									</div>
-									<div class="row">
-										<div class="col-6 col-4-medium col-12-small">Knock Frequency (kHz): </div>
-										<div class="col-1 col-6-medium col-12-small"><input type="number" id="knockFrequency" min="1.22" max="19.98" step="0.01" value=""></div>
-									</div>	
 
-
-									<div class="row">
-										<h3>Knock timing</h3>
-									</div>
-									<div class="row">
-										<div class="col-6 col-6-medium col-12-small">
-											Knock window duration (Degrees): 
-										</div>
-										<div class="col-1 tooltip">
-											<input type="number" name="quantity" min="5" max="80" value="40">
-											<span class="tooltiptext">The number of degrees that the knock window will be open for</span>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-6 col-6-medium col-12-small">Knock window delay (Degrees): </div>
-										<div class="col-1 tooltip">
-											<input type="number" name="quantity" min="1" max="40" value="10">
-											<span class="tooltiptext">The number of degrees after ignition that the knock window will open</span>
-										</div>
+                  <div class="row"><br/><br/></div>
+                  <div class="row" style="background: #0071b8;">
+                    
+										<div id="screen" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iNTBweCIgaGVpZ2h0PSI1MHB4IiB2aWV3Qm94PSIwIDAgNTAgNTAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnIGNsYXNzPSJncmlkIiBzdHJva2U9IiNmZmYiIG9wYWNpdHk9IjAuMiI+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSA1MC41IDAuNSAwLjUgNTAuNSAwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDUuNSA1MC41IDUuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSI1LjUgMC41IDUuNSA1MC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSAxMC41IDUwLjUgMTAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIxMC41IDAuNSAxMC41IDUwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDE1LjUgNTAuNSAxNS41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjE1LjUgMC41IDE1LjUgNTAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIwLjUgMjAuNSA1MC41IDIwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMjAuNSAwLjUgMjAuNSA1MC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSAyNS41IDUwLjUgMjUuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIyNS41IDAuNSAyNS41IDUwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDMwLjUgNTAuNSAzMC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjMwLjUgMC41IDMwLjUgNTAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIwLjUgMzUuNSA1MC41IDM1LjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMzUuNSAwLjUgMzUuNSA1MC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSA0MC41IDUwLjUgNDAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSI0MC41IDAuNSA0MC41IDUwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDQ1LjUgNTAuNSA0NS41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjQ1LjUgMC41IDQ1LjUgNTAuNSI+PC9wb2x5bGluZT48L2c+PC9zdmc+'); width: 100%; height: 400px;">
+                      <canvas id="crank" width="430" height="350"></canvas>
+                      <canvas id="cam" width="430" height="350"></canvas>
+                    </div>
+                    
 									</div>
                   
                   
@@ -184,7 +182,7 @@
 				<!-- Footer -->
 					<div id="footer">
 						<ul class="copyright">
-							<li>&copy; Untitled.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							<li>&copy; Josh Stewart.</li><li>Details: <a href="http://speeduino.com">Speeduino</a></li>
 						</ul>
 					</div>
 
@@ -198,11 +196,11 @@
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
 			<script src="assets/js/moment.js"></script>
-			<script src="assets/js/Chart.js"></script>
-			<script src="assets/js/chartjs-plugin-streaming.js"></script>
-			<script src="assets/js/chartjs-plugin-dragData.min.js"></script>
-			<script src="renderer.js"></script>
-			<script src="constants.js"></script>
+			<script src="assets/js/gauge.min.js"></script>
+      <script src="gear_generator.js"></script>
+      <script src="renderer.js"></script>
+      <script src="constants.js"></script>
+      
 		<script>if (window.module) module = window.module;</script>
 
 	</body>
