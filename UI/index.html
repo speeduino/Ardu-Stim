@@ -76,7 +76,8 @@
 								<select name="ports" class="select" id="portsSelect" size="10" width="20"></select>
 								<ul class="actions">
 										<li><input type='button' value="Refresh" onclick="refreshSerialPorts();" /></li>
-										<li><input type='button' value="Connect" id="btnConnect" onclick="openSerialPort();" /></li>
+                    <li><input type='button' value="Connect" id="btnConnect" onclick="openSerialPort();" /></li>
+                    <li><input type='button' value="Do the thing" id="btnDoIt" onclick="requestPatternList();" /></li>
 								</ul>
 								
 							</article>
@@ -128,11 +129,6 @@
 										<div class="col-6 col-4-medium col-12-small">Simluated Pattern: </div>
 										<div class="col-1 col-6-medium col-12-small tooltip">
 											<select id="patternSelect" onChange="updatePattern()">
-												<option value="0">36-1</option>
-												<option value="1">4cyl Distributor</option>
-                        <option value="2">420a</option>
-                        <option value="3">4G63</option>
-                        <option value="4">36-1 with Cam</option>
 											</select>
 										</div>
 									</div>

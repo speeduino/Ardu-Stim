@@ -1,6 +1,10 @@
 const serialport = require('serialport')
+const Readline = require('@serialport/parser-readline')
+const ByteLength = require('@serialport/parser-byte-length')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
+
+var onConnectInterval;
 
 function refreshSerialPorts()
 {
@@ -49,16 +53,22 @@ function openSerialPort()
 {
     var e = document.getElementById('portsSelect');
     
-
-    port = new serialport(e.options[e.selectedIndex].value, { baudRate: 9600 }, function (err) {
+    console.log("Opening serial port: ", e.options[e.selectedIndex].value);
+    port = new serialport(e.options[e.selectedIndex].value, { baudRate: 115200 }, function (err) {
         if (err) {
           return console.log('Error: ', err.message)
         }
       })
 
-    
+    //Update the patterns downdown list
+    port.on('open', onSerialConnect);
+    //port.on('data', onData);
+    //refreshPatternList();
+
+
     // Master listener for all serial actions
     // Switches the port into "flowing mode"
+    /*
     port.on('data', function (data) 
     {
         //console.log('Data:', data)
@@ -76,10 +86,14 @@ function openSerialPort()
             y: knockValue
             });
     })
+    */
 
-    //Start the live chart
-    liveChartConfig.options.scales.xAxes[0].realtime.pause = false;
-	window.liveChart.update({duration: 0});
+}
+
+function onSerialConnect()
+{
+  console.log("Serial port opened");
+  onConnectInterval = setInterval(requestPatternList, 3000);
 }
 
 function refreshAvailableFirmwares()
@@ -235,9 +249,46 @@ function uploadFW()
 
 }
 
-function refreshPatternList()
+var patternOptionCounter = 0;
+function requestPatternList()
 {
+  //Clear the interval
+  clearInterval(onConnectInterval);
+
+  //Clear the existing list
+  var select = document.getElementById('patternSelect')
+  for (i = 0; i <= select.options.length; i++) 
+  {
+      select.remove(0); //Always 0 index (As each time an item is removed, everything shuffles up 1 place)
+  }
+  patternOptionCounter = 0;
+
+
   //Read the available patterns from the arduino
+  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+  console.log("Sending 'L' command");
+  //const parser = port.pipe(new ByteLength({length: 8}))
+  port.write("L"); //Send the command to issue the pattern name list
+  parser.on('data', refreshPatternList);
+  //port.on('data', refreshPatternList);
+  
+
+}
+
+//Called back after the 'L' command has been received
+function refreshPatternList(data) 
+{
+  console.log(`Adding option #${patternOptionCounter}:\t${data}`)
+  var select = document.getElementById('patternSelect')
+  var option = document.createElement("option");
+  option.text = data;
+  option.value = patternOptionCounter;
+  
+  //Add new item
+  select.add(option);
+
+  patternOptionCounter++;
+
 }
 
 function readPattern()
@@ -249,10 +300,30 @@ function readPattern()
 
 function updatePattern()
 {
-  //Change the active pattern on the stim
-  var currentPattern = toothPatterns[document.getElementById('patternSelect').value];
-  redrawGears(currentPattern);
+  var patternID = document.getElementById('patternSelect').value;
+
+  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+  console.log(`Sending 'S' command with pattern ${patternID}`);
+  //const parser = port.pipe(new ByteLength({length: 8}))
+  //port.write('S'); //Send the command to change the pattern
+
+  var buffer = new Buffer(2);
+  buffer[0] = 0x53; // Ascii 'S'
+  buffer[1] = parseInt(patternID);
+  port.write(buffer); //Send the new pattern ID
+
+  //Request the new pattern
+  port.write("P"); //Send the command to read the new pattern out
+  parser.on('data', refreshPattern);
   
+}
+
+//Callback for the P command
+function refreshPattern(data)
+{
+  console.log(`Received pattern: ${data}`);
+  var newPattern = data.split(",");
+  redrawGears(newPattern);
 }
 
 function updateRPM()
@@ -278,8 +349,8 @@ function redrawGears(pattern)
   radius = 150;
   width = Number("100");
   line = 1;
-  var halfspeed = true;
-  //var halfspeed = false;
+  //var halfspeed = true;
+  var halfspeed = false;
 
   draw_crank(pattern, depth, radius, width, line, halfspeed);
   draw_cam(pattern, depth, radius, width, line);
