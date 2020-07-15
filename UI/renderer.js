@@ -255,9 +255,14 @@ function updatePattern()
   
 }
 
-function updatePRM()
+function updateRPM()
 {
   //Send a new fixed RPM value back to the arduino
+}
+
+function updateSweepRPM()
+{
+  //Send new sweep RPM values back to the arduino
 }
 
 function setRPMMode()
