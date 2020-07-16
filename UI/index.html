@@ -12,47 +12,6 @@
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
-		<script>
-			function updateCylinderInputs()
-			{
-				nCylinders = document.getElementsByName("nCylinders")[0].value;
-				for(x=1; x<=8; x++)
-				{
-					if(x <= nCylinders)
-					{
-						document.getElementById("firingOrder_" + x).disable = false;
-						console.log("Enabled firingOrder_" + x);
-					}
-					else
-					{
-						document.getElementById("firingOrder_" + x).disabled = true;
-						console.log("Disabled firingOrder_" + x);
-					}
-					
-				}
-			}
-			function updateIgnitionType()
-			{
-				//The firing order section is only enabled if sequential ignition type is selected
-				//(If you don't have sequential ignition we can't do cylinder ID and therefore there's no need to know the firing order)
-				if(document.getElementById("ignitionType").value != 1)
-				{
-					document.getElementById("firingOrder").style.display = "none";
-				}
-				else
-				{
-					document.getElementById("firingOrder").style.display = "flex";
-				}
-			}
-			function updateKnockFrequency()
-			{
-				bore = document.getElementById("bore").value;
-				knockFrequency = 1800 / (Math.PI * bore);
-
-				document.getElementById("knockFrequency").value = knockFrequency;
-				console.log("Nearest frequency = " + closest(bandpassFrequencies, knockFrequency));
-			}
-		</script>
 	</head>
 	<body class="is-preload">
 
@@ -62,8 +21,8 @@
 				<!-- Nav -->
 					<nav id="nav">
 						<a href="#connect" class="icon fa-plug"><span>Connect</span></a>
-						<a href="#live" class="icon fa-tachometer"><span>Dashboard</span></a>
-						<a href="#config" class="icon fa-sliders-h"><span>Config</span></a>
+						<a id="link_live" class="icon fa-tachometer"><span>Dashboard</span></a>
+						<a id="link_config" class="icon fa-sliders-h"><span>Config</span></a>
 					</nav>
 
 				<!-- Main -->
@@ -77,7 +36,6 @@
 								<ul class="actions">
 										<li><input type='button' value="Refresh" onclick="refreshSerialPorts();" /></li>
                     <li><input type='button' value="Connect" id="btnConnect" onclick="openSerialPort();" /></li>
-                    <li><input type='button' value="Do the thing" id="btnDoIt" onclick="requestPatternList();" /></li>
 								</ul>
 								
 							</article>
@@ -116,6 +74,8 @@
                         data-max-value="9000"
                         data-major-ticks="0,1000,2000,3000,4000,5000,6000,7000,8000,9000"
                         data-value-dec="0"
+                        data-width="200"
+                        data-height="200"
                 ></canvas>
 							</article>
 

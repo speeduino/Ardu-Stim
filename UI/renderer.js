@@ -5,6 +5,7 @@ const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
 var onConnectInterval;
+var isConnected=false;
 
 function refreshSerialPorts()
 {
@@ -94,6 +95,10 @@ function onSerialConnect()
 {
   console.log("Serial port opened");
   onConnectInterval = setInterval(requestPatternList, 3000);
+
+  //Activate the links
+  document.getElementById("link_live").href = "#live";
+  document.getElementById("link_config").href = "#config";
 }
 
 function refreshAvailableFirmwares()
@@ -250,10 +255,14 @@ function uploadFW()
 }
 
 var patternOptionCounter = 0;
+var numPatterns = 0;
 function requestPatternList()
 {
   //Clear the interval
   clearInterval(onConnectInterval);
+
+  //Attach the readline parser
+  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
   //Clear the existing list
   var select = document.getElementById('patternSelect')
@@ -262,10 +271,13 @@ function requestPatternList()
       select.remove(0); //Always 0 index (As each time an item is removed, everything shuffles up 1 place)
   }
   patternOptionCounter = 0;
+  numPatterns = 0;
 
+  //Request the number of wheels
+  console.log("Requesting number of wheels");
+  port.write("n");
 
   //Read the available patterns from the arduino
-  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
   console.log("Sending 'L' command");
   //const parser = port.pipe(new ByteLength({length: 8}))
   port.write("L"); //Send the command to issue the pattern name list
@@ -278,6 +290,14 @@ function requestPatternList()
 //Called back after the 'L' command has been received
 function refreshPatternList(data) 
 {
+  //If this is the first line received, the number is the total number of wheels avaialable
+  if(numPatterns == 0)
+  {
+    numPatterns = parseInt(data);
+    console.log(`Number of wheels: ${numPatterns}`);
+    return;
+  }
+
   console.log(`Adding option #${patternOptionCounter}:\t${data}`)
   var select = document.getElementById('patternSelect')
   var option = document.createElement("option");
@@ -289,6 +309,7 @@ function refreshPatternList(data)
 
   patternOptionCounter++;
 
+  if(patternOptionCounter == numPatterns) { port.unpipe(); }
 }
 
 function readPattern()
@@ -324,6 +345,8 @@ function refreshPattern(data)
   console.log(`Received pattern: ${data}`);
   var newPattern = data.split(",");
   redrawGears(newPattern);
+
+  port.unpipe();
 }
 
 function updateRPM()
@@ -349,13 +372,14 @@ function redrawGears(pattern)
   radius = 150;
   width = Number("100");
   line = 1;
-  //var halfspeed = true;
-  var halfspeed = false;
+  var halfspeed = true;
+  //var halfspeed = false;
 
   draw_crank(pattern, depth, radius, width, line, halfspeed);
   draw_cam(pattern, depth, radius, width, line);
 }
 
+/*
 var timers = [];
 function animateGauges() {
   document.gauges.forEach(function(gauge) {
@@ -366,6 +390,7 @@ function animateGauges() {
       }, gauge.animation.duration + 50));
   });
 }
+*/
 
 
 function onRefresh(chart) 
@@ -380,6 +405,6 @@ window.onload = function ()
 {
     refreshSerialPorts();
     redrawGears(toothPatterns[0]);
-    animateGauges();
+    //animateGauges();
 };
 

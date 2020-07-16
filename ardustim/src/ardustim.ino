@@ -380,22 +380,22 @@ ISR(TIMER1_COMPA_vect) {
   OCR1A = new_OCR1A;  /* Apply new "RPM" from Timer2 ISR, i.e. speed up/down the virtual "wheel" */
 }
 
-void loop() {
+void loop() 
+{
   uint16_t tmp_rpm = 0;
   /* Just handle the Serial UI, everything else is in 
    * interrupt handlers or callbacks from SerialUI.
    */
 
 
-  //TODO: Add serial handler here
   if(Serial.available() > 0) { commandParser(); }
 
   if (adc0_read_complete == true)
   {
     adc0_read_complete = false;
     tmp_rpm = adc0 << TMP_RPM_SHIFT;
-    if (tmp_rpm > TMP_RPM_CAP)
-      tmp_rpm = TMP_RPM_CAP;
+    if (tmp_rpm > TMP_RPM_CAP) { tmp_rpm = TMP_RPM_CAP; }
+    wanted_rpm = tmp_rpm;
     reset_new_OCR1A(tmp_rpm);
   }
 }

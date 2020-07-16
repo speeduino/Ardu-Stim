@@ -70,6 +70,7 @@ void serialSetup()
 
 void commandParser()
 {
+  char buf[80];
   if (cmdPending == false) { currentCommand = Serial.read(); }
 
   switch (currentCommand)
@@ -82,12 +83,15 @@ void commandParser()
       //Serial.println(MAX_WHEELS);
       
       //Wheel names are then sent 1 per line
-      char buf[80];
       for(byte x=0;x<MAX_WHEELS;x++)
       {
         strcpy_P(buf,Wheels[x].decoder_name);
         Serial.println(buf);
       }
+      break;
+
+    case 'n': //Send the number of wheels
+      Serial.println(MAX_WHEELS);
       break;
     
     case 'p': //Send the size of the current wheel
@@ -105,17 +109,31 @@ void commandParser()
         Serial.print(tempByte);
       }
       Serial.println("");
+      break;
 
     case 'S': //Set the current wheel
       while(Serial.available() < 1) {} 
-      selected_wheel = Serial.read();
-      display_new_wheel();
+      byte tmp_wheel = Serial.read();
+      if(tmp_wheel < MAX_WHEELS)
+      {
+        selected_wheel = tmp_wheel;
+        display_new_wheel();
+      }
+      
+      break;
+
+    case 'X':
+      //selected_wheel = selected_wheel+1;
+      //display_new_wheel();
+      select_next_wheel_cb();
+      strcpy_P(buf,Wheels[selected_wheel].decoder_name);
+      Serial.println(buf);
       break;
 
     default:
       break;
   }
-
+  cmdPending = false;
 }
 
 /* Helper function to spit out amount of ram remainig */
