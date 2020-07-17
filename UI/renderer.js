@@ -261,12 +261,6 @@ var patternOptionCounter = 0;
 var numPatterns = 0;
 function requestPatternList()
 {
-  //Drop the modal loading window
-  modalLoading.remove();
-  //Move to the Live tab
-  window.location.hash = '#live';
-  enableRPM();
-
   //Clear the interval
   clearInterval(onConnectInterval);
 
@@ -318,7 +312,16 @@ function refreshPatternList(data)
 
   patternOptionCounter++;
 
-  if(patternOptionCounter == numPatterns) { port.unpipe(); }
+  if(patternOptionCounter == numPatterns)
+  { 
+    port.unpipe(); 
+
+    //Drop the modal loading window
+    modalLoading.remove();
+    //Move to the Live tab
+    window.location.hash = '#live';
+    enableRPM();
+  }
 }
 
 function readPattern()
@@ -418,18 +421,26 @@ function animateGauges() {
 }
 */
 
-var RPMInterval;
+var RPMInterval = 0;
 function enableRPM()
 {
-  RPMInterval = setInterval(updateRPM, 100);
-  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
-  parser.on('data', receiveRPM);  
+  if(RPMInterval == 0)
+  {
+    RPMInterval = setInterval(updateRPM, 100);
+    const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+    parser.on('data', receiveRPM);  
+  }
+  
 }
 
 function disableRPM()
 {
+  console.log("Deactivating RPM reads");
   clearInterval(RPMInterval);
+  RPMInterval = 0;
   port.unpipe();
+  port.read(); //Flush the port
+  parser.read();
 }
 
 function receiveRPM(data)
