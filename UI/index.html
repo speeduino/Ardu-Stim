@@ -42,41 +42,51 @@
 
 						<!-- Live -->
 							<article id="live" class="panel">
-								<div class="row">
-                  <div class="col-2 col-4-medium col-12-small">RPM Mode: </div>
-                  <div class="col-1 col-6-medium col-12-small">
-                    <select id="rpmSelect" onChange="setRPMMode()">
-                      <option value="0">Use potentiometer</option>
-                      <option value="1">Fixed RPM</option>
-                      <option value="2">Sweep</option>
-                    </select>
-                  </div>
-                </div>
                 <div class="row">
-                  <div class="col-2 col-4-medium col-12-small">Fixed RPM: </div>
-                  <div class="col-1 col-6-medium col-12-small">
-                    <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500.0" onChange="updateRPM()">
+                  <div class="column25">
+                    <div class="row">
+                      <div class="col-6 col-4-medium col-12-small">RPM Mode: </div>
+                      <div class="col-1 col-6-medium col-12-small">
+                        <select id="rpmSelect" onChange="setRPMMode()">
+                          <option value="0">Use potentiometer</option>
+                          <option value="1">Fixed RPM</option>
+                          <option value="2">Sweep</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 col-4-medium col-12-small">Fixed RPM: </div>
+                      <div class="col-1 col-6-medium col-12-small">
+                        <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500.0" onChange="updateRPM()">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 col-4-medium col-12-small">RPM Sweep range: </div>
+                      <div class="col-6 col-6-medium col-12-small">
+                        <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100.0" onChange="updateSweepRPM()">
+                      </div>
+                      
+                      <div class="col-6 col-6-medium col-12-small">
+                        <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="updateSweepRPM()">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="column75" style="text-align: center;">
+                    <canvas data-type="radial-gauge"
+                            data-units="RPM"
+                            data-min-value="0"
+                            data-max-value="9000"
+                            data-major-ticks="0,1000,2000,3000,4000,5000,6000,7000,8000,9000"
+                            data-value-dec="0"
+                            data-width="400"
+                            data-height="400"
+                            data-animation-duration="100"
+                            data-animated-value="true"
+                            data-animation-rule="linear"
+                    ></canvas>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-2 col-4-medium col-12-small">RPM Sweep range: </div>
-                  <div class="col-1 col-6-medium col-12-small">
-                    <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100.0" onChange="updateSweepRPM()">
-                  </div>
-                  <div class="col-1 col-6-medium col-12-small">
-                    <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="updateSweepRPM()">
-                  </div>
-                </div>
-                
-                <canvas data-type="radial-gauge"
-                        data-units="RPM"
-                        data-min-value="0"
-                        data-max-value="9000"
-                        data-major-ticks="0,1000,2000,3000,4000,5000,6000,7000,8000,9000"
-                        data-value-dec="0"
-                        data-width="200"
-                        data-height="200"
-                ></canvas>
 							</article>
 
 						<!-- Config / Settings -->

@@ -73,6 +73,15 @@ input, select, textarea {
 	appearance: none;
 }
 
+/* Colummn */
+
+  .column25 {
+    flex: 25%;
+  }
+  .column75 {
+    flex: 75%;
+  }
+
 /* Row */
 
 	.row {

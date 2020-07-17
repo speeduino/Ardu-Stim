@@ -6,6 +6,7 @@ var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
 var onConnectInterval;
 var isConnected=false;
+var currentRPM = 0;
 
 function refreshSerialPorts()
 {
@@ -264,6 +265,7 @@ function requestPatternList()
   modalLoading.remove();
   //Move to the Live tab
   window.location.hash = '#live';
+  enableRPM();
 
   //Clear the interval
   clearInterval(onConnectInterval);
@@ -369,7 +371,6 @@ function refreshPattern(data)
     port.unpipe();
   }
 
-
   
 }
 
@@ -417,14 +418,31 @@ function animateGauges() {
 }
 */
 
+var RPMInterval;
 function enableRPM()
 {
-
+  RPMInterval = setInterval(updateRPM, 100);
+  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+  parser.on('data', receiveRPM);  
 }
 
 function disableRPM()
 {
-  
+  clearInterval(RPMInterval);
+  port.unpipe();
+}
+
+function receiveRPM(data)
+{
+  console.log(`Received RPM: ${data}`);
+  currentRPM = parseInt(data);
+}
+
+function updateRPM()
+{
+  console.log("Requesting new RPM");
+  port.write("R"); //Request next RPM read
+  document.gauges[0].value = currentRPM;
 }
 
 
@@ -440,6 +458,7 @@ window.onload = function ()
 {
     refreshSerialPorts();
     redrawGears(toothPatterns[0]);
+    window.location.hash = '#connect';
     //animateGauges();
 };
 

@@ -115,7 +115,7 @@ void commandParser()
       break;
 
     case 'R': //Send the current RPM
-      Serial.println("");
+      Serial.println(wanted_rpm);
       break;
 
     case 'S': //Set the current wheel
