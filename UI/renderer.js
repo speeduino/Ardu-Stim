@@ -66,6 +66,8 @@ function openSerialPort()
     //port.on('data', onData);
     //refreshPatternList();
 
+    //Drop the modal dialog until connection is complete
+    modalLoading.init(true);
 
     // Master listener for all serial actions
     // Switches the port into "flowing mode"
@@ -258,6 +260,12 @@ var patternOptionCounter = 0;
 var numPatterns = 0;
 function requestPatternList()
 {
+  //Drop the modal loading window
+  modalLoading.remove();
+  //Move to the Live tab
+  //document.getElementById("live").scrollIntoView();
+  window.location.hash = '#live';
+
   //Clear the interval
   clearInterval(onConnectInterval);
 
@@ -391,6 +399,16 @@ function animateGauges() {
   });
 }
 */
+
+function enableRPM()
+{
+
+}
+
+function disableRPM()
+{
+  
+}
 
 
 function onRefresh(chart) 

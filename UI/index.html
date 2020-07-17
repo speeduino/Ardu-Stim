@@ -20,9 +20,9 @@
 
 				<!-- Nav -->
 					<nav id="nav">
-						<a href="#connect" class="icon fa-plug"><span>Connect</span></a>
-						<a id="link_live" class="icon fa-tachometer"><span>Dashboard</span></a>
-						<a id="link_config" class="icon fa-sliders-h"><span>Config</span></a>
+						<a href="#connect" class="icon fa-plug" onClick="disableRPM()"><span>Connect</span></a>
+						<a id="link_live" class="icon fa-tachometer" onClick="enableRPM()"><span>Dashboard</span></a>
+						<a id="link_config" class="icon fa-sliders-h" onClick="disableRPM()"><span>Config</span></a>
 					</nav>
 
 				<!-- Main -->
@@ -152,7 +152,8 @@
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
 			<script src="assets/js/moment.js"></script>
-			<script src="assets/js/gauge.min.js"></script>
+      <script src="assets/js/gauge.min.js"></script>
+      <script src="assets/js/modalLoading.js"></script>
       <script src="gear_generator.js"></script>
       <script src="renderer.js"></script>
       <script src="constants.js"></script>
