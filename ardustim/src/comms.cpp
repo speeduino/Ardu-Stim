@@ -111,6 +111,9 @@ void commandParser()
       Serial.println("");
       break;
 
+    case 'R': //Send the current RPM
+      Serial.println()
+
     case 'S': //Set the current wheel
       while(Serial.available() < 1) {} 
       byte tmp_wheel = Serial.read();
@@ -119,12 +122,13 @@ void commandParser()
         selected_wheel = tmp_wheel;
         display_new_wheel();
       }
+
+      //Return value is the number of degrees the wheel runs over (360 or 720 typically)
+      Serial.println(Wheels[selected_wheel].wheel_degrees);
       
       break;
 
-    case 'X':
-      //selected_wheel = selected_wheel+1;
-      //display_new_wheel();
+    case 'X': //Just a test method for switching the to the next wheel
       select_next_wheel_cb();
       strcpy_P(buf,Wheels[selected_wheel].decoder_name);
       Serial.println(buf);

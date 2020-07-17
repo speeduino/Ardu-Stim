@@ -41,6 +41,7 @@ struct _wheels {
   const unsigned char *edge_states_ptr PROGMEM;
   const float rpm_scaler;
   const uint16_t wheel_max_edges;
+  const uint16_t wheel_degrees;
 };
 
 template <typename T> void PROGMEM_readAnything (const T * sce, T& dest)
