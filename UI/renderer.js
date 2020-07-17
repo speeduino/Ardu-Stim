@@ -263,7 +263,6 @@ function requestPatternList()
   //Drop the modal loading window
   modalLoading.remove();
   //Move to the Live tab
-  //document.getElementById("live").scrollIntoView();
   window.location.hash = '#live';
 
   //Clear the interval
@@ -327,6 +326,8 @@ function readPattern()
   
 }
 
+var patternRow = 0;
+var newPattern;
 function updatePattern()
 {
   var patternID = document.getElementById('patternSelect').value;
@@ -350,11 +351,26 @@ function updatePattern()
 //Callback for the P command
 function refreshPattern(data)
 {
-  console.log(`Received pattern: ${data}`);
-  var newPattern = data.split(",");
-  redrawGears(newPattern);
+  
+  if(patternRow == 0)
+  {
+    //First line sent is the pattern itself
+    console.log(`Received pattern: ${data}`);
+    newPattern = data.split(",");
+    patternRow++;
+  }
+  else
+  {
+    //2nd line received is the number of degrees the pattern runs over (360 or 720 usually)
+    console.log(`Pattern duration: ${data}`)
+    redrawGears(newPattern, parseInt(data));
+    
+    patternRow = 0;
+    port.unpipe();
+  }
 
-  port.unpipe();
+
+  
 }
 
 function updateRPM()
@@ -372,7 +388,7 @@ function setRPMMode()
   //Change between pot, fixed and sweep RPM modes
 }
 
-function redrawGears(pattern)
+function redrawGears(pattern, degrees)
 {
   var teeth, depth, radius, width;
   //teeth =  toothPattern.length / 2;
@@ -380,7 +396,8 @@ function redrawGears(pattern)
   radius = 150;
   width = Number("100");
   line = 1;
-  var halfspeed = true;
+  var halfspeed = false;
+  if(degrees == 720) { halfspeed = true; }
   //var halfspeed = false;
 
   draw_crank(pattern, depth, radius, width, line, halfspeed);

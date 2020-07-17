@@ -71,6 +71,7 @@ void serialSetup()
 void commandParser()
 {
   char buf[80];
+  byte tmp_wheel;
   if (cmdPending == false) { currentCommand = Serial.read(); }
 
   switch (currentCommand)
@@ -101,7 +102,7 @@ void commandParser()
     case 'P': //Send the pattern for the current wheel
       numTeeth = pgm_read_word(Wheels[selected_wheel].wheel_max_edges);
       //PROGMEM_readAnything (&table[i], thisOne);
-      for(byte x=0; x<Wheels[selected_wheel].wheel_max_edges; x++)
+      for(uint16_t x=0; x<Wheels[selected_wheel].wheel_max_edges; x++)
       {
         if(x != 0) { Serial.print(","); }
 
@@ -109,23 +110,22 @@ void commandParser()
         Serial.print(tempByte);
       }
       Serial.println("");
+      //2nd row of data sent is the number of degrees the wheel runs over (360 or 720 typically)
+      Serial.println(Wheels[selected_wheel].wheel_degrees);
       break;
 
     case 'R': //Send the current RPM
-      Serial.println()
+      Serial.println("");
+      break;
 
     case 'S': //Set the current wheel
       while(Serial.available() < 1) {} 
-      byte tmp_wheel = Serial.read();
+      tmp_wheel = Serial.read();
       if(tmp_wheel < MAX_WHEELS)
       {
         selected_wheel = tmp_wheel;
         display_new_wheel();
       }
-
-      //Return value is the number of degrees the wheel runs over (360 or 720 typically)
-      Serial.println(Wheels[selected_wheel].wheel_degrees);
-      
       break;
 
     case 'X': //Just a test method for switching the to the next wheel
