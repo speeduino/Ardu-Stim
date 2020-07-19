@@ -64,9 +64,9 @@
       ]
     },
     "linux": {
-      "icon": "build/images/icon.png",
+      "icon": "assets/icons/png/512x512.png",
       "target": [
-        "pacman"
+        "AppImage"
       ]
     },
     "mac": {
