@@ -44,10 +44,10 @@
 						<!-- Live -->
 							<article id="live" class="panel">
                 <div class="row">
-                  <div class="column25">
+                  <div class="column40">
                     <div class="row">
-                      <div class="col-6 col-4-medium col-12-small">RPM Mode: </div>
-                      <div class="col-1 col-6-medium col-12-small">
+                      <div class="col-5">RPM Mode: </div>
+                      <div class="col-2">
                         <select id="rpmSelect" onChange="setRPMMode()">
                           <option value="2">Use potentiometer</option>
                           <option value="1">Fixed RPM</option>
@@ -56,24 +56,24 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-6 col-4-medium col-12-small">Fixed RPM: </div>
-                      <div class="col-1 col-6-medium col-12-small">
-                        <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500" onChange="setFixedRPM()">
+                      <div class="col-5">Fixed RPM: </div>
+                      <div class="col-1">
+                        <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500" onChange="setFixedRPM()" disabled>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-6 col-4-medium col-12-small">RPM Sweep range: </div>
-                      <div class="col-6 col-6-medium col-12-small">
-                        <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100" onChange="setSweepRPM()">
+                      <div class="col-5">RPM Sweep range: </div>
+                      <div class="col-3">
+                        <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100" onChange="setSweepRPM()" disabled>
                       </div>
                       
-                      <div class="col-6 col-6-medium col-12-small">
-                        <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="setSweepRPM()">
+                      <div class="col-2">
+                        <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="setSweepRPM()" disabled>
                       </div>
                     </div>
                   </div>
                   
-                  <div class="column75" style="text-align: center;">
+                  <div class="column60" style="text-align: center;">
                     <canvas data-type="radial-gauge"
                             data-units="RPM"
                             data-min-value="0"

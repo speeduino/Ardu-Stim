@@ -208,7 +208,6 @@ void setup() {
   //Set RPM mode
   mode = EEPROM.read(EEPROM_LAST_MODE);
   if(mode > POT_RPM) { mode = POT_RPM; }
-  mode = LINEAR_SWEPT_RPM;
 
 
 } // End setup

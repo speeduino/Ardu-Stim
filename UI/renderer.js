@@ -1,6 +1,7 @@
 const serialport = require('serialport')
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
+const {remote} = require('electron')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
@@ -394,12 +395,32 @@ function setRPMMode()
   {
     //Sweep RPM mode
     setSweepRPM();
+
+    //Update the text box enablement
+    document.getElementById("rpmSweepMin").disabled = false;
+    document.getElementById("rpmSweepMax").disabled = false;
+    document.getElementById("fixedRPM").disabled = true;
   }
   else if (newMode == 1)
   {
     //Fixed RPM mode
     setFixedRPM();
+    
+    //Update the text box enablement
+    document.getElementById("fixedRPM").disabled = false;
+    document.getElementById("rpmSweepMin").disabled = true;
+    document.getElementById("rpmSweepMax").disabled = true;
   }
+  else if(newMode == 2)
+  {
+    //Pot mode
+
+    //Update the text box enablement
+    document.getElementById("rpmSweepMin").disabled = true;
+    document.getElementById("rpmSweepMax").disabled = true;
+    document.getElementById("fixedRPM").disabled = true;
+  }
+    
   
 }
 
@@ -514,7 +535,7 @@ function checkForUpdates()
         if (!error ) 
         {
             var result = JSON.parse(body);
-            latest_version = result.tag_name.substring(1);
+            latest_version = result.tag_name.substring(0);
             console.log("Latest version: " + latest_version);
 
             var semver = require('semver');

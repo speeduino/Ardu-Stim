@@ -78,6 +78,18 @@ input, select, textarea {
   .column25 {
     flex: 25%;
   }
+  .column30 {
+    flex: 30%;
+  }
+  .column40 {
+    flex: 40%;
+  }
+  .column60 {
+    flex: 60%;
+  }
+  .column70 {
+    flex: 70%;
+  }
   .column75 {
     flex: 75%;
   }
@@ -625,7 +637,7 @@ input, select, textarea {
 		font-weight: 300;
 		color: #777777;
 		font-size: 20pt;
-		line-height: 1.75em;
+		line-height: 1.5em;
 	}
 
 		@media screen and (max-width: 1280px) {
@@ -792,7 +804,10 @@ input, select, textarea {
 	form input[type="password"],
 	form select {
 		line-height: 1.35em;
-	}
+  }
+  input:disabled {
+    background: #dddddd;
+  }
 
 	form ::-webkit-input-placeholder {
 		color: #999;

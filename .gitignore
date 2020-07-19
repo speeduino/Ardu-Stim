@@ -5,3 +5,6 @@ Sweep_Notes
 wheels_default.jsw
 lib/*
 node_modules/
+.DS_Store
+UI/dist/
+UI/yarn*
