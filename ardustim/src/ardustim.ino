@@ -208,6 +208,7 @@ void setup() {
   //Set RPM mode
   mode = EEPROM.read(EEPROM_LAST_MODE);
   if(mode > POT_RPM) { mode = POT_RPM; }
+  mode = LINEAR_SWEPT_RPM;
 
 
 } // End setup
@@ -348,6 +349,7 @@ ISR(TIMER2_COMPA_vect) {
     }
   }
   sweep_lock = false;
+  //wanted_rpm = get_rpm_from_tcnt(&SweepSteps[sweep_stage].beginning_ocr, &SweepSteps[sweep_stage].prescaler_bits);
 //  PORTD = (0 << 7);
 }
 

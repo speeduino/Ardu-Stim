@@ -493,15 +493,39 @@ function updateRPM()
   console.log("Requesting new RPM");
   port.write("R"); //Request next RPM read
   document.gauges[0].value = currentRPM;
-  console.log(`New gauge RPM: ${document.gauges[0].value}`);
+  //console.log(`New gauge RPM: ${document.gauges[0].value}`);
 }
 
-
-function onRefresh(chart) 
+function checkForUpdates()
 {
-    if(port.isOpen == false) { return; }
+    var url = "https://api.github.com/repos/speeduino/Ardu-Stim/releases/latest";
 
-    port.write("G1"); //Sends the command to get live data
+    //document.getElementById('detailsHeading').innerHTML = version;
+    
+    var request = require('request');
+    const options = {
+        url: url,
+        headers: {
+          'User-Agent': 'request'
+        }
+      };
+
+    request.get(options, function (error, response, body) {
+        if (!error ) 
+        {
+            var result = JSON.parse(body);
+            latest_version = result.tag_name.substring(1);
+            console.log("Latest version: " + latest_version);
+
+            var semver = require('semver');
+            if(semver.gt(latest_version, remote.app.getVersion()))
+            {
+                //New version has been found
+                document.getElementById('update_url').setAttribute("href", result.html_url);
+                document.getElementById('update_text').style.display = "block";
+            }
+        }
+    });
 
 }
 
@@ -510,6 +534,7 @@ window.onload = function ()
     refreshSerialPorts();
     redrawGears(toothPatterns[0]);
     window.location.hash = '#connect';
+    checkForUpdates();
     //animateGauges();
 };
 
