@@ -7,15 +7,20 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "install": "electron-rebuild -f",
-    "package-mac": "electron-build --mac",
-    "package-win": "electron-build --win",
-    "package-linux": "electron-packager . Ardu-Stim --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
+    "package-mac": "electron-builder --mac",
+    "package-win": "electron-builder --win",
+    "package-linux": "electron-builder --linux",
+    "package-arm": "electron-builder --linux --arch=armv7l"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/speeduino/Ardu-Stim"
   },
-  "author": "Josh Stewart",
+  "author": {
+    "name": "Josh Stewart",
+    "email": "sales@speeduino.com",
+    "url": "https://speeduino.com"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/speeduino/Ardu-Stim/Issues"
