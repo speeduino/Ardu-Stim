@@ -26,6 +26,7 @@
 #include "user_defaults.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
+#include <EEPROM.h>
 
 /* Sensistive stuff used in ISR's */
 volatile uint8_t fraction = 0;
@@ -194,8 +195,8 @@ void setup() {
   pinMode(9, OUTPUT); /* Secondary (cam usually) output */
   pinMode(10, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  pinMode(53, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
-  pinMode(52, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
+  pinMode(53, OUTPUT); 
+  pinMode(52, OUTPUT); 
 #endif
 
   sei(); // Enable interrupts
@@ -203,6 +204,11 @@ void setup() {
   ADCSRA |= B01000000;
   /* Make sure we are using the DEFAULT RPM on startup */
   reset_new_OCR1A(wanted_rpm); 
+
+  //Set RPM mode
+  mode = EEPROM.read(EEPROM_LAST_MODE);
+  if(mode > POT_RPM) { mode = POT_RPM; }
+
 
 } // End setup
 
@@ -216,7 +222,7 @@ ISR(ADC_vect){
   if (analog_port == 0)
   {
     adc0 = ADCL | (ADCH << 8);
-	adc0_read_complete = true;
+	  adc0_read_complete = true;
     /* Flip to channel 1 */
     //ADMUX |= B00000001;
     //analog_port = 1;
@@ -390,14 +396,18 @@ void loop()
 
   if(Serial.available() > 0) { commandParser(); }
 
-  if (adc0_read_complete == true)
+  if(mode == POT_RPM)
   {
-    adc0_read_complete = false;
-    tmp_rpm = adc0 << TMP_RPM_SHIFT;
-    if (tmp_rpm > TMP_RPM_CAP) { tmp_rpm = TMP_RPM_CAP; }
-    wanted_rpm = tmp_rpm;
-    reset_new_OCR1A(tmp_rpm);
+    if (adc0_read_complete == true)
+    {
+      adc0_read_complete = false;
+      tmp_rpm = adc0 << TMP_RPM_SHIFT;
+      if (tmp_rpm > TMP_RPM_CAP) { tmp_rpm = TMP_RPM_CAP; }
+      wanted_rpm = tmp_rpm;
+      reset_new_OCR1A(tmp_rpm);
+    }
   }
+
 }
 
 

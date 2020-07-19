@@ -72,12 +72,23 @@ void commandParser()
 {
   char buf[80];
   byte tmp_wheel;
+  byte tmp_mode;
   if (cmdPending == false) { currentCommand = Serial.read(); }
 
   switch (currentCommand)
   {
     case 'a':
       break;
+
+    case 'f': //Set the fixed RPM value
+      mode = FIXED_RPM;
+      while(Serial.available() < 2) {} //Wait for the new RPM bytes
+      wanted_rpm = word(Serial.read(), Serial.read());
+      //wanted_rpm = 2000;
+      //reset_new_OCR1A(wanted_rpm);
+      setRPM(wanted_rpm);
+      break;
+      
 
     case 'L': // send the list of wheel names
       //First byte sent is the number of wheels
@@ -88,6 +99,15 @@ void commandParser()
       {
         strcpy_P(buf,Wheels[x].decoder_name);
         Serial.println(buf);
+      }
+      break;
+
+    case 'M': ///Change the RPM mode
+      while(Serial.available() < 1) {} //Wait for the new mode byte
+      tmp_mode = Serial.read();
+      if(tmp_mode <= POT_RPM)
+      {
+        mode = tmp_mode;
       }
       break;
 
@@ -116,6 +136,18 @@ void commandParser()
 
     case 'R': //Send the current RPM
       Serial.println(wanted_rpm);
+      break;
+
+    case 's': //Set the high and low RPM for sweep mode
+      mode = LINEAR_SWEPT_RPM;
+      while(Serial.available() < 4) {} //Wait for 4 bytes representing the new low and high RPMs
+
+      sweep_low_rpm = word(Serial.read(), Serial.read());
+      sweep_high_rpm = word(Serial.read(), Serial.read());
+
+      sweep_low_rpm = 100;
+      sweep_high_rpm = 4000;
+      compute_sweep_stages(&sweep_low_rpm, &sweep_high_rpm);
       break;
 
     case 'S': //Set the current wheel
@@ -231,33 +263,11 @@ void setRPM(uint32_t newRPM)
   sweep_lock = true;
   if (SweepSteps)
     free(SweepSteps);
-  mode = FIXED_RPM;
+  //mode = FIXED_RPM;
   reset_new_OCR1A(newRPM);
   wanted_rpm = newRPM;
-
-  //mySUI.print_P(new_rpm_chosen);
-  //mySUI.println(wanted_rpm);
   sweep_lock = false;
 }
-
-
-//! Returns a list of user selectable wheel patterns
-/*!
- * Iterates through the list of wheel patterns and prints them back to the user
- */
-void list_wheels_cb()
-{
-  byte i = 0;
-  for (i=0;i<MAX_WHEELS;i++)
-  {
-    /*
-    mySUI.print(i+1);
-    mySUI.print_P(colon_space);
-    mySUI.println_P((Wheels[i].decoder_name));
-    */
-  }
-}
-
 
 //! Toggle the wheel direction, useful for debugging
 /*!
@@ -297,39 +307,23 @@ void reverse_wheel_direction_cb()
  * we use this to keep things as quick as possible. This function takes
  * no parameters (it cannot due to SerialUI) and returns void
  */
-void sweep_rpm_cb()
+void sweep_rpm_cb(uint16_t tmp_low_rpm, uint16_t tmp_high_rpm)
 {
-  /*
-  uint16_t tmp_low_rpm;
-  uint16_t tmp_high_rpm;
-  uint8_t j;
+  
   char sweep_buffer[20] = {0};
 
-  mySUI.showEnterDataPrompt();
-  j = mySUI.readBytesToEOL(sweep_buffer,20);
-  j = sscanf(sweep_buffer,"%i,%i,%i",&tmp_low_rpm,&tmp_high_rpm,&sweep_rate);
   // Validate input ranges
-  if ((j == 3) && 
+  if (
       (tmp_low_rpm >= 10) &&
       (tmp_high_rpm < 51200) &&
       (sweep_rate >= 1) &&
       (sweep_rate < 51200) &&
       (tmp_low_rpm < tmp_high_rpm))
   {
-  mySUI.print_P(sweeping_from_colon_space);
-  mySUI.print(tmp_low_rpm);
-  mySUI.print_P(arrows);
-  mySUI.print(tmp_high_rpm);
-  mySUI.print_P(space_at_colon_space);
-  mySUI.print(sweep_rate);
-  mySUI.println_P(space_rpm_per_sec);
 
   compute_sweep_stages(&tmp_low_rpm, &tmp_high_rpm);
   }
-  else {
-    mySUI.returnError(range_error);
-  } 
-  */
+
 }
 
 

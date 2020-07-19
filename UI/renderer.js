@@ -339,8 +339,6 @@ function updatePattern()
 
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
   console.log(`Sending 'S' command with pattern ${patternID}`);
-  //const parser = port.pipe(new ByteLength({length: 8}))
-  //port.write('S'); //Send the command to change the pattern
 
   var buffer = new Buffer(2);
   buffer[0] = 0x53; // Ascii 'S'
@@ -377,19 +375,60 @@ function refreshPattern(data)
   
 }
 
-function updateRPM()
-{
-  //Send a new fixed RPM value back to the arduino
-}
-
-function updateSweepRPM()
-{
-  //Send new sweep RPM values back to the arduino
-}
-
 function setRPMMode()
 {
   //Change between pot, fixed and sweep RPM modes
+
+  var newMode = parseInt(document.getElementById('rpmSelect').value);
+
+  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+  console.log(`Sending 'M' command to change RPM mode to ${newMode}`);
+
+  var buffer = new Buffer(2);
+  buffer[0] = 0x4D; // Ascii 'M'
+  buffer[1] = newMode;
+  port.write(buffer); //Send the new pattern ID
+
+  //If the new mode is fixed RPM or linear sweep, then send the RPM set values for them
+  if(newMode == 0)
+  {
+    //Sweep RPM mode
+    setSweepRPM();
+  }
+  else if (newMode == 1)
+  {
+    //Fixed RPM mode
+    setFixedRPM();
+  }
+  
+}
+
+function setFixedRPM()
+{
+  var newRPM = parseInt(document.getElementById('fixedRPM').value);
+  //console.log(`Desired RPM: ${newRPM}`);
+
+  var rpmBuffer = Buffer.alloc(3);
+  rpmBuffer[0] = 0x66; // Ascii 'f'
+  rpmBuffer.writeInt16LE(newRPM, 1);
+  //console.log(rpmBuffer);
+
+  port.write(rpmBuffer);
+}
+
+function setSweepRPM()
+{
+  var newRPM_min = parseInt(document.getElementById('rpmSweepMin').value);
+  var newRPM_max = parseInt(document.getElementById('rpmSweepMax').value);
+  //console.log(`Desired RPM: ${newRPM}`);
+
+  var rpmBuffer = Buffer.alloc(5);
+  rpmBuffer[0] = 0x73; // Ascii 's'
+  rpmBuffer.writeInt16LE(newRPM_min, 1);
+  rpmBuffer.writeInt16LE(newRPM_max, 3);
+  //console.log(rpmBuffer);
+
+  port.write(rpmBuffer);
 }
 
 function redrawGears(pattern, degrees)
@@ -440,13 +479,13 @@ function disableRPM()
   RPMInterval = 0;
   port.unpipe();
   port.read(); //Flush the port
-  parser.read();
 }
 
 function receiveRPM(data)
 {
   console.log(`Received RPM: ${data}`);
   currentRPM = parseInt(data);
+  //console.log(`New RPM: ${currentRPM}`);
 }
 
 function updateRPM()
@@ -454,6 +493,7 @@ function updateRPM()
   console.log("Requesting new RPM");
   port.write("R"); //Request next RPM read
   document.gauges[0].value = currentRPM;
+  console.log(`New gauge RPM: ${document.gauges[0].value}`);
 }
 
 

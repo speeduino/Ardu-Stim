@@ -48,26 +48,26 @@
                       <div class="col-6 col-4-medium col-12-small">RPM Mode: </div>
                       <div class="col-1 col-6-medium col-12-small">
                         <select id="rpmSelect" onChange="setRPMMode()">
-                          <option value="0">Use potentiometer</option>
+                          <option value="2">Use potentiometer</option>
                           <option value="1">Fixed RPM</option>
-                          <option value="2">Sweep</option>
+                          <option value="0">Sweep</option>
                         </select>
                       </div>
                     </div>
                     <div class="row">
                       <div class="col-6 col-4-medium col-12-small">Fixed RPM: </div>
                       <div class="col-1 col-6-medium col-12-small">
-                        <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500.0" onChange="updateRPM()">
+                        <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500" onChange="setFixedRPM()">
                       </div>
                     </div>
                     <div class="row">
                       <div class="col-6 col-4-medium col-12-small">RPM Sweep range: </div>
                       <div class="col-6 col-6-medium col-12-small">
-                        <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100.0" onChange="updateSweepRPM()">
+                        <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100" onChange="setSweepRPM()">
                       </div>
                       
                       <div class="col-6 col-6-medium col-12-small">
-                        <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="updateSweepRPM()">
+                        <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="setSweepRPM()">
                       </div>
                     </div>
                   </div>
@@ -81,7 +81,7 @@
                             data-value-dec="0"
                             data-width="400"
                             data-height="400"
-                            data-animation-duration="100"
+                            data-animation-duration="50"
                             data-animated-value="true"
                             data-animation-rule="linear"
                     ></canvas>
