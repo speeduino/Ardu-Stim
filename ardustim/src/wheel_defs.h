@@ -152,7 +152,7 @@
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
  const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
- const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubish 4g63 aka 4/2 crank and cam";
+ const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
  const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
  const char honda_d17_no_cam_friendly_name[] PROGMEM = "Honda D17 Crank (12+1)";
  const char mazda_323_au_friendly_name[] PROGMEM = "Mazda 323 AU version";
