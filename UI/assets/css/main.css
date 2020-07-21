@@ -610,15 +610,11 @@ input, select, textarea {
     background: linear-gradient(to right, #182848, #4b6cb7);
     */
 
-
-
-
-
-
     background-repeat: repeat, no-repeat;
 		background-size: auto, 100% 100%;
 		background-attachment: fixed;
-		overflow-y: scroll;
+    overflow-y: hidden;
+    overflow-x: hidden;
   }
 
 		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
