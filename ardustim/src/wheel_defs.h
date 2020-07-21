@@ -110,6 +110,7 @@
    GM_7X,                 /* GM 7X pattern. 6 even teeth with 1 extra uneven tooth */
    FOUR_TWENTY_A,         /* DSM 420a */
    FORD_ST170,            /* Ford ST170 */
+   MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
    MAX_WHEELS,
  }WheelType;
 
@@ -163,6 +164,8 @@
  const char gm_seven_x_friendly_name[] PROGMEM = "GM 7X";
  const char four_twenty_a_friendly_name[] PROGMEM = "DSM 420a";
  const char ford_st170_friendly_name[] PROGMEM = "Ford ST170";
+ const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";
+ 
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1118,6 +1121,22 @@
       0,1,1,1,1,1,0,0,0,0,0,1,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,3,2,2,2,
       2,3,3,3,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,
       0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0
+   };
+
+   const unsigned char mitsubishi_3A92[] PROGMEM = 
+   {
+      3,2,3,2,2,2,3,2,1,0,1,0,
+      1,0,3,2,1,0,3,2,3,2,3,2,
+      3,2,3,2,2,2,3,2,3,2,3,2,
+      3,2,3,2,3,2,3,2,3,2,3,2,
+      3,2,2,2,2,2,3,2,3,2,1,0,
+      1,0,1,0,3,2,3,2,3,2,3,2,
+      3,2,3,2,2,2,3,2,3,2,3,2,
+      3,2,3,2,3,2,3,2,3,2,3,2,
+      3,2,3,2,2,2,3,2,1,0,1,0,
+      1,0,3,2,3,2,3,2,3,2,3,2,
+      3,2,2,2,2,2,3,2,3,2,3,2,
+      3,2,3,2,3,2,3,2,3,2,3,2
    };
 
   #endif
