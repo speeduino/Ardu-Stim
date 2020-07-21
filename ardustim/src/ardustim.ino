@@ -109,7 +109,8 @@ wheels Wheels[MAX_WHEELS] = {
   { twenty_four_with_cam_friendly_name, twelve_with_cam, 0.6, 144, 720 },
   { subaru_six_seven_name_friendly_name, subaru_six_seven, 3.0, 720, 720 },
   { gm_seven_x_friendly_name, gm_seven_x, 1.0, 180, 720 },
-  { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144, 720 }
+  { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144, 720 },
+  { ford_st170_friendly_name, ford_st170, 0.6, 720, 720 }
 };
 
 /* Initialization */
