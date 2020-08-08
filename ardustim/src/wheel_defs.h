@@ -111,6 +111,7 @@
    FOUR_TWENTY_A,         /* DSM 420a */
    FORD_ST170,            /* Ford ST170 */
    MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
+   SPARK_DIZZY_4CYL,      /* 70/100 low/high ratio hall sensor distributor, with sparksensor for secondary trigger*/
    MAX_WHEELS,
  }WheelType;
 
@@ -165,6 +166,7 @@
  const char four_twenty_a_friendly_name[] PROGMEM = "DSM 420a";
  const char ford_st170_friendly_name[] PROGMEM = "Ford ST170";
  const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";
+ const char spark_dizzy_4cyl_a_friendly_name[] PROGMEM = "4 cyl. Hall sensor dizzy with sparksensor";
  
 
  /* Very simple 50% duty cycle */
@@ -1139,4 +1141,20 @@
       3,2,3,2,3,2,3,2,3,2,3,2
    };
 
+ /* 70/110 degrees low to high ratio and sparksensor secondary */
+   const unsigned char spark_dizzy_4cyl[] PROGMEM = 
+   { //Split into 5 degree blocks (12 per line)
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      2,2,3,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,1,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,1,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,1,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+   };
   #endif
