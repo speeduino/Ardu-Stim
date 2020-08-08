@@ -67,6 +67,7 @@ wheels Wheels[MAX_WHEELS] = {
   { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8, 360 },
   { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120, 360 },
   { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240, 720 },
+  { sixty_minus_two_with_halfmoon_cam_friendly_name, sixty_minus_two_with_halfmoon_cam, 1.0, 240, 720 },
   { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72, 360 },
   { twenty_four_minus_one_friendly_name, twenty_four_minus_one, 0.5, 48, 360 },
   { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16, 720 },
