@@ -23,6 +23,7 @@
 #include "ardustim.h"
 #include "enums.h"
 #include "comms.h"
+#include "storage.h"
 #include "user_defaults.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
@@ -48,7 +49,7 @@ volatile byte total_sweep_stages = 0;
 volatile uint8_t sweep_stage = 0;
 volatile uint8_t prescaler_bits = 0;
 volatile uint8_t last_prescaler_bits = 0;
-volatile uint8_t mode = FIXED_RPM;
+volatile uint8_t mode = 0;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 
@@ -117,6 +118,7 @@ wheels Wheels[MAX_WHEELS] = {
 /* Initialization */
 void setup() {
   serialSetup();
+  loadConfig();
 
   cli(); // stop interrupts
 
@@ -206,11 +208,6 @@ void setup() {
   ADCSRA |= B01000000;
   /* Make sure we are using the DEFAULT RPM on startup */
   reset_new_OCR1A(wanted_rpm); 
-
-  //Set RPM mode
-  mode = EEPROM.read(EEPROM_LAST_MODE);
-  if(mode > POT_RPM) { mode = POT_RPM; }
-
 
 } // End setup
 

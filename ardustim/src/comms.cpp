@@ -24,6 +24,7 @@
 #include "enums.h"
 #include "comms.h"
 #include "structures.h"
+#include "storage.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <math.h>
@@ -35,7 +36,6 @@ extern uint16_t wanted_rpm;
 /* External Globla Variables */
 extern sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 extern wheels Wheels[];
-extern uint8_t mode;
 extern uint8_t total_sweep_stages;
 extern uint16_t sweep_low_rpm;
 extern uint16_t sweep_high_rpm;
@@ -88,8 +88,11 @@ void commandParser()
       //reset_new_OCR1A(wanted_rpm);
       setRPM(wanted_rpm);
       break;
-      
 
+    case 'c': //Save the current config
+      saveConfig();
+      break;
+      
     case 'L': // send the list of wheel names
       //First byte sent is the number of wheels
       //Serial.println(MAX_WHEELS);
