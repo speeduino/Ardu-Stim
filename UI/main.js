@@ -70,9 +70,23 @@ ipcMain.on('uploadFW', (e, args) => {
   var burnStarted = false;
   var burnPercent = 0;
 
-  if(process.platform == "win32") { platform = "avrdude-windows"; }
-  else if(process.platform == "darwin") { platform = "avrdude-darwin-x86"; }
-  else if(process.platform == "linux") { platform = "avrdude-linux_i686"; }
+  //All Windows builds use the 32-bit binary
+  if(process.platform == "win32") 
+  { 
+    platform = "avrdude-windows"; 
+  }
+  //All Mac builds use the 64-bit binary
+  else if(process.platform == "darwin") 
+  { 
+    platform = "avrdude-darwin-x86_64";
+  }
+  else if(process.platform == "linux") 
+  { 
+    if(process.arch == "x32") { platform = "avrdude-linux_i686"; }
+    else if(process.arch == "x64") { platform = "avrdude-linux_x86_64"; }
+    else if(process.arch == "arm") { platform = "avrdude-armhf"; }
+    else if(process.arch == "arm64") { platform = "avrdude-aarch64"; }
+  }
 
   var executableName = __dirname + "/bin/" + platform + "/avrdude";
   executableName = executableName.replace('app.asar',''); //This is important for allowing the binary to be found once the app is packaed into an asar
