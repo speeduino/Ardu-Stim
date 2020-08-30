@@ -62,7 +62,7 @@ function arcToRad(num) {
   return (360 / num) * (Math.PI / 180) / 2;
 }
 
-function draw_crank(toothPattern, depth, radius, width, line, halfspeed) {
+function draw_crank_gear(toothPattern, depth, radius, width, line, halfspeed) {
   var canvas = document.getElementById('crank');
   var c = canvas.getContext('2d');
 
@@ -108,7 +108,7 @@ function draw_crank(toothPattern, depth, radius, width, line, halfspeed) {
   c.stroke();
 }
 
-function draw_cam(toothPattern, depth, radius, width, line) {
+function draw_cam_gear(toothPattern, depth, radius, width, line) {
   var canvas = document.getElementById('cam');
   var c = canvas.getContext('2d');
 

@@ -333,6 +333,7 @@ function readPattern()
 
 var patternRow = 0;
 var newPattern;
+var patternDegrees;
 function updatePattern()
 {
   var patternID = document.getElementById('patternSelect').value;
@@ -367,14 +368,19 @@ function refreshPattern(data)
   else
   {
     //2nd line received is the number of degrees the pattern runs over (360 or 720 usually)
-    console.log(`Pattern duration: ${data}`)
-    redrawGears(newPattern, parseInt(data));
+    console.log(`Pattern duration: ${data}`);
+    patternDegrees = parseInt(data);
+    redrawGears(newPattern, patternDegrees);
     
     patternRow = 0;
     port.unpipe();
-  }
+  } 
+}
 
-  
+//Simply redraw the gear pattern using the existing details (Used when the draw style is changed)
+function resetGears()
+{
+  redrawGears(newPattern, patternDegrees);
 }
 
 function setRPMMode()
@@ -457,16 +463,45 @@ function redrawGears(pattern, degrees)
 {
   var teeth, depth, radius, width;
   //teeth =  toothPattern.length / 2;
-  depth = 10;
+
   radius = 150;
   width = Number("100");
-  line = 1;
+
   var halfspeed = false;
   if(degrees == 720) { halfspeed = true; }
   //var halfspeed = false;
 
-  draw_crank(pattern, depth, radius, width, line, halfspeed);
-  draw_cam(pattern, depth, radius, width, line);
+  var background = document.getElementById('canvas-background-colour');
+  var style = document.getElementById('wheelDisplaySelect').value
+  var crank = document.getElementById('crank');
+  var cam = document.getElementById('cam');
+  //style = 1;
+  if(style == 0)
+  {
+    crank.width = 420;
+    crank.height = 300;
+    cam.width = 420;
+    cam.height = 300;
+    depth = 10;
+    line = 1;
+    background.style.backgroundColor = "#0071b8";
+    draw_crank_gear(pattern, depth, radius, width, line, halfspeed);
+    draw_cam_gear(pattern, depth, radius, width, line);
+  }
+  else
+  {
+    crank.width = 840;
+    crank.height = 150;
+    cam.width = 840;
+    cam.height = 150;
+    depth = 80;
+    line = 3;
+    background.style.backgroundColor = "#000000";
+    draw_crank_scope(pattern, depth, radius, width, line, halfspeed);
+    draw_cam_scope(pattern, depth, radius, width, line);
+  }
+
+  
 }
 
 /*
