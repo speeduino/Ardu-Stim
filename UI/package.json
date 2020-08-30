@@ -55,7 +55,12 @@
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
       "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
-      "bin"
+      "bin",
+      "firmwares"
+    ],
+    "extraResources": [
+      "bin",
+      "firmwares"
     ],
     "win": {
       "icon": "assets/icons/win/icon.ico",
