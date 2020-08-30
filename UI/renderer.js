@@ -599,6 +599,7 @@ window.onload = function ()
     redrawGears(toothPatterns[0]);
     window.location.hash = '#connect';
     checkForUpdates();
+    document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
 };
 
