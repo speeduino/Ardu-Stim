@@ -117,6 +117,10 @@ void commandParser()
     case 'n': //Send the number of wheels
       Serial.println(MAX_WHEELS);
       break;
+
+    case 'N': //Send the number of the current wheel
+      Serial.println(selected_wheel);
+      break;
     
     case 'p': //Send the size of the current wheel
       Serial.println(Wheels[selected_wheel].wheel_max_edges);

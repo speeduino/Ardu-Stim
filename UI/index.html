@@ -33,10 +33,13 @@
 								<header><h1>Select Serial Port</h1></header>
 								Available Ports:<br />
 								<span id="serialDetectError"></span>
-								<select name="ports" class="select" id="portsSelect" size="10" width="20"></select>
+								<select name="ports" class="select" id="portsSelect" size="10" style="width:250px"></select>
 								<ul class="actions">
 										<li><input type='button' value="Refresh" onclick="refreshSerialPorts();" /></li>
                     <li><input type='button' value="Connect" id="btnConnect" onclick="openSerialPort();" /></li>
+                    <li><input type='button' value="Upload Firmware" id="btnUploadFW" onclick="uploadFW();" /></li>
+                    <li><span class="icon major" id="progressSpinner"></span></li>
+                    <li><span id="burnPercent"></span></li>
 								</ul>
 								
 							</article>
@@ -71,6 +74,10 @@
                         <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="setSweepRPM()" disabled>
                       </div>
                     </div>
+                    <div>
+                      <br />
+                      <center><input type='button' value="Save Config" id="btnSave" onclick="saveData();" /></center>
+                    </div>
                   </div>
                   
                   <div class="column60" style="text-align: center;">
@@ -94,25 +101,23 @@
 							<article id="config" class="panel">
 								<section>
 									<div class="row">
-										<h3>Stim Configuration</h3>
+                    <h3>Stim Configuration</h3>
 									</div>
 									<div class="row">
-										<div class="col-6 col-4-medium col-12-small">Simluated Pattern: </div>
+										<div class="col-6 col-4-medium col-12-small">Simulated Pattern: </div>
 										<div class="col-1 col-6-medium col-12-small tooltip">
 											<select id="patternSelect" onChange="updatePattern()">
 											</select>
-										</div>
-									</div>
+                    </div>
+                  </div>
 
                   <div class="row"><br/><br/></div>
-                  <div class="row" style="background: #0071b8;">
-                    
+                  <div class="row" style="background: #0071b8;" id="canvas-background-colour">
 										<div id="screen" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iNTBweCIgaGVpZ2h0PSI1MHB4IiB2aWV3Qm94PSIwIDAgNTAgNTAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnIGNsYXNzPSJncmlkIiBzdHJva2U9IiNmZmYiIG9wYWNpdHk9IjAuMiI+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSA1MC41IDAuNSAwLjUgNTAuNSAwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDUuNSA1MC41IDUuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSI1LjUgMC41IDUuNSA1MC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSAxMC41IDUwLjUgMTAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIxMC41IDAuNSAxMC41IDUwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDE1LjUgNTAuNSAxNS41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjE1LjUgMC41IDE1LjUgNTAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIwLjUgMjAuNSA1MC41IDIwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMjAuNSAwLjUgMjAuNSA1MC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSAyNS41IDUwLjUgMjUuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIyNS41IDAuNSAyNS41IDUwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDMwLjUgNTAuNSAzMC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjMwLjUgMC41IDMwLjUgNTAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSIwLjUgMzUuNSA1MC41IDM1LjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMzUuNSAwLjUgMzUuNSA1MC41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjAuNSA0MC41IDUwLjUgNDAuNSI+PC9wb2x5bGluZT48cG9seWxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHN0cm9rZS1taXRlcmxpbWl0PSIyIiAgcG9pbnRzPSI0MC41IDAuNSA0MC41IDUwLjUiPjwvcG9seWxpbmU+PHBvbHlsaW5lIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIgIHBvaW50cz0iMC41IDQ1LjUgNTAuNSA0NS41Ij48L3BvbHlsaW5lPjxwb2x5bGluZSBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiICBwb2ludHM9IjQ1LjUgMC41IDQ1LjUgNTAuNSI+PC9wb2x5bGluZT48L2c+PC9zdmc+'); width: 100%; height: 400px;">
                       <canvas id="crank" width="430" height="350"></canvas>
                       <canvas id="cam" width="430" height="350"></canvas>
-                    </div>
-                    
-									</div>
+                    </div> 
+                  </div>
                   
                   
 								</section>

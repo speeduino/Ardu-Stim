@@ -79,9 +79,12 @@ ipcMain.on('uploadFW', (e, args) => {
   var configName = executableName + ".conf";
   if(process.platform == "win32") { executableName = executableName + '.exe'; } //This must come after the configName line above
 
-  var hexFile = 'flash:w:' + args.firmwareFile + ':i';
+  var firmwareFile = __dirname + "/firmwares/m328p.hex";
+  firmwareFile = firmwareFile.replace('app.asar',''); //This is important for allowing the binary to be found once the app is packaed into an asar
 
-  var execArgs = ['-v', '-patmega2560', '-C', configName, '-cwiring', '-b 115200', '-P', args.port, '-D', '-U', hexFile];
+  var hexFile = 'flash:w:' + firmwareFile + ':i';
+
+  var execArgs = ['-v', '-pm328p', '-C', configName, '-carduino', '-b 57600', '-P', args.port, '-D', '-U', hexFile];
 
   console.log(executableName);
   //const child = spawn(executableName, execArgs);

@@ -191,53 +191,30 @@ function downloadIni()
 
 function uploadFW()
 {
-    //Jump to the progress section
-    window.location.href = "#progress";
 
-    //Start the spinner
+    //Set the status and spinner
     var spinner = document.getElementById('progressSpinner');
+    var burnPercentText = document.getElementById('burnPercent');
+    burnPercentText.innerHTML = "Preparing to burn firmware...";
+
     //Remove any old icons
     spinner.classList.remove('fa-pause');
     spinner.classList.remove('fa-check');
     spinner.classList.remove('fa-times');
     spinner.classList.add('fa-spinner');
 
-    var statusText = document.getElementById('statusText');
-    var burnPercentText = document.getElementById('burnPercent');
-    statusText.innerHTML = "Downloading INI file"
-    downloadIni();
+    //Retrieve the select serial port
+    var e = document.getElementById('portsSelect');
+    uploadPort = e.options[e.selectedIndex].value;
+    console.log("Uploading to port: " + uploadPort);
 
-
-    ipcRenderer.on("download complete", (event, file, state) => {
-        console.log("Saved file: " + file); // Full file path
-
-        var extension = file.substr(file.length - 3);
-        if(extension == "ini")
-        {
-            statusText.innerHTML = "Downloading firmware"
-            downloadHex();
-        }
-        else if(extension == "hex")
-        {
-            statusText.innerHTML = "Uploading firmware to board"
-
-            //Retrieve the select serial port
-            var e = document.getElementById('portsSelect');
-            uploadPort = e.options[e.selectedIndex].value;
-            console.log("Using port: " + uploadPort);
-
-            //Begin the upload
-            ipcRenderer.send("uploadFW", {
-                port: uploadPort,
-                firmwareFile: file
-            });
-        }
-        console.log();
+    //Begin the upload
+    ipcRenderer.send("uploadFW", {
+      port: uploadPort,
     });
 
     ipcRenderer.on("upload completed", (event, code) => {
-        statusText.innerHTML = "Upload to arduino completed successfully!";
-        burnPercentText.innerHTML = "";
+        burnPercent.innerHTML = "Upload to arduino completed successfully!";
         spinner.classList.remove('fa-spinner');
         spinner.classList.add('fa-check');
     });
@@ -256,6 +233,12 @@ function uploadFW()
     });
 
 
+}
+
+function saveData()
+{
+  //Request the arduino save the current config
+  port.write("c"); //Send the command to perform EEPROM burn
 }
 
 var patternOptionCounter = 0;
@@ -317,12 +300,28 @@ function refreshPatternList(data)
   { 
     port.unpipe(); 
 
+    //Request the currently selected patter
+    port.write("N"); //Send the command to issue the current pattern number
+    const parser = port.pipe(new Readline({ delimiter: '\r\n' })); //Attach the readline parser
+    parser.on('data', refreshPatternNumber);
+
     //Drop the modal loading window
     modalLoading.remove();
     //Move to the Live tab
     window.location.hash = '#live';
     enableRPM();
   }
+}
+
+//Callback from the 'N' command that returns the number of the selected pattern
+function refreshPatternNumber(data)
+{
+  var select = document.getElementById('patternSelect')
+  var patternID = parseInt(data);
+  port.unpipe();
+  select.value = patternID;
+  console.log("Currently selected Pattern: " + patternID);
+  updatePattern();
 }
 
 function readPattern()
@@ -346,10 +345,12 @@ function updatePattern()
   buffer[1] = parseInt(patternID);
   port.write(buffer); //Send the new pattern ID
 
+  //Send the command to save the pattern to EEPROM
+  saveData();
+
   //Request the new pattern
   port.write("P"); //Send the command to read the new pattern out
   parser.on('data', refreshPattern);
-  
 }
 
 //Callback for the P command
