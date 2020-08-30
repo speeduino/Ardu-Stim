@@ -8,6 +8,7 @@ var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 var onConnectInterval;
 var isConnected=false;
 var currentRPM = 0;
+var initComplete = false;
 
 function refreshSerialPorts()
 {
@@ -70,6 +71,7 @@ function openSerialPort()
 
     //Drop the modal dialog until connection is complete
     modalLoading.init(true);
+    initComplete = false;
 
     // Master listener for all serial actions
     // Switches the port into "flowing mode"
@@ -304,12 +306,6 @@ function refreshPatternList(data)
     port.write("N"); //Send the command to issue the current pattern number
     const parser = port.pipe(new Readline({ delimiter: '\r\n' })); //Attach the readline parser
     parser.on('data', refreshPatternNumber);
-
-    //Drop the modal loading window
-    modalLoading.remove();
-    //Move to the Live tab
-    window.location.hash = '#live';
-    enableRPM();
   }
 }
 
@@ -374,6 +370,17 @@ function refreshPattern(data)
     
     patternRow = 0;
     port.unpipe();
+
+    if(initComplete == false)
+    {
+      //Drop the modal loading window
+      modalLoading.remove();
+      //Move to the Live tab
+      window.location.hash = '#live';
+      enableRPM();
+      initComplete = true;
+    }
+
   } 
 }
 
