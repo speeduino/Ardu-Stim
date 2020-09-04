@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "electron-dl": "^1.13.0",
-    "marked": "^0.6.1",
+    "marked": "^0.7.0",
     "request": "^2.88.0",
     "serialport": "^7.1.4"
   },
