@@ -111,6 +111,10 @@
    FOUR_TWENTY_A,         /* DSM 420a */
    FORD_ST170,            /* Ford ST170 */
    MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
+   ROVER_K_MODE1_36_ONE_ONE,         /* MEMS pattern 1 36-1-1 with teeth as 17 gap 17 gap */
+   ROVER_K_MODE2_36_ONE_ONE_ONE_ONE, /* MEMS pattern 2 36-1-1-1-1 with teeth as 11 gap 5 gap 12 gap 4 gap */
+   ROVER_K_MODE3_36_ONE_ONE_ONE_ONE, /* MEMS pattern 3 36-1-1-1-1 with teeth as 2 gap 14 gap 3 gap 13 gap */
+   ROVER_K_MODE4_36_ONE_ONE_ONE_ONE, /* MEMS pattern 4 36-1-1-1-1 with teeth as 3 gap 14 gap 2 gap 13 gap */
    MAX_WHEELS,
  }WheelType;
 
@@ -151,7 +155,7 @@
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
- const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
+ const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooth cam";
  const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
  const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
  const char honda_d17_no_cam_friendly_name[] PROGMEM = "Honda D17 Crank (12+1)";
@@ -164,9 +168,15 @@
  const char gm_seven_x_friendly_name[] PROGMEM = "GM 7X";
  const char four_twenty_a_friendly_name[] PROGMEM = "DSM 420a";
  const char ford_st170_friendly_name[] PROGMEM = "Ford ST170";
- const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";
+ const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";  
+ const char rover_mems_mode1_thirtysix_minus_one_one_friendly_name[] PROGMEM = "Rover 36-1-1 flywheel EARLY MEMS";
+ const char rover_mems_mode2_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 11 gap 5 gap 12 gap 4 gap";
+ const char rover_mems_mode3_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 2 gap 14 gap 3 gap 13 gap";
+ const char rover_mems_mode4_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 3 gap 14 gap 2 gap 13 gap";
+ #ifdef MJR_DEBUG  
+ const char rover_mems_test_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover mems test "; // added for testing can be removed
+ #endif
  
-
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
@@ -600,7 +610,7 @@
  const unsigned char thirty_six_minus_one_plus_one_with_cam_ngc4[] PROGMEM = 
    { /* 36-1+1 NGC-4 needs 1 deg resolution, chrysler 2.0/2.4 engines
       * cam edges are at 26,62,98,134,170,314,350,368,422,458,494,530,674 and 710 dev
-	  * crank is 36-1 with alarge window at one end 2.5 teeth cycles (25 deg) wide and alosed
+	  * crank is 36-1 with alarge window at one end 2.5 teeth cycles (25 deg) wide and a closed
 	  * at 180deg apart for 2 teeth cycles (20 deg)
 	  */
 	  /* Crankshaft degrees
@@ -1139,4 +1149,129 @@
       3,2,3,2,3,2,3,2,3,2,3,2
    };
 
-  #endif
+/* Rover MEMS engine tooth patterns. 4 available. 1st isn't commoon (36-1-1). 2,3 and 4 are the most common. 
+ * Cam goes high at 206 degrees through to 566 (so is split between the first and second 360 cycle
+ * Pattern 1 is MEMS 1.0,1.3,1.6 36-1-1 with the teeth grouped 17-17- with gaps (i believe) at 0 and 180 degrees. Guess VR sensor is 55 BTDC 
+ * Pattern 2 is MEMS 1.9 36-1-1-1-1 with the teeth grouped 12-4-11-5 with gaps at 100, 180, 310 and 0. VR sensor 55DTDC
+ * Pattern 3 is MEMS 2.0 36-1-1-1-1 with the teeth grouped 14-3-13-2 with gaps at 30,60, 210 and 250 VR sensor 55 BTDC
+ * Pattern 4 is MEMS 3.0 36-1-1-1-1 with the teeth grouped 14-3-13-2 - ie same as MEMS 2.0 but the location on the wheel is different, 40 degrees sooner. VR sensor 55 BTDC
+ */
+
+const unsigned char rover_mems_mode1_thirtysix_minus_one_one [] PROGMEM =
+{
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,0,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+0,0
+};
+
+
+
+const unsigned char rover_mems_mode2_thirtysix_minus_one_one_one_one [] PROGMEM =
+{
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+1,2,3,2,2,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+2,2,3,2,3,2,3,2,3,2,
+2,2,3,2,3,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,2,2,3,2,3,2,
+3,2,3,0,1,0,0,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+1,0,0,0
+};                 
+                
+
+          
+  
+          
+          
+            
+
+
+const unsigned char rover_mems_mode3_thirtysix_minus_one_one_one_one [] PROGMEM =
+{
+1,0,1,0,0,0,1,0,1,0,
+0,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,2,3,2,3,2,3,2,3,2,
+2,2,3,2,3,2,3,2,2,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,3,2,2,2,3,2,
+3,2,2,2,3,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,0,1,0,1,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+0,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0
+};          
+          
+              
+                 
+        
+                 
+               
+                 
+                 
+                
+                 
+
+ 
+const unsigned char rover_mems_mode4_thirtysix_minus_one_one_one_one [] PROGMEM =
+{
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,0,0,1,0,
+1,0,1,0,0,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,2,3,2,3,2,3,2,3,2,
+3,2,3,2,2,2,3,2,3,2,
+2,2,3,2,3,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,3,2,3,2,2,2,
+3,2,3,2,3,2,2,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,1,0,1,0,1,0,
+1,0,1,0,1,0,0,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+1,0,1,0
+};           
+          
+           
+         
+        
+          
+         
+           
+         
+           
+           
+          
+#ifdef MJR_DEBUG            
+// added for testing, can be removed          
+const unsigned char rover_mems_test_thirtysix_minus_one_one_one_one [] PROGMEM =
+{
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,0,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,1,0,1,0,1,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+0,0,1,0,1,0,1,0,1,0,
+1,0
+};            
+#endif
+
+
+
+#endif

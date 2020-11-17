@@ -113,6 +113,10 @@ wheels Wheels[MAX_WHEELS] = {
   { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144, 720 },
   { ford_st170_friendly_name, ford_st170, 0.6, 720, 720 },
   { mitsubishi_3A92_friendly_name, mitsubishi_3A92, 0.6, 144, 720 },
+  { rover_mems_mode1_thirtysix_minus_one_one_friendly_name,  rover_mems_mode1_thirtysix_minus_one_one,  0.6, 72, 360 },
+  { rover_mems_mode2_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode2_thirtysix_minus_one_one_one_one, 0.6, 144, 720 }, 
+  { rover_mems_mode3_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode3_thirtysix_minus_one_one_one_one, 0.6, 144, 720 }, 
+  { rover_mems_mode4_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode4_thirtysix_minus_one_one_one_one, 0.6, 144, 720 }, 
 };
 
 /* Initialization */
