@@ -111,13 +111,10 @@
    FOUR_TWENTY_A,         /* DSM 420a */
    FORD_ST170,            /* Ford ST170 */
    MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
-   ROVER_K_MODE1_36_ONE_ONE,         /* early MEMS versions with 36-1-1 pattern (aka 18-1 at cam speed) */
-   ROVER_K_MODE2_36_ONE_ONE_ONE_ONE, /* MEMS 1.9 of the 36 with 4 missing teeth */
-   ROVER_K_MODE3_36_ONE_ONE_ONE_ONE, /* MEMS 2.0 of the 36 with 4 missing teeth at different places */
-   ROVER_K_MODE4_36_ONE_ONE_ONE_ONE, /* MEMS 3.0 of the 36 with 4 missing teeth at different places */
-   #ifdef MJR_DEBUG  
-   ROVER_MEMS_TEST_36_ONE_ONE_ONE_ONE,
-   #endif
+   ROVER_K_MODE1_36_ONE_ONE,         /* MEMS pattern 1 36-1-1 with teeth as 17 gap 17 gap */
+   ROVER_K_MODE2_36_ONE_ONE_ONE_ONE, /* MEMS pattern 2 36-1-1-1-1 with teeth as 11 gap 5 gap 12 gap 4 gap */
+   ROVER_K_MODE3_36_ONE_ONE_ONE_ONE, /* MEMS pattern 3 36-1-1-1-1 with teeth as 2 gap 14 gap 3 gap 13 gap */
+   ROVER_K_MODE4_36_ONE_ONE_ONE_ONE, /* MEMS pattern 4 36-1-1-1-1 with teeth as 3 gap 14 gap 2 gap 13 gap */
    MAX_WHEELS,
  }WheelType;
 
@@ -173,9 +170,9 @@
  const char ford_st170_friendly_name[] PROGMEM = "Ford ST170";
  const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";  
  const char rover_mems_mode1_thirtysix_minus_one_one_friendly_name[] PROGMEM = "Rover 36-1-1 flywheel EARLY MEMS";
- const char rover_mems_mode2_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 flywheel MEMS 1.9";
- const char rover_mems_mode3_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 flywheel MEMS 2";
- const char rover_mems_mode4_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 flywheel MEMS 3";
+ const char rover_mems_mode2_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 11 gap 5 gap 12 gap 4 gap";
+ const char rover_mems_mode3_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 2 gap 14 gap 3 gap 13 gap";
+ const char rover_mems_mode4_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 3 gap 14 gap 2 gap 13 gap";
  #ifdef MJR_DEBUG  
  const char rover_mems_test_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover mems test "; // added for testing can be removed
  #endif
@@ -606,7 +603,7 @@
      1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
-     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-35 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
      0,0                  /* 36th MISSING tooth */
    }; 
    
@@ -1176,22 +1173,23 @@ const unsigned char rover_mems_mode1_thirtysix_minus_one_one [] PROGMEM =
 
 const unsigned char rover_mems_mode2_thirtysix_minus_one_one_one_one [] PROGMEM =
 {
-1,0,1,0,0,0,1,0,1,0,
-1,0,1,0,0,0,1,0,1,0,
 1,0,1,0,1,0,1,0,1,0,
-3,2,3,2,3,2,3,2,2,2,
+1,0,1,0,1,0,1,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+1,2,3,2,2,2,3,2,3,2,
+3,2,3,2,3,2,3,2,3,2,
 3,2,3,2,3,2,3,2,3,2,
 2,2,3,2,3,2,3,2,3,2,
+2,2,3,2,3,2,3,2,3,2,
 3,2,3,2,3,2,3,2,3,2,
-3,2,3,2,3,2,2,2,3,2,
-3,2,3,2,3,2,2,2,3,2,
-3,2,3,2,3,2,3,2,3,2,
-3,2,1,0,1,0,1,0,1,0,
-0,0,1,0,1,0,1,0,1,0,
-1,0,0,0,1,0,1,0,1,0,
+3,2,3,2,2,2,3,2,3,2,
+3,2,3,0,1,0,0,0,1,0,
 1,0,1,0,1,0,1,0,1,0,
-1,0,1,0
+1,0,1,0,1,0,1,0,1,0,
+1,0,0,0,1,0,1,0,1,0,
+1,0,0,0
 };                 
+                
 
           
   
@@ -1205,19 +1203,20 @@ const unsigned char rover_mems_mode3_thirtysix_minus_one_one_one_one [] PROGMEM 
 1,0,1,0,0,0,1,0,1,0,
 0,0,1,0,1,0,1,0,1,0,
 1,0,1,0,1,0,1,0,1,0,
-3,2,3,2,3,2,3,2,3,2,
+1,2,3,2,3,2,3,2,3,2,
 2,2,3,2,3,2,3,2,2,2,
 3,2,3,2,3,2,3,2,3,2,
 3,2,3,2,3,2,3,2,3,2,
 3,2,3,2,3,2,2,2,3,2,
 3,2,2,2,3,2,3,2,3,2,
 3,2,3,2,3,2,3,2,3,2,
-3,2,1,0,1,0,1,0,1,0,
+3,2,3,0,1,0,1,0,1,0,
 1,0,0,0,1,0,1,0,1,0,
 0,0,1,0,1,0,1,0,1,0,
 1,0,1,0,1,0,1,0,1,0,
 1,0,1,0
-};           
+};          
+          
               
                  
         
@@ -1234,19 +1233,25 @@ const unsigned char rover_mems_mode4_thirtysix_minus_one_one_one_one [] PROGMEM 
 1,0,1,0,1,0,1,0,1,0,
 1,0,1,0,1,0,0,0,1,0,
 1,0,1,0,0,0,1,0,1,0,
-3,2,3,2,3,2,3,2,3,2,
-3,2,3,2,3,2,3,2,3,2,
+1,0,1,0,1,0,1,0,1,0,
+1,2,3,2,3,2,3,2,3,2,
 3,2,3,2,2,2,3,2,3,2,
 2,2,3,2,3,2,3,2,3,2,
 3,2,3,2,3,2,3,2,3,2,
 3,2,3,2,3,2,3,2,2,2,
 3,2,3,2,3,2,2,2,3,2,
-3,2,1,0,1,0,1,0,1,0,
-1,0,1,0,1,0,1,0,1,0,
+3,2,3,2,3,2,3,2,3,2,
+3,2,3,2,1,0,1,0,1,0,
 1,0,1,0,1,0,0,0,1,0,
 1,0,0,0,1,0,1,0,1,0,
 1,0,1,0
 };           
+          
+           
+         
+        
+          
+         
            
          
            
