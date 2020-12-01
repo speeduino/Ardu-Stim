@@ -39,7 +39,8 @@ enum {
 enum {
   LINEAR_SWEPT_RPM,
   FIXED_RPM,
-  POT_RPM
+  POT_RPM,
+  MAX_MODES,
 };
 
 #endif
