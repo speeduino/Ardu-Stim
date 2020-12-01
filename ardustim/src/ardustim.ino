@@ -62,8 +62,8 @@ uint16_t sweep_rate = 1;
 sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 
 wheels Wheels[MAX_WHEELS] = {
-  /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
-  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.003333, 4, 360 },
+  /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array, whether the number of edges covers 360 or 720 degrees */
+  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4, 360 },
   { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6, 360 },
   { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8, 360 },
   { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120, 360 },
