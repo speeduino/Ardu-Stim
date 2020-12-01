@@ -66,6 +66,7 @@
    DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
    SIXTY_MINUS_TWO,      /* 60-2 crank only */
    SIXTY_MINUS_TWO_WITH_CAM, /* 60-2 with 2nd trigger on cam */
+   SIXTY_MINUS_TWO_WITH_HALFMOON_CAM, /* 60-2 with "half moon" trigger on cam */
    THIRTY_SIX_MINUS_ONE, /* 36-1 crank only */
    TWENTY_FOUR_MINUS_ONE,
    FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
@@ -122,6 +123,7 @@
  const char dizzy_eight_cylinder_friendly_name[] PROGMEM = "8 cylinder dizzy";
  const char sixty_minus_two_friendly_name[] PROGMEM = "60-2 crank only";
  const char sixty_minus_two_with_cam_friendly_name[] PROGMEM = "60-2 crank and cam";
+ const char sixty_minus_two_with_halfmoon_cam_friendly_name[] PROGMEM = "60-2 crank and 'half moon' cam";
  const char thirty_six_minus_one_friendly_name[] PROGMEM = "36-1 crank only";
  const char twenty_four_minus_one_friendly_name[] PROGMEM = "24-1 crank only";
  const char four_minus_one_with_cam_friendly_name[] PROGMEM = "4-1 crank wheel with cam";
@@ -231,6 +233,36 @@
      1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
      1,2,1,0,1,0,1,0,1,0,  /* teeth 36-40, Cam trigger on latter half of 36th */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
+     1,0,1,0,1,0,0,0,0,0   /* teeth 56-58 and 59-60 MISSING */
+   };
+ 
+ /* 60-2 pattern with half moon cam trigger (cam input is high for one rotation and low for second rotation),
+  * 50% duty cyctle during normal teeth */
+ const unsigned char sixty_minus_two_with_halfmoon_cam[] PROGMEM = 
+   { /* 60-2 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,1,0,3,2,3,2,  /* teeth 41-45, Cam trigger goes high on 44th tooth */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 46-50 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 51-55 */
+     3,2,3,2,3,2,2,2,2,2,  /* teeth 56-58 and 59-60 MISSING */
+     3,2,3,2,3,2,3,2,3,2,  /* Second revolution teeth 1-5 */ 
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 6-10 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 11-15 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 16-20 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 21-25 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 26-30 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 31-35 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 36-40 */
+     3,2,3,2,3,2,1,0,1,0,  /* teeth 41-45, Cam trigger goes low on 43th tooth on rotation 2 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
      1,0,1,0,1,0,0,0,0,0   /* teeth 56-58 and 59-60 MISSING */
