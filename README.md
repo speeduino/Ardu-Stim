@@ -17,12 +17,16 @@ This version is a fork of the original by David Andruczyk [https://gitlab.com/li
 
 ## Wiring
 
-- pin `8` will provide the `crank` or primary wheel signal
-- pin `9` will provide the `cam` or secondary wheel signal
+- **Arduino Uno**
+  - pin `8` will provide the `crank` or primary wheel signal
+  - pin `9` will provide the `cam` or secondary wheel signal
+- **Arduino Mega**
+  - pin `53` will provide the `crank` or primary wheel signal
+  - pin `52` will provide the `cam` or secondary wheel signal
 
-Example for `Speeduino v0.4 Series` board with `Arduino Mega`:
+Example for `Arduino Uno` connected to `Speeduino v0.4 Series` board with `Arduino Mega`:
 
-![Ardustim wiring](docs/v04-wiring.png)
+![ArduStim wiring](docs/uno-v04-wiring.png)
 
 ## Build
 
