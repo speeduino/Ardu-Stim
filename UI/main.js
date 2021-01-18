@@ -12,9 +12,24 @@ var avrdudeIsRunning = false;
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 1024, height: 700, backgroundColor: '#312450', 
-                            webPreferences: { nodeIntegration: true }
-                          })
+  win = new BrowserWindow({
+    width: 1024,
+    height: 700, 
+    backgroundColor: '#312450', 
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+    },
+  });
+
+  // auto hide menu bar (Win, Linux)
+  win.setMenuBarVisibility(false);
+  win.setAutoHideMenuBar(true);
+
+  // remove completely when app is packaged (Win, Linux)
+  if (app.isPackaged) {
+    win.removeMenu();
+  }
 
   // and load the index.html of the app.
   win.loadFile('index.html')
