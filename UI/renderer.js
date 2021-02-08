@@ -1,4 +1,5 @@
 const serialport = require('serialport')
+const usb = require('usb')
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
 const {remote} = require('electron')
@@ -12,14 +13,8 @@ var initComplete = false;
 
 function refreshSerialPorts()
 {
-    serialport.list((err, ports) => {
+    serialport.list().then((ports) => {
         console.log('Serial ports found: ', ports);
-        if (err) {
-          document.getElementById('serialDetectError').textContent = err.message
-          return
-        } else {
-          document.getElementById('serialDetectError').textContent = ''
-        }
       
         if (ports.length === 0) {
           document.getElementById('serialDetectError').textContent = 'No ports discovered'
@@ -169,10 +164,8 @@ function uploadFW()
     });
 
     ipcRenderer.on("upload error", (event, code) => {
-        statusText.innerHTML = "Upload to arduino failed";
+        burnPercentText.innerHTML = "Upload to arduino failed";
         //Mke the terminal/error section visible
-        document.getElementById('terminalSection').style.display = "block";
-        document.getElementById('terminalText').innerHTML = code;
         spinner.classList.remove('fa-spinner');
         spinner.classList.add('fa-times');
     });
@@ -544,5 +537,8 @@ window.onload = function ()
     checkForUpdates();
     document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
+
+    usb.on('attach', refreshSerialPorts);
+    usb.on('detach', refreshSerialPorts);
 };
 
