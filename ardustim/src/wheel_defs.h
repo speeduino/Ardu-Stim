@@ -78,7 +78,8 @@
    ODDFIRE_VR,            /* Oddfire V-twin */
    OPTISPARK_LT1,         /* Optispark 360 and 8 */
    TWELVE_MINUS_THREE,    /* 12-3 */
-   THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only H4 */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO_H6, /* 36-2-2-2 crank only H6 */
    THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_CAM, /* 36-2-2-2 crank and cam */
    FOURTY_TWO_HUNDRED_WHEEL, /* 4200 wheel */
    THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3, /* Mazda F3 36-1 crank and cam */
@@ -135,7 +136,8 @@
  const char oddfire_vr_friendly_name[] PROGMEM = "odd fire 90 deg pattern 0 and 135 pulses";
  const char optispark_lt1_friendly_name[] PROGMEM = "GM OptiSpark LT1 360 and 8";
  const char twelve_minus_three_friendly_name[] PROGMEM = "12-3 oddball";
- const char thirty_six_minus_two_two_two_friendly_name[] PROGMEM = "36-2-2-2 Crank only";
+ const char thirty_six_minus_two_two_two_friendly_name[] PROGMEM = "36-2-2-2 H4 Crank only";
+ const char thirty_six_minus_two_two_two_h6_friendly_name[] PROGMEM = "36-2-2-2 H6 Crank only";
  const char thirty_six_minus_two_two_two_with_cam_friendly_name[] PROGMEM = "36-2-2-2 Crank and cam";
  const char fourty_two_hundred_wheel_friendly_name[] PROGMEM = "GM 4200 crank wheel";
  const char thirty_six_minus_one_with_cam_fe3_friendly_name[] PROGMEM = "Mazda FE3 36-1 with cam";
@@ -155,7 +157,7 @@
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
- const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
+ const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooth cam";
  const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
  const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
  const char honda_d17_no_cam_friendly_name[] PROGMEM = "Honda D17 Crank (12+1)";
@@ -417,6 +419,7 @@
   
   const unsigned char thirty_six_minus_two_two_two[] PROGMEM = 
     {
+      //H4 version
       1,0,1,0,1,0,1,0,1,0,
       1,0,1,0,1,0,1,0,1,0,
       1,0,1,0,1,0,0,0,0,0,
@@ -427,8 +430,21 @@
       1,0 
     };
   
+  const unsigned char thirty_six_minus_two_two_two_h6[] PROGMEM = 
+    {
+      //H6 version
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,0,0,
+      0,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,0,0,0,0,1,0,0,0,
+      0,0 
+    };
+  
   const unsigned char thirty_six_minus_two_two_two_with_cam[] PROGMEM = 
-    { /* 36-2-2-2 with cam  */
+    { /* 36-2-2-2 H4 with cam  */
       1,0,0,2,0,0,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
       0,0,1,0,1,0,1,0,1,0, /* Missing tooth 6, then 7-10 */
       1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
