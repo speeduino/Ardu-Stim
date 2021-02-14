@@ -36,7 +36,7 @@
     "electron-dl": "^1.14.0",
     "request": "^2.88.0",
     "serialport": "^9.0.4",
-    "usb": "^1.6.3"
+    "usb": "^1.6.5"
   },
   "build": {
     "appId": "Test",
