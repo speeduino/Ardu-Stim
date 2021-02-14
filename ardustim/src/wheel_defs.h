@@ -115,6 +115,7 @@
    MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
    TOYOTA_4AGE_CAS,           /*Toyota 4AGE CAS, 4 teeth and one cam tooth*/
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
+   SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
    MAX_WHEELS,
  }WheelType;
 
@@ -173,7 +174,7 @@
  const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";
  const char Toyota_4AGE_CAS_friendly_name[] PROGMEM = "Toyota 4AGE";
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
- 
+ const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1222,5 +1223,14 @@
      1,1,0,0,0,0,0,0,0,0,0,0,
      1,1,0,0,0,0,0,0,0,0,0,0,
      1,1,0,0,0,0,0,0,0,0,0,0,
+  };
+
+  const unsigned char suzuki_DRZ400[] PROGMEM ={
+      3,3,3,3,3,3,2,2,2,2,2,2,
+      1,1,3,3,3,3,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
   };
   #endif
