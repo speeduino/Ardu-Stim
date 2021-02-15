@@ -79,18 +79,19 @@ function openSerialPort()
     console.log("Opening serial port: ", e.options[e.selectedIndex].value);
     port = new serialport(e.options[e.selectedIndex].value, { baudRate: 115200 }, function (err) {
         if (err) {
-          return console.log('Error: ', err.message)
+          window.alert(`Error while opening serial port: ${err.message}`);
+          throw err;
         }
-      })
+
+        //Drop the modal dialog until connection is complete
+        modalLoading.init(true);
+        initComplete = false;
+      });
 
     //Update the patterns downdown list
     port.on('open', onSerialConnect);
     //port.on('data', onData);
     //refreshPatternList();
-
-    //Drop the modal dialog until connection is complete
-    modalLoading.init(true);
-    initComplete = false;
 
     // Master listener for all serial actions
     // Switches the port into "flowing mode"
