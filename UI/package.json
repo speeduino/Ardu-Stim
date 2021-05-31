@@ -1,6 +1,6 @@
 {
   "name": "Ardu-Stim",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Ardu-Stim engine simulator - Speeduino Version",
   "main": "main.js",
   "scripts": {
@@ -27,16 +27,16 @@
   },
   "homepage": "https://github.com/speeduino/Ardu-Stim",
   "devDependencies": {
-    "electron": "^4.1.1",
-    "electron-builder": "^22.7.0",
-    "electron-packager": "^13.1.1",
-    "electron-rebuild": "^1.8.4"
+    "electron": "^11.2.0",
+    "electron-builder": "^22.9.1",
+    "electron-packager": "^15.2.0",
+    "electron-rebuild": "^2.3.4"
   },
   "dependencies": {
-    "electron-dl": "^1.13.0",
-    "marked": "^0.6.1",
+    "electron-dl": "^1.14.0",
     "request": "^2.88.0",
-    "serialport": "^7.1.4"
+    "serialport": "^9.0.4",
+    "usb": "^1.6.5"
   },
   "build": {
     "appId": "Test",
@@ -55,7 +55,12 @@
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
       "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
-      "bin"
+      "bin",
+      "firmwares"
+    ],
+    "extraResources": [
+      "bin",
+      "firmwares"
     ],
     "win": {
       "icon": "assets/icons/win/icon.ico",

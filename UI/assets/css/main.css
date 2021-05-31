@@ -286,13 +286,8 @@ input, select, textarea {
 					padding-top: 0.625em;
 				}
 
-		.row {
-			margin-top: -1.25em;
-			margin-left: -1.25em;
-		}
-
 			.row > * {
-				padding: 1.25em 0 0 1.25em;
+				padding: 0.55em 0 0 1.25em;
 			}
 
 			.row.gtr-uniform {
@@ -529,13 +524,8 @@ input, select, textarea {
 							padding-top: 0.625em;
 						}
 
-				.row {
-					margin-top: -1.25em;
-					margin-left: -1.25em;
-				}
-
 					.row > * {
-						padding: 1.55em 0 0 0.25em;
+						padding: 0.55em 0 0 0.25em;
 					}
 
 					.row.gtr-uniform {
@@ -1494,4 +1484,19 @@ input, select, textarea {
 	/* Show the tooltip text when you mouse over the tooltip container */
 	* .tooltip:hover .tooltiptext {
 		visibility: visible;
+  }
+  
+  /* Custom stuff for animated spinner*/
+	@keyframes spin {
+		0% { -webkit-transform: rotate(0deg); transform:rotate(0deg); } 
+		50% { -webkit-transform: rotate(180deg); transform:rotate(180deg); } 
+		100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } 
+		
+	}
+
+	/* This is the class name given by the Font Awesome component when icon contains 'spinner' */
+	.fa-spinner {
+		/* Apply 'spinner' keyframes looping once every second (1s)  */
+		animation: spin 2s linear infinite;
+		display: inline-block;
 	}

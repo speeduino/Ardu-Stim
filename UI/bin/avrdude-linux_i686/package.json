@@ -1,0 +1,9 @@
+{
+    "description": "AVRDUDE",
+    "name": "tool-avrdude",
+    "system": [
+        "linux_i686"
+    ],
+    "url": "http://www.nongnu.org/avrdude/",
+    "version": "1.60001.0"
+}

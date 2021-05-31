@@ -12,9 +12,24 @@ var avrdudeIsRunning = false;
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 1024, height: 700, backgroundColor: '#312450', 
-                            webPreferences: { nodeIntegration: true }
-                          })
+  win = new BrowserWindow({
+    width: 1024,
+    height: 700, 
+    backgroundColor: '#312450', 
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+    },
+  });
+
+  // auto hide menu bar (Win, Linux)
+  win.setMenuBarVisibility(false);
+  win.setAutoHideMenuBar(true);
+
+  // remove completely when app is packaged (Win, Linux)
+  if (app.isPackaged) {
+    win.removeMenu();
+  }
 
   // and load the index.html of the app.
   win.loadFile('index.html')
@@ -70,18 +85,35 @@ ipcMain.on('uploadFW', (e, args) => {
   var burnStarted = false;
   var burnPercent = 0;
 
-  if(process.platform == "win32") { platform = "avrdude-windows"; }
-  else if(process.platform == "darwin") { platform = "avrdude-darwin-x86"; }
-  else if(process.platform == "linux") { platform = "avrdude-linux_i686"; }
+  //All Windows builds use the 32-bit binary
+  if(process.platform == "win32") 
+  { 
+    platform = "avrdude-windows"; 
+  }
+  //All Mac builds use the 64-bit binary
+  else if(process.platform == "darwin") 
+  { 
+    platform = "avrdude-darwin-x86_64";
+  }
+  else if(process.platform == "linux") 
+  { 
+    if(process.arch == "x32") { platform = "avrdude-linux_i686"; }
+    else if(process.arch == "x64") { platform = "avrdude-linux_x86_64"; }
+    else if(process.arch == "arm") { platform = "avrdude-armhf"; }
+    else if(process.arch == "arm64") { platform = "avrdude-aarch64"; }
+  }
 
   var executableName = __dirname + "/bin/" + platform + "/avrdude";
   executableName = executableName.replace('app.asar',''); //This is important for allowing the binary to be found once the app is packaed into an asar
   var configName = executableName + ".conf";
   if(process.platform == "win32") { executableName = executableName + '.exe'; } //This must come after the configName line above
 
-  var hexFile = 'flash:w:' + args.firmwareFile + ':i';
+  var firmwareFile = __dirname + "/firmwares/m328p.hex";
+  firmwareFile = firmwareFile.replace('app.asar',''); //This is important for allowing the binary to be found once the app is packaed into an asar
 
-  var execArgs = ['-v', '-patmega2560', '-C', configName, '-cwiring', '-b 115200', '-P', args.port, '-D', '-U', hexFile];
+  var hexFile = 'flash:w:' + firmwareFile + ':i';
+
+  var execArgs = ['-v', '-pm328p', '-C', configName, '-carduino', '-b 57600', '-P', args.port, '-D', '-U', hexFile];
 
   console.log(executableName);
   //const child = spawn(executableName, execArgs);

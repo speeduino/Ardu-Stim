@@ -66,6 +66,7 @@
    DIZZY_EIGHT_CYLINDER, /* 4 evenly spaced teeth */
    SIXTY_MINUS_TWO,      /* 60-2 crank only */
    SIXTY_MINUS_TWO_WITH_CAM, /* 60-2 with 2nd trigger on cam */
+   SIXTY_MINUS_TWO_WITH_HALFMOON_CAM, /* 60-2 with "half moon" trigger on cam */
    THIRTY_SIX_MINUS_ONE, /* 36-1 crank only */
    TWENTY_FOUR_MINUS_ONE,
    FOUR_MINUS_ONE_WITH_CAM, /* 4-1 crank + cam */
@@ -77,7 +78,8 @@
    ODDFIRE_VR,            /* Oddfire V-twin */
    OPTISPARK_LT1,         /* Optispark 360 and 8 */
    TWELVE_MINUS_THREE,    /* 12-3 */
-   THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only H4 */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO_H6, /* 36-2-2-2 crank only H6 */
    THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_CAM, /* 36-2-2-2 crank and cam */
    FOURTY_TWO_HUNDRED_WHEEL, /* 4200 wheel */
    THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3, /* Mazda F3 36-1 crank and cam */
@@ -112,6 +114,9 @@
    FORD_ST170,            /* Ford ST170 */
    MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
    SPARK_DIZZY_4CYL,      /* 70/100 low/high ratio hall sensor distributor, with sparksensor for secondary trigger*/
+   TOYOTA_4AGE_CAS,           /*Toyota 4AGE CAS, 4 teeth and one cam tooth*/
+   TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
+   SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
    MAX_WHEELS,
  }WheelType;
 
@@ -121,6 +126,7 @@
  const char dizzy_eight_cylinder_friendly_name[] PROGMEM = "8 cylinder dizzy";
  const char sixty_minus_two_friendly_name[] PROGMEM = "60-2 crank only";
  const char sixty_minus_two_with_cam_friendly_name[] PROGMEM = "60-2 crank and cam";
+ const char sixty_minus_two_with_halfmoon_cam_friendly_name[] PROGMEM = "60-2 crank and 'half moon' cam";
  const char thirty_six_minus_one_friendly_name[] PROGMEM = "36-1 crank only";
  const char twenty_four_minus_one_friendly_name[] PROGMEM = "24-1 crank only";
  const char four_minus_one_with_cam_friendly_name[] PROGMEM = "4-1 crank wheel with cam";
@@ -132,7 +138,8 @@
  const char oddfire_vr_friendly_name[] PROGMEM = "odd fire 90 deg pattern 0 and 135 pulses";
  const char optispark_lt1_friendly_name[] PROGMEM = "GM OptiSpark LT1 360 and 8";
  const char twelve_minus_three_friendly_name[] PROGMEM = "12-3 oddball";
- const char thirty_six_minus_two_two_two_friendly_name[] PROGMEM = "36-2-2-2 Crank only";
+ const char thirty_six_minus_two_two_two_friendly_name[] PROGMEM = "36-2-2-2 H4 Crank only";
+ const char thirty_six_minus_two_two_two_h6_friendly_name[] PROGMEM = "36-2-2-2 H6 Crank only";
  const char thirty_six_minus_two_two_two_with_cam_friendly_name[] PROGMEM = "36-2-2-2 Crank and cam";
  const char fourty_two_hundred_wheel_friendly_name[] PROGMEM = "GM 4200 crank wheel";
  const char thirty_six_minus_one_with_cam_fe3_friendly_name[] PROGMEM = "Mazda FE3 36-1 with cam";
@@ -152,7 +159,7 @@
  const char gm_six_tooth_with_cam_friendly_name[] PROGMEM = "GM 6 even-tooth crank with 1 tooth cam";
  const char gm_eight_tooth_with_cam_friendly_name[] PROGMEM = "GM 8 even-tooth crank with 1 tooth cam";
  const char volvo_d12acd_with_cam_friendly_name[] PROGMEM = "Volvo d12[acd] crank with 7 tooth cam";
- const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooht cam";
+ const char mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name[] PROGMEM = "Mazda 36-2-2-2 with 6 tooth cam";
  const char mitsubishi_4g63_4_2_friendly_name[] PROGMEM = "Mitsubishi 4g63 aka 4/2 crank and cam";
  const char audi_135_with_cam_friendly_name[] PROGMEM = "Audi 135 tooth crank and cam";
  const char honda_d17_no_cam_friendly_name[] PROGMEM = "Honda D17 Crank (12+1)";
@@ -167,7 +174,9 @@
  const char ford_st170_friendly_name[] PROGMEM = "Ford ST170";
  const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";
  const char spark_dizzy_4cyl_a_friendly_name[] PROGMEM = "4 cyl. Hall sensor dizzy with sparksensor";
- 
+ const char Toyota_4AGE_CAS_friendly_name[] PROGMEM = "Toyota 4AGE";
+ const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
+ const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -229,6 +238,36 @@
      1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
      1,2,1,0,1,0,1,0,1,0,  /* teeth 36-40, Cam trigger on latter half of 36th */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 41-45 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
+     1,0,1,0,1,0,0,0,0,0   /* teeth 56-58 and 59-60 MISSING */
+   };
+ 
+ /* 60-2 pattern with half moon cam trigger (cam input is high for one rotation and low for second rotation),
+  * 50% duty cyctle during normal teeth */
+ const unsigned char sixty_minus_two_with_halfmoon_cam[] PROGMEM = 
+   { /* 60-2 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 1-5 */ 
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 26-30 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 31-35 */
+     1,0,1,0,1,0,1,0,1,0,  /* teeth 36-40 */
+     1,0,1,0,1,0,3,2,3,2,  /* teeth 41-45, Cam trigger goes high on 44th tooth */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 46-50 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 51-55 */
+     3,2,3,2,3,2,2,2,2,2,  /* teeth 56-58 and 59-60 MISSING */
+     3,2,3,2,3,2,3,2,3,2,  /* Second revolution teeth 1-5 */ 
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 6-10 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 11-15 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 16-20 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 21-25 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 26-30 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 31-35 */
+     3,2,3,2,3,2,3,2,3,2,  /* teeth 36-40 */
+     3,2,3,2,3,2,1,0,1,0,  /* teeth 41-45, Cam trigger goes low on 43th tooth on rotation 2 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 46-50 */
      1,0,1,0,1,0,1,0,1,0,  /* teeth 51-55 */
      1,0,1,0,1,0,0,0,0,0   /* teeth 56-58 and 59-60 MISSING */
@@ -383,6 +422,7 @@
   
   const unsigned char thirty_six_minus_two_two_two[] PROGMEM = 
     {
+      //H4 version
       1,0,1,0,1,0,1,0,1,0,
       1,0,1,0,1,0,1,0,1,0,
       1,0,1,0,1,0,0,0,0,0,
@@ -393,8 +433,21 @@
       1,0 
     };
   
+  const unsigned char thirty_six_minus_two_two_two_h6[] PROGMEM = 
+    {
+      //H6 version
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,0,0,
+      0,0,1,0,1,0,1,0,1,0,
+      1,0,1,0,1,0,1,0,1,0,
+      1,0,0,0,0,0,1,0,0,0,
+      0,0 
+    };
+  
   const unsigned char thirty_six_minus_two_two_two_with_cam[] PROGMEM = 
-    { /* 36-2-2-2 with cam  */
+    { /* 36-2-2-2 H4 with cam  */
       1,0,0,2,0,0,1,0,0,0, /* Tooth one, missing teeth 2,3 and 5, 2nd trigger during teeth 2 and 3 */
       0,0,1,0,1,0,1,0,1,0, /* Missing tooth 6, then 7-10 */
       1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
@@ -595,7 +648,7 @@
      1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
      1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
-     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-35 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 31-35 */
      0,0                  /* 36th MISSING tooth */
    }; 
    
@@ -1125,23 +1178,27 @@
       0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0
    };
 
-   const unsigned char mitsubishi_3A92[] PROGMEM = 
-   {
-      3,2,3,2,2,2,3,2,1,0,1,0,
-      1,0,3,2,1,0,3,2,3,2,3,2,
-      3,2,3,2,2,2,3,2,3,2,3,2,
-      3,2,3,2,3,2,3,2,3,2,3,2,
-      3,2,2,2,2,2,3,2,3,2,1,0,
-      1,0,1,0,3,2,3,2,3,2,3,2,
-      3,2,3,2,2,2,3,2,3,2,3,2,
-      3,2,3,2,3,2,3,2,3,2,3,2,
-      3,2,3,2,2,2,3,2,1,0,1,0,
-      1,0,3,2,3,2,3,2,3,2,3,2,
-      3,2,2,2,2,2,3,2,3,2,3,2,
-      3,2,3,2,3,2,3,2,3,2,3,2
-   };
+  const unsigned char mitsubishi_3A92 [] PROGMEM =
+  {
+    1,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    2,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,0,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,2,0,
+    2,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    1,0,0,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,2,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    1,0,1,0,1,0,1,0,1,0,
+    0,0,0,0
+  };
 
- /* 70/110 degrees low to high ratio and sparksensor secondary */
+ /* 70/110 degrees low to high ratio and sparksensor secondary 
+    two pulses per crank revolution plus one cam pulse*/
    const unsigned char spark_dizzy_4cyl[] PROGMEM = 
    { //Split into 5 degree blocks (12 per line)
       0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1157,4 +1214,46 @@
       0,0,1,1,1,1,1,1,1,1,1,1, 
       1,1,1,1,1,1,1,1,1,1,1,1,
    };
+
+/* 4AGE CAS inside dizzy, 4 pulses 2 per crank revolution one cam pulse at 5 Deg  */
+	 const unsigned char toyota_4AGE_CAS[] PROGMEM = 
+	  {
+      1,1,2,2,0,0,0,0,0,0,0,0, /*5 deg per */
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      1,1,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      1,1,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      1,1,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+	};
+  /* 4AGZE inside dizzy, 24 pulses 12 per crank revolution one cam pulse at 5 Deg  */
+
+	 const unsigned char toyota_4AGZE[] PROGMEM = 
+   { 1,1,2,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0,
+     1,1,0,0,0,0,0,0,0,0,0,0
+  };
+
+  const unsigned char suzuki_DRZ400[] PROGMEM ={
+      1,1,1,1,1,1,2,2,2,2,0,0,
+      3,3,3,3,3,3,2,2,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0,
+      1,1,1,1,1,1,0,0,0,0,0,0
+  };
   #endif

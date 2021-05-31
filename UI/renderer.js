@@ -1,4 +1,5 @@
 const serialport = require('serialport')
+const usb = require('usb')
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
 const {remote} = require('electron')
@@ -8,17 +9,12 @@ var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 var onConnectInterval;
 var isConnected=false;
 var currentRPM = 0;
+var initComplete = false;
 
 function refreshSerialPorts()
 {
-    serialport.list((err, ports) => {
+    serialport.list().then((ports) => {
         console.log('Serial ports found: ', ports);
-        if (err) {
-          document.getElementById('serialDetectError').textContent = err.message
-          return
-        } else {
-          document.getElementById('serialDetectError').textContent = ''
-        }
       
         if (ports.length === 0) {
           document.getElementById('serialDetectError').textContent = 'No ports discovered'
@@ -38,8 +34,32 @@ function refreshSerialPorts()
             var newOption = document.createElement('option');
             newOption.value = ports[i].comName;
             newOption.innerHTML = ports[i].comName;
+            if(ports[i].vendorId == "2341")
+            {
+              //Arduino device
+              if(ports[i].productId == "0010" || ports[i].productId == "0042") 
+              { 
+                //Mega2560
+                newOption.innerHTML = newOption.innerHTML + " (Arduino Mega)"; 
+                isMega = true;
+              }
+            }
+            else if(ports[i].vendorId == "16c0")
+            {
+              //Teensy
+              if(ports[i].productId == "0483")
+              {
+                //Teensy - Unfortunately all Teensy devices use the same device ID :(
+                newOption.innerHTML = newOption.innerHTML + " (Teensy)"; 
+              } 
+            }
+            else if(ports[i].vendorId == "16c0")
+            {
+            }
+            
             select.add(newOption);
-        }
+            console.log("Vendor: " + ports[i].vendorId);
+            console.log("Product: " +ports[i].productId);
         var button = document.getElementById("btnConnect")
         if(ports.length > 0) 
         {
@@ -47,8 +67,8 @@ function refreshSerialPorts()
             button.disabled = false;
         }
         else { button.disabled = true; }
-      
-      })
+      }
+    })
 }
 
 
@@ -59,17 +79,19 @@ function openSerialPort()
     console.log("Opening serial port: ", e.options[e.selectedIndex].value);
     port = new serialport(e.options[e.selectedIndex].value, { baudRate: 115200 }, function (err) {
         if (err) {
-          return console.log('Error: ', err.message)
+          window.alert(`Error while opening serial port: ${err.message}`);
+          throw err;
         }
-      })
+
+        //Drop the modal dialog until connection is complete
+        modalLoading.init(true);
+        initComplete = false;
+      });
 
     //Update the patterns downdown list
     port.on('open', onSerialConnect);
     //port.on('data', onData);
     //refreshPatternList();
-
-    //Drop the modal dialog until connection is complete
-    modalLoading.init(true);
 
     // Master listener for all serial actions
     // Switches the port into "flowing mode"
@@ -105,139 +127,35 @@ function onSerialConnect()
   document.getElementById("link_config").href = "#config";
 }
 
-function refreshAvailableFirmwares()
-{
-    //Disable the buttons. These are only re-enabled if the retrieve is successful
-    var DetailsButton = document.getElementById("btnDetails");
-    var ChoosePortButton = document.getElementById("btnChoosePort");
-    DetailsButton.disabled = true;
-    ChoosePortButton.disabled = true;
-
-    var request = require('request');
-    request.get('http://speeduino.com/fw/versions', {timeout: 10000}, function (error, response, body) 
-    {
-        select = document.getElementById('versionsSelect');
-        if (!error && response.statusCode == 200) {
-
-            var lines = body.split('\n');
-            // Continue with your processing here.
-            
-            for(var i = 0;i < lines.length;i++)
-            {
-                var newOption = document.createElement('option');
-                newOption.value = lines[i];
-                newOption.innerHTML = lines[i];
-                select.appendChild(newOption);
-            }
-            select.selectedIndex = 0;
-
-            //Re-enable the buttons
-            DetailsButton.disabled = false;
-            ChoosePortButton.disabled = false;
-        }
-        else if(error)
-        {
-            console.log("Error retrieving available firmwares");
-            var newOption = document.createElement('option');
-            if(error.code === 'ETIMEDOUT')
-            {
-                newOption.value = "Connection timed out";
-                newOption.innerHTML = "Connection timed out";
-            }
-            else
-            {
-                newOption.value = "Cannot retrieve firmware list";
-                newOption.innerHTML = "Cannot retrieve firmware list. Check internet connection and restart";
-            }
-            select.appendChild(newOption);
-        }
-        else if(response.statusCode == 404)
-        {
-
-        }
-    }
-    );
-}
-
-function downloadHex()
-{
-
-    var e = document.getElementById('versionsSelect');
-    var DLurl = "http://speeduino.com/fw/bin/" + e.options[e.selectedIndex].value + ".hex";
-    console.log("Downloading: " + DLurl);
-    
-    //Download the Hex file
-    ipcRenderer.send("download", {
-        url: DLurl,
-        properties: {directory: "downloads"}
-    });
-
-}
-
-function downloadIni()
-{
-
-    var e = document.getElementById('versionsSelect');
-    var DLurl = "http://speeduino.com/fw/" + e.options[e.selectedIndex].value + ".ini";
-    console.log("Downloading: " + DLurl);
-
-    //Download the ini file
-    ipcRenderer.send("download", {
-        url: DLurl,
-        properties: {directory: "downloads"}
-    });
-
-}
 
 function uploadFW()
 {
-    //Jump to the progress section
-    window.location.href = "#progress";
 
-    //Start the spinner
+    //Set the status and spinner
     var spinner = document.getElementById('progressSpinner');
+    var burnPercentText = document.getElementById('burnPercent');
+    burnPercentText.innerHTML = "Preparing to burn firmware...";
+
     //Remove any old icons
     spinner.classList.remove('fa-pause');
     spinner.classList.remove('fa-check');
     spinner.classList.remove('fa-times');
     spinner.classList.add('fa-spinner');
 
-    var statusText = document.getElementById('statusText');
-    var burnPercentText = document.getElementById('burnPercent');
-    statusText.innerHTML = "Downloading INI file"
-    downloadIni();
+    //Retrieve the select serial port
+    var e = document.getElementById('portsSelect');
+    uploadPort = e.options[e.selectedIndex].value;
+    console.log("Uploading to port: " + uploadPort);
 
+    //Retrieve the 
 
-    ipcRenderer.on("download complete", (event, file, state) => {
-        console.log("Saved file: " + file); // Full file path
-
-        var extension = file.substr(file.length - 3);
-        if(extension == "ini")
-        {
-            statusText.innerHTML = "Downloading firmware"
-            downloadHex();
-        }
-        else if(extension == "hex")
-        {
-            statusText.innerHTML = "Uploading firmware to board"
-
-            //Retrieve the select serial port
-            var e = document.getElementById('portsSelect');
-            uploadPort = e.options[e.selectedIndex].value;
-            console.log("Using port: " + uploadPort);
-
-            //Begin the upload
-            ipcRenderer.send("uploadFW", {
-                port: uploadPort,
-                firmwareFile: file
-            });
-        }
-        console.log();
+    //Begin the upload
+    ipcRenderer.send("uploadFW", {
+      port: uploadPort,
     });
 
     ipcRenderer.on("upload completed", (event, code) => {
-        statusText.innerHTML = "Upload to arduino completed successfully!";
-        burnPercentText.innerHTML = "";
+        burnPercent.innerHTML = "Upload to arduino completed successfully!";
         spinner.classList.remove('fa-spinner');
         spinner.classList.add('fa-check');
     });
@@ -247,15 +165,19 @@ function uploadFW()
     });
 
     ipcRenderer.on("upload error", (event, code) => {
-        statusText.innerHTML = "Upload to arduino failed";
+        burnPercentText.innerHTML = "Upload to arduino failed";
         //Mke the terminal/error section visible
-        document.getElementById('terminalSection').style.display = "block";
-        document.getElementById('terminalText').innerHTML = code;
         spinner.classList.remove('fa-spinner');
         spinner.classList.add('fa-times');
     });
 
 
+}
+
+function saveData()
+{
+  //Request the arduino save the current config
+  port.write("c"); //Send the command to perform EEPROM burn
 }
 
 var patternOptionCounter = 0;
@@ -317,12 +239,22 @@ function refreshPatternList(data)
   { 
     port.unpipe(); 
 
-    //Drop the modal loading window
-    modalLoading.remove();
-    //Move to the Live tab
-    window.location.hash = '#live';
-    enableRPM();
+    //Request the currently selected patter
+    port.write("N"); //Send the command to issue the current pattern number
+    const parser = port.pipe(new Readline({ delimiter: '\r\n' })); //Attach the readline parser
+    parser.on('data', refreshPatternNumber);
   }
+}
+
+//Callback from the 'N' command that returns the number of the selected pattern
+function refreshPatternNumber(data)
+{
+  var select = document.getElementById('patternSelect')
+  var patternID = parseInt(data);
+  port.unpipe();
+  select.value = patternID;
+  console.log("Currently selected Pattern: " + patternID);
+  updatePattern();
 }
 
 function readPattern()
@@ -334,6 +266,7 @@ function readPattern()
 
 var patternRow = 0;
 var newPattern;
+var patternDegrees;
 function updatePattern()
 {
   var patternID = document.getElementById('patternSelect').value;
@@ -346,10 +279,12 @@ function updatePattern()
   buffer[1] = parseInt(patternID);
   port.write(buffer); //Send the new pattern ID
 
+  //Send the command to save the pattern to EEPROM
+  saveData();
+
   //Request the new pattern
   port.write("P"); //Send the command to read the new pattern out
   parser.on('data', refreshPattern);
-  
 }
 
 //Callback for the P command
@@ -366,14 +301,30 @@ function refreshPattern(data)
   else
   {
     //2nd line received is the number of degrees the pattern runs over (360 or 720 usually)
-    console.log(`Pattern duration: ${data}`)
-    redrawGears(newPattern, parseInt(data));
+    console.log(`Pattern duration: ${data}`);
+    patternDegrees = parseInt(data);
+    redrawGears(newPattern, patternDegrees);
     
     patternRow = 0;
     port.unpipe();
-  }
 
-  
+    if(initComplete == false)
+    {
+      //Drop the modal loading window
+      modalLoading.remove();
+      //Move to the Live tab
+      window.location.hash = '#live';
+      enableRPM();
+      initComplete = true;
+    }
+
+  } 
+}
+
+//Simply redraw the gear pattern using the existing details (Used when the draw style is changed)
+function resetGears()
+{
+  redrawGears(newPattern, patternDegrees);
 }
 
 function setRPMMode()
@@ -456,16 +407,45 @@ function redrawGears(pattern, degrees)
 {
   var teeth, depth, radius, width;
   //teeth =  toothPattern.length / 2;
-  depth = 10;
+
   radius = 150;
   width = Number("100");
-  line = 1;
+
   var halfspeed = false;
   if(degrees == 720) { halfspeed = true; }
   //var halfspeed = false;
 
-  draw_crank(pattern, depth, radius, width, line, halfspeed);
-  draw_cam(pattern, depth, radius, width, line);
+  var background = document.getElementById('canvas-background-colour');
+  var style = document.getElementById('wheelDisplaySelect').value
+  var crank = document.getElementById('crank');
+  var cam = document.getElementById('cam');
+  //style = 1;
+  if(style == 0)
+  {
+    crank.width = 420;
+    crank.height = 300;
+    cam.width = 420;
+    cam.height = 300;
+    depth = 10;
+    line = 1;
+    background.style.backgroundColor = "#0071b8";
+    draw_crank_gear(pattern, depth, radius, width, line, halfspeed);
+    draw_cam_gear(pattern, depth, radius, width, line);
+  }
+  else
+  {
+    crank.width = 840;
+    crank.height = 150;
+    cam.width = 840;
+    cam.height = 150;
+    depth = 80;
+    line = 3;
+    background.style.backgroundColor = "#000000";
+    draw_crank_scope(pattern, depth, radius, width, line, halfspeed);
+    draw_cam_scope(pattern, depth, radius, width, line);
+  }
+
+  
 }
 
 /*
@@ -556,6 +536,10 @@ window.onload = function ()
     redrawGears(toothPatterns[0]);
     window.location.hash = '#connect';
     checkForUpdates();
+    document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
+
+    usb.on('attach', refreshSerialPorts);
+    usb.on('detach', refreshSerialPorts);
 };
 
