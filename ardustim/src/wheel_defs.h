@@ -113,6 +113,7 @@
    FOUR_TWENTY_A,         /* DSM 420a */
    FORD_ST170,            /* Ford ST170 */
    MITSUBISHI_3A92,        /* Mitsubishi 3cylinder 3A92 */
+   SPARK_DIZZY_4CYL,      /* 70/100 low/high ratio hall sensor distributor, with sparksensor for secondary trigger*/
    TOYOTA_4AGE_CAS,           /*Toyota 4AGE CAS, 4 teeth and one cam tooth*/
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
@@ -172,6 +173,7 @@
  const char four_twenty_a_friendly_name[] PROGMEM = "DSM 420a";
  const char ford_st170_friendly_name[] PROGMEM = "Ford ST170";
  const char mitsubishi_3A92_friendly_name[] PROGMEM = "Mitsubishi 3A92";
+ const char spark_dizzy_4cyl_a_friendly_name[] PROGMEM = "4 cyl. Hall sensor dizzy with sparksensor";
  const char Toyota_4AGE_CAS_friendly_name[] PROGMEM = "Toyota 4AGE";
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
@@ -1195,8 +1197,25 @@
     0,0,0,0
   };
 
-   /* 4AGE CAS inside dizzy, 4 pulses 2 per crank revolution one cam pulse at 5 Deg  */
+ /* 70/110 degrees low to high ratio and sparksensor secondary 
+    two pulses per crank revolution plus one cam pulse*/
+   const unsigned char spark_dizzy_4cyl[] PROGMEM = 
+   { //Split into 5 degree blocks (12 per line)
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      2,2,3,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,1,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,1,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,1,1,1,1,1,1,1,1,1,1, 
+      1,1,1,1,1,1,1,1,1,1,1,1,
+   };
 
+/* 4AGE CAS inside dizzy, 4 pulses 2 per crank revolution one cam pulse at 5 Deg  */
 	 const unsigned char toyota_4AGE_CAS[] PROGMEM = 
 	  {
       1,1,2,2,0,0,0,0,0,0,0,0, /*5 deg per */
