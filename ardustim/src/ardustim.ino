@@ -115,7 +115,7 @@ wheels Wheels[MAX_WHEELS] = {
   { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144, 720 },
   { ford_st170_friendly_name, ford_st170, 3.0, 720, 720 },
   { mitsubishi_3A92_friendly_name, mitsubishi_3A92, 0.6, 144, 720 },
-  { spark_dizzy_4cyl_a_friendly_name, spark_dizzy_4cyl, 0.6, 144, 720 } 
+  { spark_dizzy_4cyl_a_friendly_name, spark_dizzy_4cyl, 0.6, 144, 720 } ,
   { Toyota_4AGE_CAS_friendly_name, toyota_4AGE_CAS, 0.333, 144, 720 },
   { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.333, 144, 720 },
   { Suzuki_DRZ400_friendly_name, suzuki_DRZ400,0.6, 72, 360},
