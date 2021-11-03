@@ -1,4 +1,5 @@
 const serialport = require('serialport')
+const usb = require('usb')
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
 const {remote} = require('electron')
@@ -12,14 +13,8 @@ var initComplete = false;
 
 function refreshSerialPorts()
 {
-    serialport.list((err, ports) => {
+    serialport.list().then((ports) => {
         console.log('Serial ports found: ', ports);
-        if (err) {
-          document.getElementById('serialDetectError').textContent = err.message
-          return
-        } else {
-          document.getElementById('serialDetectError').textContent = ''
-        }
       
         if (ports.length === 0) {
           document.getElementById('serialDetectError').textContent = 'No ports discovered'
@@ -39,8 +34,32 @@ function refreshSerialPorts()
             var newOption = document.createElement('option');
             newOption.value = ports[i].comName;
             newOption.innerHTML = ports[i].comName;
+            if(ports[i].vendorId == "2341")
+            {
+              //Arduino device
+              if(ports[i].productId == "0010" || ports[i].productId == "0042") 
+              { 
+                //Mega2560
+                newOption.innerHTML = newOption.innerHTML + " (Arduino Mega)"; 
+                isMega = true;
+              }
+            }
+            else if(ports[i].vendorId == "16c0")
+            {
+              //Teensy
+              if(ports[i].productId == "0483")
+              {
+                //Teensy - Unfortunately all Teensy devices use the same device ID :(
+                newOption.innerHTML = newOption.innerHTML + " (Teensy)"; 
+              } 
+            }
+            else if(ports[i].vendorId == "16c0")
+            {
+            }
+            
             select.add(newOption);
-        }
+            console.log("Vendor: " + ports[i].vendorId);
+            console.log("Product: " +ports[i].productId);
         var button = document.getElementById("btnConnect")
         if(ports.length > 0) 
         {
@@ -48,8 +67,8 @@ function refreshSerialPorts()
             button.disabled = false;
         }
         else { button.disabled = true; }
-      
-      })
+      }
+    })
 }
 
 
@@ -60,18 +79,19 @@ function openSerialPort()
     console.log("Opening serial port: ", e.options[e.selectedIndex].value);
     port = new serialport(e.options[e.selectedIndex].value, { baudRate: 115200 }, function (err) {
         if (err) {
-          return console.log('Error: ', err.message)
+          window.alert(`Error while opening serial port: ${err.message}`);
+          throw err;
         }
-      })
+
+        //Drop the modal dialog until connection is complete
+        modalLoading.init(true);
+        initComplete = false;
+      });
 
     //Update the patterns downdown list
     port.on('open', onSerialConnect);
     //port.on('data', onData);
     //refreshPatternList();
-
-    //Drop the modal dialog until connection is complete
-    modalLoading.init(true);
-    initComplete = false;
 
     // Master listener for all serial actions
     // Switches the port into "flowing mode"
@@ -107,89 +127,6 @@ function onSerialConnect()
   document.getElementById("link_config").href = "#config";
 }
 
-function refreshAvailableFirmwares()
-{
-    //Disable the buttons. These are only re-enabled if the retrieve is successful
-    var DetailsButton = document.getElementById("btnDetails");
-    var ChoosePortButton = document.getElementById("btnChoosePort");
-    DetailsButton.disabled = true;
-    ChoosePortButton.disabled = true;
-
-    var request = require('request');
-    request.get('http://speeduino.com/fw/versions', {timeout: 10000}, function (error, response, body) 
-    {
-        select = document.getElementById('versionsSelect');
-        if (!error && response.statusCode == 200) {
-
-            var lines = body.split('\n');
-            // Continue with your processing here.
-            
-            for(var i = 0;i < lines.length;i++)
-            {
-                var newOption = document.createElement('option');
-                newOption.value = lines[i];
-                newOption.innerHTML = lines[i];
-                select.appendChild(newOption);
-            }
-            select.selectedIndex = 0;
-
-            //Re-enable the buttons
-            DetailsButton.disabled = false;
-            ChoosePortButton.disabled = false;
-        }
-        else if(error)
-        {
-            console.log("Error retrieving available firmwares");
-            var newOption = document.createElement('option');
-            if(error.code === 'ETIMEDOUT')
-            {
-                newOption.value = "Connection timed out";
-                newOption.innerHTML = "Connection timed out";
-            }
-            else
-            {
-                newOption.value = "Cannot retrieve firmware list";
-                newOption.innerHTML = "Cannot retrieve firmware list. Check internet connection and restart";
-            }
-            select.appendChild(newOption);
-        }
-        else if(response.statusCode == 404)
-        {
-
-        }
-    }
-    );
-}
-
-function downloadHex()
-{
-
-    var e = document.getElementById('versionsSelect');
-    var DLurl = "http://speeduino.com/fw/bin/" + e.options[e.selectedIndex].value + ".hex";
-    console.log("Downloading: " + DLurl);
-    
-    //Download the Hex file
-    ipcRenderer.send("download", {
-        url: DLurl,
-        properties: {directory: "downloads"}
-    });
-
-}
-
-function downloadIni()
-{
-
-    var e = document.getElementById('versionsSelect');
-    var DLurl = "http://speeduino.com/fw/" + e.options[e.selectedIndex].value + ".ini";
-    console.log("Downloading: " + DLurl);
-
-    //Download the ini file
-    ipcRenderer.send("download", {
-        url: DLurl,
-        properties: {directory: "downloads"}
-    });
-
-}
 
 function uploadFW()
 {
@@ -210,6 +147,8 @@ function uploadFW()
     uploadPort = e.options[e.selectedIndex].value;
     console.log("Uploading to port: " + uploadPort);
 
+    //Retrieve the 
+
     //Begin the upload
     ipcRenderer.send("uploadFW", {
       port: uploadPort,
@@ -226,10 +165,8 @@ function uploadFW()
     });
 
     ipcRenderer.on("upload error", (event, code) => {
-        statusText.innerHTML = "Upload to arduino failed";
+        burnPercentText.innerHTML = "Upload to arduino failed";
         //Mke the terminal/error section visible
-        document.getElementById('terminalSection').style.display = "block";
-        document.getElementById('terminalText').innerHTML = code;
         spinner.classList.remove('fa-spinner');
         spinner.classList.add('fa-times');
     });
@@ -601,5 +538,8 @@ window.onload = function ()
     checkForUpdates();
     document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
+
+    usb.on('attach', refreshSerialPorts);
+    usb.on('detach', refreshSerialPorts);
 };
 

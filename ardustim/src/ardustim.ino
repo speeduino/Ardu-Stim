@@ -62,12 +62,13 @@ uint16_t sweep_rate = 1;
 sweep_step *SweepSteps;  /* Global pointer for the sweep steps */
 
 wheels Wheels[MAX_WHEELS] = {
-  /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array */
-  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.003333, 4, 360 },
+  /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array, whether the number of edges covers 360 or 720 degrees */
+  { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4, 360 },
   { dizzy_six_cylinder_friendly_name, dizzy_six_cylinder, 0.05, 6, 360 },
   { dizzy_eight_cylinder_friendly_name, dizzy_eight_cylinder, 0.06667, 8, 360 },
   { sixty_minus_two_friendly_name, sixty_minus_two, 1.0, 120, 360 },
   { sixty_minus_two_with_cam_friendly_name, sixty_minus_two_with_cam, 1.0, 240, 720 },
+  { sixty_minus_two_with_halfmoon_cam_friendly_name, sixty_minus_two_with_halfmoon_cam, 1.0, 240, 720 },
   { thirty_six_minus_one_friendly_name, thirty_six_minus_one, 0.6, 72, 360 },
   { twenty_four_minus_one_friendly_name, twenty_four_minus_one, 0.5, 48, 360 },
   { four_minus_one_with_cam_friendly_name, four_minus_one_with_cam, 0.06667, 16, 720 },
@@ -80,6 +81,7 @@ wheels Wheels[MAX_WHEELS] = {
   { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720, 720 },
   { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48, 360 },
   { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72, 360 },
+  { thirty_six_minus_two_two_two_h6_friendly_name, thirty_six_minus_two_two_two_h6, 0.6, 72, 360 },
   { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 144, 720 },
   { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72, 360 },
   { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144, 720 },
@@ -111,8 +113,11 @@ wheels Wheels[MAX_WHEELS] = {
   { subaru_six_seven_name_friendly_name, subaru_six_seven, 3.0, 720, 720 },
   { gm_seven_x_friendly_name, gm_seven_x, 1.502, 180, 720 },
   { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144, 720 },
-  { ford_st170_friendly_name, ford_st170, 0.6, 720, 720 },
+  { ford_st170_friendly_name, ford_st170, 3.0, 720, 720 },
   { mitsubishi_3A92_friendly_name, mitsubishi_3A92, 0.6, 144, 720 },
+  { Toyota_4AGE_CAS_friendly_name, toyota_4AGE_CAS, 0.333, 144, 720 },
+  { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.333, 144, 720 },
+  { Suzuki_DRZ400_friendly_name, suzuki_DRZ400,0.6, 72, 360},
 };
 
 /* Initialization */

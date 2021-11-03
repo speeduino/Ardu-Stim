@@ -286,13 +286,8 @@ input, select, textarea {
 					padding-top: 0.625em;
 				}
 
-		.row {
-			margin-top: -1.25em;
-			margin-left: -1.25em;
-		}
-
 			.row > * {
-				padding: 1.25em 0 0 1.25em;
+				padding: 0.55em 0 0 1.25em;
 			}
 
 			.row.gtr-uniform {
@@ -529,13 +524,8 @@ input, select, textarea {
 							padding-top: 0.625em;
 						}
 
-				.row {
-					margin-top: -1.25em;
-					margin-left: -1.25em;
-				}
-
 					.row > * {
-						padding: 1.55em 0 0 0.25em;
+						padding: 0.55em 0 0 0.25em;
 					}
 
 					.row.gtr-uniform {

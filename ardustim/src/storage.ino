@@ -8,6 +8,7 @@
 void loadConfig()
 {
   if(EEPROM.read(EEPROM_VERSION) == 255)
+  //if(true)
   {
     //New arduino
     selected_wheel = 5; //36-1
@@ -22,6 +23,11 @@ void loadConfig()
     byte highByte = EEPROM.read(EEPROM_CURRENT_RPM);
     byte lowByte =  EEPROM.read(EEPROM_CURRENT_RPM+1);
     wanted_rpm = word(highByte, lowByte);
+
+    //Error checking
+    if(selected_wheel >= MAX_WHEELS) { selected_wheel = 5; }
+    if(mode >= MAX_MODES) { mode = FIXED_RPM; }
+    if(wanted_rpm > 15000) { wanted_rpm = 4000; }
   }
 }
 
