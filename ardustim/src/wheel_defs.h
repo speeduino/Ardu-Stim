@@ -89,7 +89,9 @@
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
-   THIRTY_SIX_MINUS_ONE_PLUS_ONE_WITH_CAM_NGC4, /* From jimstim 36-1+1 wheel #5 4 cyl chrysler? */
+   CHRYSLER_NGC_THIRTY_SIX_PLUS_TWO_MINUS_TWO_WITH_NGC4_CAM, /* Chrysler NGC 36+2-2 crank with NGC 4 cylinder cam pattern */
+   CHRYSLER_NGC_THIRTY_SIX_MINUS_TWO_PLUS_TWO_WITH_NGC6_CAM, /* Chrysler NGC 36-2+2 crank with NGC 6 cylinder cam pattern */
+   CHRYSLER_NGC_THIRTY_SIX_MINUS_TWO_PLUS_TWO_WITH_NGC8_CAM, /* Chrysler NGC 36-2+2 crank with NGC 8 cylinder cam pattern */
    WEBER_IAW_WITH_CAM, /* From jimstim IAW weber-marelli */
    FIAT_ONE_POINT_EIGHT_SIXTEEN_VALVE_WITH_CAM, /* Fiat 1.8 16V from jimstim */
    THREE_SIXTY_NISSAN_CAS, /*from jimstim 360 tooth cas with 6 slots */
@@ -148,7 +150,9 @@
  const char lotus_thirty_six_minus_one_one_one_one_friendly_name[] PROGMEM = "Odd Lotus 36-1-1-1-1 flywheel";
  const char honda_rc51_with_cam_friendly_name[] PROGMEM = "Honda RC51 with cam";
  const char thirty_six_minus_one_with_second_trigger_friendly_name[] PROGMEM = "36-1 crank with 2nd trigger on teeth 33-34";
- const char thirty_six_minus_one_plus_one_with_cam_ngc4_friendly_name[] PROGMEM = "36-1+1 crank with cam pattern NGC4";
+ const char chrysler_ngc_thirty_six_plus_two_minus_two_with_ngc4_cam_friendly_name[] PROGMEM = "Chrysler NGC 36+2-2 crank, NGC 4-cyl cam";
+ const char chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc6_cam_friendly_name[] PROGMEM = "Chrysler NGC 36-2+2 crank, NGC 6-cyl cam";
+ const char chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc8_cam_friendly_name[] PROGMEM = "Chrysler NGC 36-2+2 crank, NGC 8-cyl cam";
  const char weber_iaw_with_cam_friendly_name[] PROGMEM = "Weber-Marelli 8 crank+2 cam pattern";
  const char fiat_one_point_eight_sixteen_valve_with_cam_friendly_name[] PROGMEM = "Fiat 1.8 16V crank and cam";
  const char three_sixty_nissan_cas_friendly_name[] PROGMEM = "Nissan 360 CAS with 6 slots";
@@ -650,11 +654,11 @@
      0,0                  /* 36th MISSING tooth */
    }; 
    
- const unsigned char thirty_six_minus_one_plus_one_with_cam_ngc4[] PROGMEM = 
-   { /* 36-1+1 NGC-4 needs 1 deg resolution, chrysler 2.0/2.4 engines
+ const unsigned char chrysler_ngc_thirty_six_plus_two_minus_two_with_ngc4_cam[] PROGMEM = 
+   { /* 36+2-2 NGC-4 needs 1 deg resolution, Chrysler NGC engines used in Chrysler/Dodge/Jeep
       * cam edges are at 26,62,98,134,170,314,350,368,422,458,494,530,674 and 710 dev
-	  * crank is 36-1 with alarge window at one end 2.5 teeth cycles (25 deg) wide and alosed
-	  * at 180deg apart for 2 teeth cycles (20 deg)
+	  * crank is 36 teeth with two sets of two missing teeth ~180 degrees apart
+    * The sets of missing teeth have different polarity to distinguish position
 	  */
 	  /* Crankshaft degrees
      1   3   5   7   9  11  13  15  17  19  21  23  25  27  29  31  33  35  37  39  41 */
@@ -666,9 +670,9 @@
 	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 201-240 */
 	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 241-280 */
 	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,0,0,1,1,1,1,1, /* 281-320 */
-     0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,3,2,2,2,2,2,3,3,3,3,3, /* 321-360 */
+   0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,3,2,2,2,2,2,3,3,3,3,3, /* 321-360 */
 	 2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 361-400 */
-     0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 401-440 */
+   0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 401-440 */
 	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1, /* 441-480 */
 	 0,0,0,0,0,1,1,1,1,1,0,0,0,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3, /* 481-520 */
 	 2,2,2,2,2,3,3,3,3,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 521-560 */
@@ -678,6 +682,76 @@
 	 2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,3,2,2,2,2,2,3,3,3,3,1,0,0,0,0,0,1,1,1,1,1  /* 681-720 */
    };
 
+ const unsigned char chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc6_cam[] PROGMEM = 
+ { /*
+   Crank is same as NGC 4 pattern except cylinder 1 TDC is 180 degrees off, hence 36-2+2
+ 
+   Cam information has been determined from:
+   https://rotkee.com/en/wavebase/good-timing-ckp-cmp-signal-dodge-charger-lx-ld-2006-2010?brand=167
+   https://rotkee.com/en/wavebase/good-timing-ckp-cmp-signal-jeep-liberty-kj-2002-2007?brand=180
+   https://rotkee.com/en/wavebase/good-timing-ckp-cmp-signal-dodge-caravan-2008-2020?brand=167
+   Cam cylinder 1 has been determined from https://youtu.be/CVXKXmCudAs?t=893
+ 
+   Cam has 6 groups consisting of 1-3 teeth. Each group starting 120 degrees apart.
+   The number of teeth per group form the pattern 3-1-2-3-2-1 of which any 2 values can be used to determine position.
+   Each tooth is ~10 degrees wide and is spaced ~21 degrees from the other teeth.
+   */
+   2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,1,1,1,1,1,0,0,0,0,2,3,
+   3,3,3,3,2,2,2,2,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,
+   1,1,0,0,2,2,2,3,3,3,3,3,2,2,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,
+   0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,2,2,2,3,3,3,3,3,2,2,0,0,0,1,1,1,1,1,0,0,
+   0,2,2,3,3,3,3,3,2,2,2,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,
+   1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,2,2,2,3,3,3,3,3,
+   2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,1,1,1,1,1,0,0,0,0,2,3,
+   3,3,3,3,2,2,2,2,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,
+   1,1,0,0,2,2,2,3,3,3,3,3,2,2,0,0,0,1,1,1,1,1,0,0,0,2,2,3,3,3,3,3,2,2,2,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,
+   0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,2,2,2,3,3,3,3,3,2,2,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,
+   1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,2,2,2,3,3,3,3,3
+ };
+ 
+ const unsigned char chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc8_cam[] PROGMEM = 
+ { /*
+   Crank is same as NGC 4 pattern except cylinder 1 TDC is 180 degrees off, hence 36-2+2
+   
+   Cam information has been determined from:
+   https://rotkee.com/en/wavebase/good-timing-ckp-cmp-in-cylinder-pressure-dodge-ram-3-dr-dh-d1-dc-dm-2001-2009?brand=167
+   https://rotkee.com/en/wavebase/good-timing-ckp-cmp-signal-dodge-durango-2-2003-2008?brand=167
+   https://rotkee.com/en/wavebase/good-timing-ckp-cmp-signal-dodge-ram-3-dr-dh-d1-dc-dm-2001-2009?engine=2299
+ 
+   Cam has 8 groups consisting of 1-3 teeth. Each group starting 90 degrees apart.
+   The number of teeth per group form the pattern 1-2-3-2-2-1-3-1 of which any 2 values can be used to determine position.
+   Each tooth is ~8 degrees wide and is spaced ~21 degrees from the other teeth.
+   */
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,
+   1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,
+   0,0,0,0,0,1,1,1,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,0,0,0,0,0,1,1,1,3,3,2,2,2,2,2,3,1,1,
+   1,1,0,0,0,0,0,1,1,1,1,3,2,2,2,2,2,3,3,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,
+   0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,0,0,0,0,0,1,1,1,3,3,2,2,2,2,2,3,1,1,
+   1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,
+   0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,
+   1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
+   0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1,0,0,0,0,0,1,1,1,3,3,2,2,2,2,2,3,1,1,
+   1,1,0,0,0,0,0,1,1,1,1,3,2,2,2,2,2,3,3,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,
+   0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,3,3,3,2,2,2,2,2,1,1,1,1,1
+ };
 
  const unsigned char weber_iaw_with_cam[] PROGMEM =
    { /*Weber marelli (Cosworth/Lancia) from jimstim
