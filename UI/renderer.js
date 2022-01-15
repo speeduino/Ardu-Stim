@@ -503,30 +503,35 @@ function checkForUpdates()
 
     //document.getElementById('detailsHeading').innerHTML = version;
     
-    var request = require('request');
+    const fetch = require('cross-fetch');
     const options = {
-        url: url,
         headers: {
-          'User-Agent': 'request'
+        'User-Agent': 'cross-fetch'
         }
       };
 
-    request.get(options, function (error, response, body) {
-        if (!error ) 
-        {
-            var result = JSON.parse(body);
-            latest_version = result.tag_name.substring(0);
-            console.log("Latest version: " + latest_version);
-
-            var semver = require('semver');
-            if(semver.gt(latest_version, remote.app.getVersion()))
-            {
-                //New version has been found
-                document.getElementById('update_url').setAttribute("href", result.html_url);
-                document.getElementById('update_text').style.display = "block";
-            }
+    
+    fetch(url, options)
+      .then(function (res) {
+        if (res.status >= 400) {
+          throw new Error("Bad response from server");
         }
-    });
+        return res.json();
+      })
+      .then(function (json) {
+        latest_version = json.tag_name.substring(0);
+
+        var semver = require('semver');
+        if(semver.gt(latest_version, remote.app.getVersion()))
+        {
+            //New version has been found
+            document.getElementById('update_url').setAttribute("href", json.html_url);
+            document.getElementById('update_text').style.display = "block";
+        }
+      })
+      .catch(function (err) {
+        console.log("Error checking for updates: " + err.message);
+      });
 
 }
 
