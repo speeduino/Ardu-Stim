@@ -32,8 +32,8 @@ function refreshSerialPorts()
         for(var i = 0; i < ports.length; i++)
         {
             var newOption = document.createElement('option');
-            newOption.value = ports[i].comName;
-            newOption.innerHTML = ports[i].comName;
+            newOption.value = ports[i].path;
+            newOption.innerHTML = ports[i].path;
             if(ports[i].vendorId == "2341")
             {
               //Arduino device
