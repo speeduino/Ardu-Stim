@@ -51,6 +51,6 @@ $ git clone https://github.com/speeduino/Ardu-Stim.git
 $ cd Ardu-Stim/UI
 $
 $ npm install electron-rebuild -g
-$ npm install
+$ npm ci
 $ npm start
 ```
