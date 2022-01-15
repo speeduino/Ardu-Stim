@@ -1,5 +1,5 @@
 const serialport = require('serialport')
-const usb = require('usb')
+//const usb = require('usb')
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
 const {remote} = require('electron')
@@ -544,7 +544,7 @@ window.onload = function ()
     document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
 
-    usb.on('attach', refreshSerialPorts);
-    usb.on('detach', refreshSerialPorts);
+    //usb.on('attach', refreshSerialPorts);
+    //usb.on('detach', refreshSerialPorts);
 };
 
