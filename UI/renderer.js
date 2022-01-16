@@ -23,7 +23,7 @@ function refreshSerialPorts()
         select = document.getElementById('portsSelect');
 
         //Clear the current options
-        for (i = 0; i <= select.options.length; i++) 
+        while (select.options.length > 0) 
         {
             select.remove(0); //Always 0 index (As each time an item is removed, everything shuffles up 1 place)
         }
