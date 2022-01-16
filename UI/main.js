@@ -1,5 +1,4 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
-const {download} = require('electron-dl')
 const {spawn} = require('child_process');
 const {execFile} = require('child_process');
 
@@ -74,12 +73,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-ipcMain.on('download', (e, args) => {
-	download(BrowserWindow.getFocusedWindow(), args.url)
-    .then(dl => e.sender.send( "download complete", dl.getSavePath(), dl.getState() ) )
-    .catch(console.error);
-});
 
 ipcMain.on('uploadFW', (e, args) => {
 
