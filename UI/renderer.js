@@ -1,6 +1,5 @@
 const serialport = require('serialport')
-const usb = require('usb');
-const webusb = new usb.WebUSB({ allowAllDevices: true });
+const usb = require('usb').usb;
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
 const {ipcRenderer} = require("electron")
@@ -546,7 +545,7 @@ window.onload = function ()
     checkForUpdates();
     //animateGauges();
 
-    webusb.addEventListener('connect', refreshSerialPorts);
-    webusb.addEventListener('disconnect', refreshSerialPorts);
+    usb.on('attach', refreshSerialPorts);
+    usb.on('detach', refreshSerialPorts);
 };
 
