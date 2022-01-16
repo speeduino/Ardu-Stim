@@ -2,7 +2,6 @@ const serialport = require('serialport')
 //const usb = require('usb')
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
-const {remote} = require('electron')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
@@ -497,8 +496,11 @@ function updateRPM()
   //console.log(`New gauge RPM: ${document.gauges[0].value}`);
 }
 
-function checkForUpdates()
+async function checkForUpdates()
 {
+    let current_version = await ipcRenderer.invoke("getAppVersion");
+    document.getElementById('versionSpan').innerHTML = current_version;
+
     var url = "https://api.github.com/repos/speeduino/Ardu-Stim/releases/latest";
 
     //document.getElementById('detailsHeading').innerHTML = version;
@@ -522,7 +524,7 @@ function checkForUpdates()
         latest_version = json.tag_name.substring(0);
 
         var semver = require('semver');
-        if(semver.gt(latest_version, remote.app.getVersion()))
+        if(semver.gt(latest_version, current_version))
         {
             //New version has been found
             document.getElementById('update_url').setAttribute("href", json.html_url);
@@ -541,7 +543,6 @@ window.onload = function ()
     redrawGears(toothPatterns[0]);
     window.location.hash = '#connect';
     checkForUpdates();
-    document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
 
     //usb.on('attach', refreshSerialPorts);
