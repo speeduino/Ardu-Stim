@@ -274,7 +274,7 @@ function updatePattern()
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
   console.log(`Sending 'S' command with pattern ${patternID}`);
 
-  var buffer = new Buffer(2);
+  var buffer = Buffer.alloc(2);
   buffer[0] = 0x53; // Ascii 'S'
   buffer[1] = parseInt(patternID);
   port.write(buffer); //Send the new pattern ID
@@ -336,7 +336,7 @@ function setRPMMode()
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
   console.log(`Sending 'M' command to change RPM mode to ${newMode}`);
 
-  var buffer = new Buffer(2);
+  var buffer = Buffer.alloc(2);
   buffer[0] = 0x4D; // Ascii 'M'
   buffer[1] = newMode;
   port.write(buffer); //Send the new pattern ID
