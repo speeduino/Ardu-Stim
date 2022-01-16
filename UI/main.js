@@ -21,6 +21,14 @@ function createWindow () {
     },
   });
 
+  // Open links in external browser
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:')) {
+      require('electron').shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
   // auto hide menu bar (Win, Linux)
   win.setMenuBarVisibility(false);
   win.setAutoHideMenuBar(true);
