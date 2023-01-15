@@ -505,20 +505,12 @@ async function checkForUpdates()
 
     //document.getElementById('detailsHeading').innerHTML = version;
     
-    const fetch = require('cross-fetch');
-    const options = {
-        headers: {
-        'User-Agent': 'cross-fetch'
+    fetch(url)
+      .then(function (response) {
+        if (response.ok) {
+            return response.json();
         }
-      };
-
-    
-    fetch(url, options)
-      .then(function (res) {
-        if (res.status >= 400) {
-          throw new Error("Bad response from server");
-        }
-        return res.json();
+        return Promise.reject(response);
       })
       .then(function (json) {
         latest_version = json.tag_name.substring(0);
@@ -532,7 +524,7 @@ async function checkForUpdates()
         }
       })
       .catch(function (err) {
-        console.log("Error checking for updates: " + err.message);
+        console.log("Error checking for updates.", err);
       });
 
 }
