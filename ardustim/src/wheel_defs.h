@@ -119,7 +119,7 @@
    ROVER_K_MODE3_36_ONE_ONE_ONE_ONE, /* MEMS pattern 3 36-1-1-1-1 with teeth as 2 gap 14 gap 3 gap 13 gap */
    ROVER_K_MODE4_36_ONE_ONE_ONE_ONE, /* MEMS pattern 4 36-1-1-1-1 with teeth as 3 gap 14 gap 2 gap 13 gap */
    ROVER_K_MODE5_36_ONE_ONE_ONE_ONE, /* MEMS pattern 5 36-1-1-1-1 with teeth as 9 gap 7 gap 10 gap 6 gap */
-   MAX_WHEELS,
+   MAX_WHEELS
  }WheelType;
 
 /* Name strings for EACH wheel type, for serial UI */
@@ -180,7 +180,8 @@
  const char rover_mems_mode2_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 11 gap 5 gap 12 gap 4 gap";
  const char rover_mems_mode3_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 2 gap 14 gap 3 gap 13 gap";
  const char rover_mems_mode4_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 3 gap 14 gap 2 gap 13 gap";
- const char rover_mems_mode5_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 9 gap 14 gap 2 gap 13 gap";
+ const char rover_mems_mode5_thirtysix_minus_one_one_one_one_friendly_name[] PROGMEM = "Rover 36-1-1-1-1 9 gap 7 gap 10 gap 6 gap";
+ 
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 

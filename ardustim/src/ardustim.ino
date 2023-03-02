@@ -120,7 +120,7 @@ wheels Wheels[MAX_WHEELS] = {
   { rover_mems_mode2_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode2_thirtysix_minus_one_one_one_one, 0.6, 144, 720 }, 
   { rover_mems_mode3_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode3_thirtysix_minus_one_one_one_one, 0.6, 144, 720 }, 
   { rover_mems_mode4_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode4_thirtysix_minus_one_one_one_one, 0.6, 144, 720 },
-  { rover_mems_mode5_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode5_thirtysix_minus_one_one_one_one, 1.2, 144, 720 }
+  { rover_mems_mode5_thirtysix_minus_one_one_one_one_friendly_name, rover_mems_mode5_thirtysix_minus_one_one_one_one, 0.6, 144, 720 }
 };
 
 /* Initialization */
