@@ -11,7 +11,7 @@ void loadConfig()
   //if(true)
   {
     //New arduino
-    selected_wheel = 5; //36-1
+    selected_wheel = 20; //36-2-2-2 H6 Two Cams
     wanted_rpm = 3000;
     mode = POT_RPM;
   }

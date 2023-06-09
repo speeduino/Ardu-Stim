@@ -51,6 +51,17 @@
   * Most/all patterns show the pulses you're receive for one revolution
   * of a REAL wheel on a real engine.
   */
+
+ /*
+   * Values to use within a wheel definition. 
+   * 0 means no tooth on any wheel definition
+   * 1 means crank tooth
+   * 2 means cam1 tooth
+   * 4 means cam2 tooth
+   * 
+   * combinations of numbers mean all of the related teeth are present, 
+   * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
+   */
   
   /* Wheel types we know about...
    * This enumerations is the INDEX into the Wheels[] array of structures
@@ -80,6 +91,8 @@
    TWELVE_MINUS_THREE,    /* 12-3 */
    THIRTY_SIX_MINUS_TWO_TWO_TWO, /* 36-2-2-2 crank only H4 */
    THIRTY_SIX_MINUS_TWO_TWO_TWO_H6, /* 36-2-2-2 crank only H6 */
+   THIRTY_SIX_MINUS_TWO_TWO_TWO_H6_WITH_CAM, /* 36-2-2-2 H6 with cam*/
+   THIRTY_SIX_MINUS_TWO_TWO_TWO_H6_WITH_TWO_CAMS, /* 36-2-2-2 H6 with cam*/
    THIRTY_SIX_MINUS_TWO_TWO_TWO_WITH_CAM, /* 36-2-2-2 crank and cam */
    FOURTY_TWO_HUNDRED_WHEEL, /* 4200 wheel */
    THIRTY_SIX_MINUS_ONE_WITH_CAM_FE3, /* Mazda F3 36-1 crank and cam */
@@ -142,6 +155,8 @@
  const char twelve_minus_three_friendly_name[] PROGMEM = "12-3 oddball";
  const char thirty_six_minus_two_two_two_friendly_name[] PROGMEM = "36-2-2-2 H4 Crank only";
  const char thirty_six_minus_two_two_two_h6_friendly_name[] PROGMEM = "36-2-2-2 H6 Crank only";
+ const char thirty_six_minus_two_two_two_h6_with_cam_friendly_name[] PROGMEM = "36-2-2-2 H6 Crank and Cam (EZ30D)";
+ const char thirty_six_minus_two_two_two_h6_with_two_cams_friendly_name[] PROGMEM = "36-2-2-2 H6 Crank and Two Cams (EZ30R)";
  const char thirty_six_minus_two_two_two_with_cam_friendly_name[] PROGMEM = "36-2-2-2 Crank and cam";
  const char fourty_two_hundred_wheel_friendly_name[] PROGMEM = "GM 4200 crank wheel";
  const char thirty_six_minus_one_with_cam_fe3_friendly_name[] PROGMEM = "Mazda FE3 36-1 with cam";
@@ -448,6 +463,45 @@
       1,0,1,0,1,0,1,0,1,0,
       1,0,0,0,0,0,1,0,0,0,
       0,0 
+    };
+   const unsigned char thirty_six_minus_two_two_two_h6_with_cam[] PROGMEM = 
+    { /* 36-2-2-2 H6 with cam (EZ30D)  */
+      3,2,2,2,2,2,3,2,3,2, /* Teeth 1-5, missing teeth on 4 and 3 */
+      3,2,3,2,3,2,3,2,3,2, /* Teeth 6-10 */
+      1,0,1,0,1,0,2,2,2,2, /* Teeth 11-15, missing teeth on 14 and 15, cam gap centered at tooth 14 */
+      3,2,2,2,2,2,3,2,3,2, /* Teeth 16-20, missing teeth on 17 and 18 */
+      3,2,3,2,3,2,3,2,3,2, /* Teeth 21-25 */
+      3,2,3,2,3,2,3,2,3,2, /* Teeth 26-30 */
+      3,2,3,2,3,2,3,2,1,0, /* Teeth 31-35 */
+      1,0,                 /* 36th Tooth, cam gap centered at tooth 36 */
+      1,0,2,2,2,2,3,2,3,2, /* Teeth 1-5, missing teeth on 2 and 3 */
+      3,2,3,2,3,2,3,2,3,2, /* Teeth 6-10 */
+      3,2,3,2,3,2,2,2,2,2, /* Teeth 11-15, missing teeth on 14 and 15 */
+      3,2,2,2,2,2,3,2,3,2, /* Teeth 16-20, missing teeth on 17 and 18 */
+      3,2,3,2,1,0,1,0,1,0, /* Teeth 21-25, cam gap centered at tooth 24 */
+      3,2,3,2,3,2,3,2,3,2, /* Teeth 26-20 */
+      3,2,3,2,3,2,3,2,3,2, /* Teeth 31-35 */
+      3,2,                 /* 36th Tooth */
+    };
+
+    const unsigned char thirty_six_minus_two_two_two_h6_with_two_cams[] PROGMEM = 
+    { /* 36-2-2-2 H6 with cam (EZ30R)  */
+      7,6,6,6,6,6,7,6,7,6, /* Teeth 1-5, missing teeth on 4 and 3 */
+      7,6,7,6,7,6,7,6,7,6, /* Teeth 6-10 */
+      1,0,1,0,1,0,6,6,6,6, /* Teeth 11-15, missing teeth on 14 and 15, cam gap centered at tooth 14 */
+      7,6,6,6,6,6,7,6,7,6, /* Teeth 16-20, missing teeth on 17 and 18 */
+      7,6,7,6,7,6,7,6,7,6, /* Teeth 21-25 */
+      7,6,7,6,7,6,7,6,7,6, /* Teeth 26-30 */
+      7,6,7,6,7,6,7,6,1,0, /* Teeth 31-35 */
+      1,0,                 /* 36th Tooth, cam gap centered at tooth 36 */
+      1,0,6,6,6,6,7,6,7,6, /* Teeth 1-5, missing teeth on 2 and 3 */
+      7,6,7,6,7,6,7,6,7,6, /* Teeth 6-10 */
+      7,6,7,6,7,6,6,6,6,6, /* Teeth 11-15, missing teeth on 14 and 15 */
+      7,6,6,6,6,6,7,6,7,6, /* Teeth 16-20, missing teeth on 17 and 18 */
+      7,6,7,6,1,0,1,0,1,0, /* Teeth 21-25, cam gap centered at tooth 24 */
+      7,6,7,6,7,6,7,6,7,6, /* Teeth 26-20 */
+      7,6,7,6,7,6,7,6,7,6, /* Teeth 31-35 */
+      7,6,                 /* 36th Tooth */
     };
   
   const unsigned char thirty_six_minus_two_two_two_with_cam[] PROGMEM = 
