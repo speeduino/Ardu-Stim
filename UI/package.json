@@ -33,10 +33,10 @@
     "electron-rebuild": "^2.3.4"
   },
   "dependencies": {
-    "electron-dl": "^1.14.0",
-    "request": "^2.88.0",
-    "serialport": "^9.0.4",
-    "usb": "^1.6.5"
+    "electron-dl": "^3.5.0",
+    "request": "^2.88.2",
+    "serialport": "^11.0.0",
+    "usb": "^2.9.0"
   },
   "build": {
     "appId": "Test",
