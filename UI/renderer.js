@@ -1,8 +1,7 @@
 const serialport = require('serialport')
-const usb = require('usb')
+const usb = require('usb').usb;
 const Readline = require('@serialport/parser-readline')
 const ByteLength = require('@serialport/parser-byte-length')
-const {remote} = require('electron')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
@@ -32,8 +31,8 @@ function refreshSerialPorts()
         for(var i = 0; i < ports.length; i++)
         {
             var newOption = document.createElement('option');
-            newOption.value = ports[i].comName;
-            newOption.innerHTML = ports[i].comName;
+            newOption.value = ports[i].path;
+            newOption.innerHTML = ports[i].path;
             if(ports[i].vendorId == "2341")
             {
               //Arduino device
@@ -274,7 +273,7 @@ function updatePattern()
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
   console.log(`Sending 'S' command with pattern ${patternID}`);
 
-  var buffer = new Buffer(2);
+  var buffer = Buffer.alloc(2);
   buffer[0] = 0x53; // Ascii 'S'
   buffer[1] = parseInt(patternID);
   port.write(buffer); //Send the new pattern ID
@@ -336,7 +335,7 @@ function setRPMMode()
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
   console.log(`Sending 'M' command to change RPM mode to ${newMode}`);
 
-  var buffer = new Buffer(2);
+  var buffer = Buffer.alloc(2);
   buffer[0] = 0x4D; // Ascii 'M'
   buffer[1] = newMode;
   port.write(buffer); //Send the new pattern ID
@@ -497,36 +496,36 @@ function updateRPM()
   //console.log(`New gauge RPM: ${document.gauges[0].value}`);
 }
 
-function checkForUpdates()
+async function checkForUpdates()
 {
+    let current_version = await ipcRenderer.invoke("getAppVersion");
+    document.getElementById('versionSpan').innerHTML = current_version;
+
     var url = "https://api.github.com/repos/speeduino/Ardu-Stim/releases/latest";
 
     //document.getElementById('detailsHeading').innerHTML = version;
     
-    var request = require('request');
-    const options = {
-        url: url,
-        headers: {
-          'User-Agent': 'request'
+    fetch(url)
+      .then(function (response) {
+        if (response.ok) {
+            return response.json();
         }
-      };
+        return Promise.reject(response);
+      })
+      .then(function (json) {
+        latest_version = json.tag_name.substring(0);
 
-    request.get(options, function (error, response, body) {
-        if (!error ) 
+        var semver = require('semver');
+        if(semver.gt(latest_version, current_version))
         {
-            var result = JSON.parse(body);
-            latest_version = result.tag_name.substring(0);
-            console.log("Latest version: " + latest_version);
-
-            var semver = require('semver');
-            if(semver.gt(latest_version, remote.app.getVersion()))
-            {
-                //New version has been found
-                document.getElementById('update_url').setAttribute("href", result.html_url);
-                document.getElementById('update_text').style.display = "block";
-            }
+            //New version has been found
+            document.getElementById('update_url').setAttribute("href", json.html_url);
+            document.getElementById('update_text').style.display = "block";
         }
-    });
+      })
+      .catch(function (err) {
+        console.log("Error checking for updates.", err);
+      });
 
 }
 
@@ -536,7 +535,6 @@ window.onload = function ()
     redrawGears(toothPatterns[0]);
     window.location.hash = '#connect';
     checkForUpdates();
-    document.getElementById('versionSpan').innerHTML = remote.app.getVersion();
     //animateGauges();
 
     usb.on('attach', refreshSerialPorts);

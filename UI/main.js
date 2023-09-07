@@ -1,5 +1,4 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
-const {download} = require('electron-dl')
 const {spawn} = require('child_process');
 const {execFile} = require('child_process');
 
@@ -17,8 +16,8 @@ function createWindow () {
     height: 700, 
     backgroundColor: '#312450', 
     webPreferences: {
+      contextIsolation: false,
       nodeIntegration: true,
-      enableRemoteModule: true,
     },
   });
 
@@ -48,6 +47,11 @@ function createWindow () {
 
 app.allowRendererProcessReuse = false;
 
+// Register handler before app.on/createWindow as this is used during window creation
+ipcMain.handle('getAppVersion', async (e) => {
+  return app.getVersion();
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -69,12 +73,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-ipcMain.on('download', (e, args) => {
-	download(BrowserWindow.getFocusedWindow(), args.url)
-    .then(dl => e.sender.send( "download complete", dl.getSavePath(), dl.getState() ) )
-    .catch(console.error);
-});
 
 ipcMain.on('uploadFW', (e, args) => {
 

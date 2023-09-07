@@ -27,16 +27,15 @@
   },
   "homepage": "https://github.com/speeduino/Ardu-Stim",
   "devDependencies": {
-    "electron": "^11.2.0",
-    "electron-builder": "^22.9.1",
-    "electron-packager": "^15.2.0",
-    "electron-rebuild": "^2.3.4"
+    "electron": "^16.0.7",
+    "electron-builder": "^22.14.5",
+    "electron-packager": "^15.4.0",
+    "electron-rebuild": "^3.2.7"
   },
   "dependencies": {
-    "electron-dl": "^1.14.0",
-    "request": "^2.88.0",
-    "serialport": "^9.0.4",
-    "usb": "^1.6.5"
+    "semver": "^7.3.5",
+    "serialport": "^10.0.2",
+    "usb": "^2.0.3"
   },
   "build": {
     "appId": "Test",
