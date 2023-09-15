@@ -51,6 +51,18 @@
   * Most/all patterns show the pulses you're receive for one revolution
   * of a REAL wheel on a real engine.
   */
+
+  /*
+   * Values to use within a wheel definition. 
+   * 0 means no tooth on any wheel definition
+   * 1 means crank tooth
+   * 2 means cam1 tooth
+   * 4 means cam2 tooth
+   * 
+   * combinations of numbers mean all of the related teeth are present, 
+   * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
+   */
+
   
   /* Wheel types we know about...
    * This enumerations is the INDEX into the Wheels[] array of structures
