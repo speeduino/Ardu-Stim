@@ -24,7 +24,7 @@
 /* defines */
 #define SWEEP_ISR_RATE 1000
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
-#define TMP_RPM_CAP 16384 /* MAX RPM via pot control */
+#define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */
 #define FACTOR_THRESHOLD 1000000
 #define MORE_LINEAR_SWEEP 1
 #define SUI_NO_INCLUDE_EXTRA_SAFETYCHECKS
