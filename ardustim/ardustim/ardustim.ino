@@ -88,6 +88,7 @@ wheels Wheels[MAX_WHEELS] = {
   { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144, 720 },
   { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80, 720 },
   { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720, 720 },
+  { gm_ls_58X_crank_and_4x_cam_friendly_name, GM_LS_58X_crank_and_4x_cam, 1.0, 240, 720},
   { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72, 360 },
   { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48, 720 },
   { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144, 720 },
