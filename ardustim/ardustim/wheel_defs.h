@@ -98,6 +98,7 @@
    SIX_G_SEVENTY_TWO_WITH_CAM, /* Mitsubishi DOHC CAS and TCDS 6G72 */
    BUELL_ODDFIRE_CAM,     /* Buell 45 deg cam wheel */
    GM_LS1_CRANK_AND_CAM,  /* GM LS1 24 tooth with cam */
+   GM_58x_LS_CRANK_4X_CAM, /* GM 58x LS crank 4x cam wheel */
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
@@ -160,6 +161,7 @@
  const char six_g_seventy_two_with_cam_friendly_name[] PROGMEM = "Mitsubishi 6g72 with cam";
  const char buell_oddfire_cam_friendly_name[] PROGMEM = "Buell Oddfire CAM wheel";
  const char gm_ls1_crank_and_cam_friendly_name[] PROGMEM = "GM LS1 crank and cam";
+ const char gm_ls_58X_crank_and_4x_cam_friendly_name[] PROGMEM = "GM 58x crank and 4x cam";
  const char lotus_thirty_six_minus_one_one_one_one_friendly_name[] PROGMEM = "Odd Lotus 36-1-1-1-1 flywheel";
  const char honda_rc51_with_cam_friendly_name[] PROGMEM = "Honda RC51 with cam";
  const char thirty_six_minus_one_with_second_trigger_friendly_name[] PROGMEM = "36-1 crank with 2nd trigger on teeth 33-34";
@@ -621,6 +623,35 @@
       2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,2,2,2,2,2,
       2,2,2,2,2,2,2,3,3,3,2,2,2,2,2,2,2,2,2,2,
       2,2,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,
+    };
+
+ //Added by Dale Follett of Twisted Builds LLC for GM gen4 LS 58x 4x crank cam simulation.
+ const unsigned char GM_LS_58X_crank_and_4x_cam[] PROGMEM = 
+    { //58x LS crank 4x LS cam
+      1,0,1,0,3,2,3,2,3,2, //1-5
+      3,2,3,2,3,2,1,0,1,0, //6-10
+      1,0,1,0,1,0,1,0,1,0, //11-15
+      1,0,1,0,1,0,1,0,1,0, //16-20
+      1,0,1,0,1,0,1,0,1,0, //21-25
+      1,0,1,0,1,0,1,0,1,0, //26-30
+      1,0,1,0,3,2,3,2,3,2, //31-35
+      3,2,3,2,3,2,1,0,1,0, //36-40
+      1,0,1,0,3,2,3,2,3,2, //41-45
+      3,2,3,2,3,2,3,2,3,2, //46-50
+      3,2,3,2,3,2,3,2,3,2, //51-55
+      3,2,3,2,3,2,2,2,2,2, //56-60 - First crank revolution, last two crank teeth missing
+      3,2,3,2,3,2,3,2,3,2, //61-65
+      3,2,3,2,3,2,1,0,1,0, //66-70
+      1,0,1,0,3,2,3,2,3,2, //71-75
+      3,2,3,2,3,2,3,2,3,2, //76-80
+      3,2,3,2,3,2,3,2,3,2, //81-85
+      3,2,3,2,3,2,3,2,3,2, //86-90
+      3,2,3,2,3,2,3,2,3,2, //91-95
+      3,2,3,2,3,2,1,0,1,0, //96-100
+      1,0,1,0,1,0,1,0,1,0, //101-105
+      1,0,1,0,1,0,1,0,1,0, //106-110
+      1,0,1,0,1,0,1,0,1,0, //111-115
+      1,0,1,0,1,0,0,0,0,0, //116-120
     };
   
  /* Lotus 36-1-1-1-1 wheel, missing teeth at
