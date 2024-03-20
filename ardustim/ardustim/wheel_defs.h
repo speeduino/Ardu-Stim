@@ -132,6 +132,7 @@
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
    JEEP2000,  /* Jeep 4.0 6cyl aka jeep2000 */
+   BMW_N20, //BMW N20 58x and custom cam wheels
    MAX_WHEELS,
  }WheelType;
 
@@ -195,6 +196,7 @@
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
  const char Jeep_2000_friendly_name[] PROGMEM = "Jeep 2000";
+ const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1395,6 +1397,34 @@
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 660-680. Tooth #19 at 674* for 2* duration */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 680-700. Tooth #20 at 694* for 2* duration */
      0,0,0,0,0,0,0,1,0,0  /* Degrees 700-720. Tooth #21 at 714* for 2* duration */
+   };
+
+   const unsigned char bmw_n20[] PROGMEM = 
+   { 
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 1-5 (TDC Cylinder 1, first tooth after missing)
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 6-10
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 11-15
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 16-20, both camshaft signals high
+     7,6,7,6,7,6,1,0,1,0, //Crank teeth 21-25, both camshaft signals high until last two teeth, then low
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 26-30
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 31-35
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 36-40
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 41-45
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 46-50, both camshaft signals high for 180* (30 teeth)
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 51-55
+     7,6,7,6,7,6,6,6,6,6, //Crank teeth 56-60 - last two teeth missing
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 1-5
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 6-10
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 11-15
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 16-20 cam signals low
+     1,0,1,0,7,6,7,6,7,6, //Crank teeth 21-25 cam signals low then back high
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 26-30
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 31-35
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 36-40
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 41-45
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 46-50
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 51-55
+     1,0,1,0,1,0,0,0,0,0, //Crank teeth 56-60 - last two teeth missing
    };
 
 
