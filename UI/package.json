@@ -35,7 +35,7 @@
   "dependencies": {
     "semver": "^7.3.5",
     "serialport": "^10.0.2",
-    "usb": "^2.0.3"
+    "usb": "^2.12.1"
   },
   "build": {
     "appId": "Test",
