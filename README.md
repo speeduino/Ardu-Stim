@@ -1,16 +1,19 @@
 <div align="center">
 
-![Twisted-Builds-Logo-Color](https://github.com/twisted-builds-llc/Ardu-Stim/assets/58715445/bbe519b5-b80e-47e9-80ce-855e0538daa5)
+<img src="https://github.com/speeduino/wiki.js/raw/master/img/Speeduino%20logo_med.png" alt="Speeduino" width="600" />
 
+[![Release](https://img.shields.io/github/release/speeduino/Ardu-Stim.svg)](https://github.com/speeduino/Ardu-Stim/releases/latest)
+[![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/speeduino/Ardu-Stim/blob/master/LICENSE)
+[![https://img.shields.io/discord/879495735912071269 ](https://img.shields.io/discord/879495735912071269?label=Discord&logo=Discord)](https://discord.gg/YWCEexaNDe)
 
-##### This is the Twisted Builds LLC fork of the Speeduino fork of the ardustim engine simulator.
+##### This is the Speeduino fork of the ardustim engine simulator.
 </div>
 
 ## Ardustim
 
-Ardustim is an engine simulator built on the Arduino platform. It produces simulated crank and cam signals that can be used for testing aftermarket or factory ECUs as well as being a useful tool for the development of products or firmware for these.
+Ardustim is an engine simulator built on the Arduino platform. It produces simulated crank and cam signals that can be used for testing aftermarket ECUs as well as being a useful tool for the development of firmware for these
 
-This version is a fork of the Josh Stewarts Speeduino arduistim [https://github.com/speeduino/Ardu-Stim](https://github.com/speeduino/Ardu-Stim) and that one was a fork of the original by David Andruczyk [https://gitlab.com/libreems-suite/ardu-stim](https://gitlab.com/libreems-suite/ardu-stim) and is intended to provide a more modern, cross platform GUI as well as continued expansion of the trigger pattern library. It was primarily developed for use by the Speeduino community, but can be utilised for testing virtually any aftermarket ECU system. Dale Follett of Twisted Builds LLC has customized this fork for use with the Twisted Builds LLC version of the engine simulator, and have added multiple wheel patterns as requested by customers and users. If you are on any other software version of this ardu-stim software, please feel free to copy/paste any of the wheel patterns I have added and use them as you see fit. There is no guarentee on any of the wheels used or added to this code base, however at time of upload they appear to be correct. Please use and test at your own risk.
+This version is a fork of the original by David Andruczyk [https://gitlab.com/libreems-suite/ardu-stim](https://gitlab.com/libreems-suite/ardu-stim) and is intended to provide a more modern, cross platform GUI as well as continued expansion of the trigger pattern library. It was primarily developed for use by the Speeduino community, but can be utilised for testing virtually any aftermarket ECU system
 
 ## Wiring
 
