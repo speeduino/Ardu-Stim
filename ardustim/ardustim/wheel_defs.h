@@ -133,6 +133,7 @@
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
    JEEP2000,  /* Jeep 4.0 6cyl aka jeep2000 */
    BMW_N20, //BMW N20 58x and custom cam wheels
+   VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    MAX_WHEELS,
  }WheelType;
 
@@ -197,6 +198,7 @@
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
  const char Jeep_2000_friendly_name[] PROGMEM = "Jeep 2000";
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
+ const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1425,6 +1427,40 @@
      1,0,1,0,1,0,1,0,1,0, //Crank teeth 46-50
      1,0,1,0,1,0,1,0,1,0, //Crank teeth 51-55
      1,0,1,0,1,0,0,0,0,0, //Crank teeth 56-60 - last two teeth missing
+   };
+
+   const unsigned char viper9602wheel[] PROGMEM = 
+   // Viper pattern has 10 total crank teeth that are on shortly in pairs. Cam is high for 360* of crank then low for the next 360* of crank
+   // This pattern was added by Dale Follett of Twisted Builds LLC going off a supplied oscilloscope image of the wheel pattern. Due to this
+   // There is no guarentees on this wheel pattern as of 3/24/2024 and this pattern should be used at your own risk. However it should be correct.
+   // I'm basing this using percentages. 120 total "edges" but should duplicate the factory wheels. Will test with o-scope.
+   {
+      //Cam on this revolution
+      2,2,2,2,2,2,3,3,2,2, //1-5
+      2,2,3,3,2,2,2,2,2,2, //6-10
+      2,2,2,2,2,2,2,2,2,2, //11-15
+      3,3,2,2,2,2,3,3,2,2, //16-20
+      2,2,2,2,2,2,2,2,2,2, //21-25
+      2,2,2,2,3,3,2,2,2,2, //26-30
+      3,3,2,2,2,2,2,2,2,2, //31-35
+      2,2,2,2,2,2,2,2,3,3, //36-40
+      2,2,2,2,3,3,2,2,2,2, //41-45
+      2,2,2,2,2,2,2,2,2,2, //46-50
+      2,2,3,3,2,2,2,2,3,3, //51-55
+      2,2,2,2,2,2,2,2,2,2, //56-60
+      //Cam off this revolution
+      0,0,0,0,0,0,1,1,0,0, //1-5
+      0,0,1,1,0,0,0,0,0,0, //6-10
+      0,0,0,0,0,0,0,0,0,0, //11-15
+      1,1,0,0,0,0,1,1,0,0, //16-20
+      0,0,0,0,0,0,0,0,0,0, //21-25
+      0,0,0,0,1,1,0,0,0,0, //26-30
+      1,1,0,0,0,0,0,0,0,0, //31-35
+      0,0,0,0,0,0,0,0,1,1, //36-40
+      0,0,0,0,1,1,0,0,0,0, //41-45
+      0,0,0,0,0,0,0,0,0,0, //46-50
+      0,0,1,1,0,0,0,0,1,1, //51-55
+      0,0,0,0,0,0,0,0,0,0, //56-60
    };
 
 
