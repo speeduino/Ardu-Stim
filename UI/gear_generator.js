@@ -82,7 +82,8 @@ function draw_crank_gear(toothPattern, depth, radius, width, line, halfspeed) {
   c.arc(x, y, radius/5, 0, 2 * Math.PI);
   c.moveTo(x+radius-depth, y); //Move to the starting point
   
-  for (var i = 0; i <= (teeth * 2)-1; i++) {
+  for (var i = 0; i <= (teeth * 2)-1; i++) 
+  {
 
     var start, end, newEnd, diff;
     diff = ((((100 - width) / 100) / 2) * arcToRad(teeth));
@@ -91,9 +92,21 @@ function draw_crank_gear(toothPattern, depth, radius, width, line, halfspeed) {
     start = lastEnd + diff;
     end = newEnd - diff;
 
-    if (toothPattern[i] == 1 || toothPattern[i] == 3) {
+    /*
+   * Values to use within a wheel definition. 
+   * 0 means no tooth on any wheel definition
+   * 1 means crank tooth
+   * 2 means cam1 tooth
+   * 4 means cam2 tooth
+   * 
+   * combinations of numbers mean all of the related teeth are present, 
+   * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
+   */
+    if (toothPattern[i] == 1 || toothPattern[i] == 3 || toothPattern[i] == 5 || toothPattern[i] == 7) 
+    {
       c.arc(x, y, radius, start, end, false);
-    } else {
+    } else 
+    {
       c.arc(x, y, (radius - depth), start, end, false);
     }
     lastEnd = newEnd;
@@ -126,7 +139,8 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
   c.arc(x, y, radius/5, 0, 2 * Math.PI);
   c.moveTo(x+radius-depth, y); //Move to the starting point
   
-  for (var i = 0; i <= (teeth * 2)-1; i++) {
+  for (var i = 0; i <= (teeth * 2)-1; i++) 
+  {
 
     var start, end, newEnd, diff;
     diff = ((((100 - width) / 100) / 2) * arcToRad(teeth));
@@ -135,9 +149,21 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
     start = lastEnd + diff;
     end = newEnd - diff;
 
-    if (toothPattern[i] == 2 || toothPattern[i] == 3) {
+    /*
+   * Values to use within a wheel definition. 
+   * 0 means no tooth on any wheel definition
+   * 1 means crank tooth
+   * 2 means cam1 tooth
+   * 4 means cam2 tooth
+   * 
+   * combinations of numbers mean all of the related teeth are present, 
+   * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
+   */
+    if (toothPattern[i] == 2 || toothPattern[i] == 3 || toothPattern[i] == 6 || toothPattern[i] == 7) 
+    {
       c.arc(x, y, radius, start, end, false);
-    } else {
+    } else 
+    {
       c.arc(x, y, (radius - depth), start, end, false);
     }
     lastEnd = newEnd;

@@ -24,12 +24,13 @@ function draw_crank_scope(toothPattern, depth, radius, width, line, halfspeed) {
 
   c.beginPath();
   
-  for (var i = 0; i < toothPattern.length; i++) {
+  for (var i = 0; i < toothPattern.length; i++) 
+  {
     var newEnd;
     
     newEnd = lastEnd + toothWidth;
 
-    if (toothPattern[i] == 1 || toothPattern[i] == 3) 
+    if (toothPattern[i] == 1 || toothPattern[i] == 3 || toothPattern[i] == 5 || toothPattern[i] == 7) 
     {
       if(lastState == 0) { c.lineTo(newEnd, depth); }
       c.lineTo(newEnd, 0);
@@ -72,7 +73,7 @@ function draw_cam_scope(toothPattern, depth, radius, width, line) {
     
     newEnd = lastEnd + toothWidth;
 
-    if (toothPattern[i] == 2 || toothPattern[i] == 3) 
+    if (toothPattern[i] == 2 || toothPattern[i] == 3 || toothPattern[i] == 6 || toothPattern[i] == 7) 
     {
       if(lastState == 0) { c.lineTo(newEnd, depth); }
       c.lineTo(newEnd, 0);
