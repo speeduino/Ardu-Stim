@@ -98,6 +98,7 @@
    SIX_G_SEVENTY_TWO_WITH_CAM, /* Mitsubishi DOHC CAS and TCDS 6G72 */
    BUELL_ODDFIRE_CAM,     /* Buell 45 deg cam wheel */
    GM_LS1_CRANK_AND_CAM,  /* GM LS1 24 tooth with cam */
+   GM_58x_LS_CRANK_4X_CAM, /* GM 58x LS crank 4x cam wheel */
    LOTUS_THIRTY_SIX_MINUS_ONE_ONE_ONE_ONE, /* Lotus crank wheel 36-1-1-1-1 */
    HONDA_RC51_WITH_CAM,   /* Honda oddfire 90 deg V-twin */
    THIRTY_SIX_MINUS_ONE_WITH_SECOND_TRIGGER, /* From jimstim */
@@ -131,6 +132,8 @@
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
    JEEP2000,  /* Jeep 4.0 6cyl aka jeep2000 */
+   BMW_N20, //BMW N20 58x and custom cam wheels
+   VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    MAX_WHEELS,
  }WheelType;
 
@@ -160,6 +163,7 @@
  const char six_g_seventy_two_with_cam_friendly_name[] PROGMEM = "Mitsubishi 6g72 with cam";
  const char buell_oddfire_cam_friendly_name[] PROGMEM = "Buell Oddfire CAM wheel";
  const char gm_ls1_crank_and_cam_friendly_name[] PROGMEM = "GM LS1 crank and cam";
+ const char gm_ls_58X_crank_and_4x_cam_friendly_name[] PROGMEM = "GM 58x crank and 4x cam";
  const char lotus_thirty_six_minus_one_one_one_one_friendly_name[] PROGMEM = "Odd Lotus 36-1-1-1-1 flywheel";
  const char honda_rc51_with_cam_friendly_name[] PROGMEM = "Honda RC51 with cam";
  const char thirty_six_minus_one_with_second_trigger_friendly_name[] PROGMEM = "36-1 crank with 2nd trigger on teeth 33-34";
@@ -193,6 +197,8 @@
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
  const char Jeep_2000_friendly_name[] PROGMEM = "Jeep 2000";
+ const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
+ const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -621,6 +627,35 @@
       2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,2,2,2,2,2,
       2,2,2,2,2,2,2,3,3,3,2,2,2,2,2,2,2,2,2,2,
       2,2,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,
+    };
+
+ //Added by Dale Follett of Twisted Builds LLC for GM gen4 LS 58x 4x crank cam simulation.
+ const unsigned char GM_LS_58X_crank_and_4x_cam[] PROGMEM = 
+    { //58x LS crank 4x LS cam
+      1,0,1,0,3,2,3,2,3,2, //1-5
+      3,2,3,2,3,2,1,0,1,0, //6-10
+      1,0,1,0,1,0,1,0,1,0, //11-15
+      1,0,1,0,1,0,1,0,1,0, //16-20
+      1,0,1,0,1,0,1,0,1,0, //21-25
+      1,0,1,0,1,0,1,0,1,0, //26-30
+      1,0,1,0,3,2,3,2,3,2, //31-35
+      3,2,3,2,3,2,1,0,1,0, //36-40
+      1,0,1,0,3,2,3,2,3,2, //41-45
+      3,2,3,2,3,2,3,2,3,2, //46-50
+      3,2,3,2,3,2,3,2,3,2, //51-55
+      3,2,3,2,3,2,2,2,2,2, //56-60 - First crank revolution, last two crank teeth missing
+      3,2,3,2,3,2,3,2,3,2, //61-65
+      3,2,3,2,3,2,1,0,1,0, //66-70
+      1,0,1,0,3,2,3,2,3,2, //71-75
+      3,2,3,2,3,2,3,2,3,2, //76-80
+      3,2,3,2,3,2,3,2,3,2, //81-85
+      3,2,3,2,3,2,3,2,3,2, //86-90
+      3,2,3,2,3,2,3,2,3,2, //91-95
+      3,2,3,2,3,2,1,0,1,0, //96-100
+      1,0,1,0,1,0,1,0,1,0, //101-105
+      1,0,1,0,1,0,1,0,1,0, //106-110
+      1,0,1,0,1,0,1,0,1,0, //111-115
+      1,0,1,0,1,0,0,0,0,0, //116-120
     };
   
  /* Lotus 36-1-1-1-1 wheel, missing teeth at
@@ -1364,6 +1399,68 @@
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 660-680. Tooth #19 at 674* for 2* duration */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 680-700. Tooth #20 at 694* for 2* duration */
      0,0,0,0,0,0,0,1,0,0  /* Degrees 700-720. Tooth #21 at 714* for 2* duration */
+   };
+
+   const unsigned char bmw_n20[] PROGMEM = 
+   { 
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 1-5 (TDC Cylinder 1, first tooth after missing)
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 6-10
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 11-15
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 16-20, both camshaft signals high
+     7,6,7,6,7,6,1,0,1,0, //Crank teeth 21-25, both camshaft signals high until last two teeth, then low
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 26-30
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 31-35
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 36-40
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 41-45
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 46-50, both camshaft signals high for 180* (30 teeth)
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 51-55
+     7,6,7,6,7,6,6,6,6,6, //Crank teeth 56-60 - last two teeth missing
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 1-5
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 6-10
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 11-15
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 16-20 cam signals low
+     1,0,1,0,7,6,7,6,7,6, //Crank teeth 21-25 cam signals low then back high
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 26-30
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 31-35
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 36-40
+     7,6,7,6,7,6,7,6,7,6, //Crank teeth 41-45
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 46-50
+     1,0,1,0,1,0,1,0,1,0, //Crank teeth 51-55
+     1,0,1,0,1,0,0,0,0,0, //Crank teeth 56-60 - last two teeth missing
+   };
+
+   const unsigned char viper9602wheel[] PROGMEM = 
+   // Viper pattern has 10 total crank teeth that are on shortly in pairs. Cam is high for 360* of crank then low for the next 360* of crank
+   // This pattern was added by Dale Follett of Twisted Builds LLC going off a supplied oscilloscope image of the wheel pattern. Due to this
+   // There is no guarentees on this wheel pattern as of 3/24/2024 and this pattern should be used at your own risk. However it should be correct.
+   // I'm basing this using percentages. 120 total "edges" but should duplicate the factory wheels. Will test with o-scope.
+   {
+      //Cam on this revolution
+      2,2,2,2,2,2,3,3,2,2, //1-5
+      2,2,3,3,2,2,2,2,2,2, //6-10
+      2,2,2,2,2,2,2,2,2,2, //11-15
+      3,3,2,2,2,2,3,3,2,2, //16-20
+      2,2,2,2,2,2,2,2,2,2, //21-25
+      2,2,2,2,3,3,2,2,2,2, //26-30
+      3,3,2,2,2,2,2,2,2,2, //31-35
+      2,2,2,2,2,2,2,2,3,3, //36-40
+      2,2,2,2,3,3,2,2,2,2, //41-45
+      2,2,2,2,2,2,2,2,2,2, //46-50
+      2,2,3,3,2,2,2,2,3,3, //51-55
+      2,2,2,2,2,2,2,2,2,2, //56-60
+      //Cam off this revolution
+      0,0,0,0,0,0,1,1,0,0, //1-5
+      0,0,1,1,0,0,0,0,0,0, //6-10
+      0,0,0,0,0,0,0,0,0,0, //11-15
+      1,1,0,0,0,0,1,1,0,0, //16-20
+      0,0,0,0,0,0,0,0,0,0, //21-25
+      0,0,0,0,1,1,0,0,0,0, //26-30
+      1,1,0,0,0,0,0,0,0,0, //31-35
+      0,0,0,0,0,0,0,0,1,1, //36-40
+      0,0,0,0,1,1,0,0,0,0, //41-45
+      0,0,0,0,0,0,0,0,0,0, //46-50
+      0,0,1,1,0,0,0,0,1,1, //51-55
+      0,0,0,0,0,0,0,0,0,0, //56-60
    };
 
 
