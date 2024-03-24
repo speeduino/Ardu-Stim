@@ -8,7 +8,7 @@
 
 ## Ardustim
 
-Ardustim is an engine simulator built on the Arduino platform. It produces simulated crank and cam signals that can be used for testing aftermarket ECUs as well as being a useful tool for the development of firmware for these
+Ardustim is an engine simulator built on the Arduino platform. It produces simulated crank and cam signals that can be used for testing aftermarket or factory ECUs as well as being a useful tool for the development of products or firmware for these.
 
 This version is a fork of the Josh Stewarts Speeduino arduistim [https://github.com/speeduino/Ardu-Stim](https://github.com/speeduino/Ardu-Stim) and that one was a fork of the original by David Andruczyk [https://gitlab.com/libreems-suite/ardu-stim](https://gitlab.com/libreems-suite/ardu-stim) and is intended to provide a more modern, cross platform GUI as well as continued expansion of the trigger pattern library. It was primarily developed for use by the Speeduino community, but can be utilised for testing virtually any aftermarket ECU system. Dale Follett of Twisted Builds LLC has customized this fork for use with the Twisted Builds LLC version of the engine simulator, and have added multiple wheel patterns as requested by customers and users. If you are on any other software version of this ardu-stim software, please feel free to copy/paste any of the wheel patterns I have added and use them as you see fit. There is no guarentee on any of the wheels used or added to this code base, however at time of upload they appear to be correct. Please use and test at your own risk.
 
