@@ -313,7 +313,6 @@ function refreshPattern(data)
       modalLoading.remove();
       //Move to the Live tab
       window.location.hash = '#live';
-      enableRPM();
       initComplete = true;
     }
 
@@ -463,6 +462,7 @@ function animateGauges() {
 var RPMInterval = 0;
 function enableRPM()
 {
+  console.log("Enabling RPM reads");
   if(RPMInterval == 0)
   {
     RPMInterval = setInterval(updateRPM, 100);
@@ -529,6 +529,19 @@ async function checkForUpdates()
 
 }
 
+function liveShowHide(mutationsList, observer) {
+  mutationsList.forEach(mutation => {
+    if (mutation.attributeName === 'style') {
+      if (mutation.target.style.display === 'none') {
+        disableRPM();
+      }
+      else {
+        enableRPM();
+      }
+    }
+  })
+}
+
 window.onload = function () 
 {
     refreshSerialPorts();
@@ -536,6 +549,13 @@ window.onload = function ()
     window.location.hash = '#connect';
     checkForUpdates();
     //animateGauges();
+
+    //Enable and disabled retrieval of RPM when viewing live panel
+    const liveShowHideObserver = new MutationObserver(liveShowHide);
+    liveShowHideObserver.observe(
+      document.getElementById('live'),
+      { attributes: true }
+    );
 
     usb.on('attach', refreshSerialPorts);
     usb.on('detach', refreshSerialPorts);
