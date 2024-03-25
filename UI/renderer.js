@@ -253,7 +253,7 @@ function refreshPatternNumber(data)
   port.unpipe();
   select.value = patternID;
   console.log("Currently selected Pattern: " + patternID);
-  updatePattern();
+  updatePatternQueue();
 }
 
 function readPattern()
@@ -266,16 +266,29 @@ function readPattern()
 var patternRow = 0;
 var newPattern;
 var patternDegrees;
+
+var nextPatternID = null;
+var currentPatternID = null;
+function updatePatternQueue()
+{
+  nextPatternID = document.getElementById('patternSelect').value;
+
+  if (currentPatternID === null) {
+    updatePattern();
+  }
+}
+
 function updatePattern()
 {
-  var patternID = document.getElementById('patternSelect').value;
+  currentPatternID = nextPatternID;
+  nextPatternID = null;
 
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
-  console.log(`Sending 'S' command with pattern ${patternID}`);
+  console.log(`Sending 'S' command with pattern ${currentPatternID}`);
 
   var buffer = Buffer.alloc(2);
   buffer[0] = 0x53; // Ascii 'S'
-  buffer[1] = parseInt(patternID);
+  buffer[1] = parseInt(currentPatternID);
   port.write(buffer); //Send the new pattern ID
 
   //Send the command to save the pattern to EEPROM
@@ -316,7 +329,15 @@ function refreshPattern(data)
       initComplete = true;
     }
 
-  } 
+    if (nextPatternID !== null) {
+      updatePattern();
+    }
+    else {
+      currentPatternID = null;
+    }
+
+  }
+
 }
 
 //Simply redraw the gear pattern using the existing details (Used when the draw style is changed)
