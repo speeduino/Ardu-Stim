@@ -41,7 +41,7 @@ Intended hardware platform is the Arduino Nano or Diecimila.
 ### Pre-Requisites
 
 - NPM - https://www.npmjs.com/get-npm
-- Python 2.x
+- Python
 - Git
 
 ### GUI Installation steps
