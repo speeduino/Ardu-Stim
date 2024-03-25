@@ -33,7 +33,7 @@
     "electron-rebuild": "^3.2.7"
   },
   "dependencies": {
-    "semver": "^7.3.5",
+    "semver": "^7.5.2",
     "serialport": "^10.0.2",
     "usb": "^2.12.1"
   },
