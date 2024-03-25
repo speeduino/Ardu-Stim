@@ -27,10 +27,10 @@
   },
   "homepage": "https://github.com/speeduino/Ardu-Stim",
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
     "electron": "^16.0.7",
     "electron-builder": "^24.13.3",
-    "electron-packager": "^15.4.0",
-    "electron-rebuild": "^3.2.7"
+    "electron-packager": "^15.4.0"
   },
   "dependencies": {
     "semver": "^7.3.5",
