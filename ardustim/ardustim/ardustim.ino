@@ -121,7 +121,8 @@ wheels Wheels[MAX_WHEELS] = {
   { Toyota_4AGE_CAS_friendly_name, toyota_4AGE_CAS, 0.333, 144, 720 },
   { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.333, 144, 720 },
   { Suzuki_DRZ400_friendly_name, suzuki_DRZ400,0.6, 72, 360},
-  { Jeep_2000_friendly_name, jeep_2000, 1.5, 360, 720},
+  { Jeep_2000_4cyl_friendly_name, jeep_2000_4cyl, 1.5, 360, 720},
+  { Jeep_2000_6cyl_friendly_name, jeep_2000_6cyl, 1.5, 360, 720},
   { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
 };
