@@ -131,7 +131,8 @@
    TOYOTA_4AGE_CAS,           /*Toyota 4AGE CAS, 4 teeth and one cam tooth*/
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
-   JEEP2000,  /* Jeep 4.0 6cyl aka jeep2000 */
+   JEEP2000_4CYL,  /* Jeep 2.5 4cyl aka jeep2000_4cyl */
+   JEEP2000_6CYL  /* Jeep 4.0 6cyl aka jeep2000_6cyl */
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    MAX_WHEELS,
@@ -1360,6 +1361,46 @@
       1,1,1,1,1,1,0,0,0,0,0,0,
       1,1,1,1,1,1,0,0,0,0,0,0
   };
+
+  const unsigned char jeep_2000_4cyl[] PROGMEM = 
+    { /* Every number represents 2 degrees */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20    */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40   */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 40-60   */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 60-80   */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 80-100  */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 100-120 Tooth #1 at 114* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 120-140 Tooth #2 at 134* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 140-160 Tooth #3 at 154* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 160-180 Tooth #4 at 174* for 2* duration. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 180-200 */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 200-220 */
+      0,0,0,0,0,0,0,2,2,2,  /* Degrees 220-240. Camshaft is active from 146* to 506* (total = 360*) */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 240-260 */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 260-280 */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 280-300. Tooth #5 at 294* for 2* duration */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 300-320. Tooth #6 at 314* for 2* duration */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 320-340. Tooth #7 at 334* for 2* duration */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 340-360. Tooth #8 at 354* for 2* duration */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 360-380. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 380-400. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 400-420. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 420-440. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 440-460. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 460-480. Tooth #9 at 474* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 480-500. Tooth #10 at 494* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 500-520. Tooth #11 at 514* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 520-540. Tooth #12 at 534* for 2* duration. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 540-560. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 560-580. */
+      2,2,2,2,2,2,2,0,0,0,  /* Degrees 580-600. Camshaft is down at 596 */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 600-620 */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 620-640 */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 640-660. Tooth #13 at 654* for 2* duration */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 660-680. Tooth #14 at 674* for 2* duration */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 680-700. Tooth #15 at 694* for 2* duration */
+      0,0,0,0,0,0,1,0,0,0  /* Degrees 700-720. Tooth #16 at 714* for 2* duration */
+   };
 
   const unsigned char jeep_2000[] PROGMEM = 
    { /* Every number represents 2 degrees */
