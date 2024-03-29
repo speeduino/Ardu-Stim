@@ -1364,7 +1364,7 @@
   };
 
   const unsigned char jeep_2000_4cyl[] PROGMEM = 
-    { /* Every number represents 2 degrees */
+    { /* Every number represents 2 degrees. */
       0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20. */
       0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40. */
       0,0,0,0,0,0,0,0,0,0,  /* Degrees 40-60. */
@@ -1404,7 +1404,7 @@
    };
 
   const unsigned char jeep_2000_6cyl[] PROGMEM = 
-   { /* Every number represents 2 degrees */
+   { /* Every number represents 2 degrees. */
      0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20. */
      0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40. */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 40-60. Tooth #1 at 54* for 2* duration. */
