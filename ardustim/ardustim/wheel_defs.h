@@ -132,7 +132,7 @@
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
    JEEP2000_4CYL,  /* Jeep 2.5 4cyl aka jeep2000_4cyl */
-   JEEP2000_6CYL  /* Jeep 4.0 6cyl aka jeep2000_6cyl */
+   JEEP2000_6CYL,  /* Jeep 4.0 6cyl aka jeep2000_6cyl */
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    MAX_WHEELS,
@@ -197,7 +197,8 @@
  const char Toyota_4AGE_CAS_friendly_name[] PROGMEM = "Toyota 4AGE";
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
- const char Jeep_2000_friendly_name[] PROGMEM = "Jeep 2000";
+ const char Jeep_2000_4cyl_friendly_name[] PROGMEM = "Jeep 2000 4cyl";
+ const char Jeep_2000_6cyl_friendly_name[] PROGMEM = "Jeep 2000 6 cyl";
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
 
@@ -1402,7 +1403,7 @@
       0,0,0,0,0,0,1,0,0,0  /* Degrees 700-720. Tooth #16 at 714* for 2* duration */
    };
 
-  const unsigned char jeep_2000[] PROGMEM = 
+  const unsigned char jeep_2000_6cyl[] PROGMEM = 
    { /* Every number represents 2 degrees */
      0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20 */
      0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40 */
