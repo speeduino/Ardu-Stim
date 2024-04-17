@@ -31,11 +31,12 @@
 int check_and_adjust_tcnt_limits(uint32_t *, uint32_t *);  
 sweep_step * build_sweep_steps(uint32_t *, uint32_t *, uint8_t *);
 void reset_new_OCR1A(uint32_t);
-uint16_t get_rpm_from_tcnt(uint16_t *, uint8_t *);
 uint8_t get_bitshift_from_prescaler(uint8_t *);
 void get_prescaler_bits(uint32_t *, uint8_t *, uint8_t *);
 
 extern volatile uint8_t mode;
+extern uint16_t sweep_low_rpm;
+extern uint16_t sweep_high_rpm;
 
 /* Prototypes */
 
