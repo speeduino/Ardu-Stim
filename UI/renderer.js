@@ -160,7 +160,11 @@ function uploadFW()
     });
 
     ipcRenderer.on("upload percent", (event, percent) => {
-        burnPercentText.innerHTML = " (" + percent + "%)";
+        burnPercentText.innerHTML = "Uploading (" + percent + "% Complete)";
+    });
+
+    ipcRenderer.on("old bootloader", (event) => {
+      burnPercentText.innerHTML = "No new Nano found. Retrying for old bootloader.";
     });
 
     ipcRenderer.on("upload error", (event, code) => {
