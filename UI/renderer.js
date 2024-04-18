@@ -373,6 +373,7 @@ function setRPMMode()
     //Update the text box enablement
     document.getElementById("rpmSweepMin").disabled = false;
     document.getElementById("rpmSweepMax").disabled = false;
+    document.getElementById("rpmSweepSpeed").disabled = false;
     document.getElementById("fixedRPM").disabled = true;
   }
   else if (newMode == 1)
@@ -384,6 +385,7 @@ function setRPMMode()
     document.getElementById("fixedRPM").disabled = false;
     document.getElementById("rpmSweepMin").disabled = true;
     document.getElementById("rpmSweepMax").disabled = true;
+    document.getElementById("rpmSweepSpeed").disabled = true;
   }
   else if(newMode == 2)
   {
@@ -392,6 +394,7 @@ function setRPMMode()
     //Update the text box enablement
     document.getElementById("rpmSweepMin").disabled = true;
     document.getElementById("rpmSweepMax").disabled = true;
+    document.getElementById("rpmSweepSpeed").disabled = true;
     document.getElementById("fixedRPM").disabled = true;
   }
     
@@ -415,12 +418,14 @@ function setSweepRPM()
 {
   var newRPM_min = parseInt(document.getElementById('rpmSweepMin').value);
   var newRPM_max = parseInt(document.getElementById('rpmSweepMax').value);
-  //console.log(`Desired RPM: ${newRPM}`);
+  var newRPMSpeed = parseInt(document.getElementById('rpmSweepSpeed').value);
+  console.log(`New sweep speed: ${newRPMSpeed}`);
 
-  var rpmBuffer = Buffer.alloc(5);
+  var rpmBuffer = Buffer.alloc(7);
   rpmBuffer[0] = 0x73; // Ascii 's'
-  rpmBuffer.writeInt16LE(newRPM_min, 1);
-  rpmBuffer.writeInt16LE(newRPM_max, 3);
+  rpmBuffer.writeUInt16LE(newRPM_min, 1);
+  rpmBuffer.writeUInt16LE(newRPM_max, 3);
+  rpmBuffer.writeUInt16LE(newRPMSpeed, 5);
   //console.log(rpmBuffer);
 
   port.write(rpmBuffer);

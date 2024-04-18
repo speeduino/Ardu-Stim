@@ -18,13 +18,21 @@
  * along with any ArduStim software.  If not, see http://www.gnu.org/licenses/
  *
  */
-#ifndef __DEFINES_H__
-#define __DEFINES_H__
+#ifndef __GLOBALS_H__
+#define __GLOBALS_H__
+
+#include "Arduino.h"
  
-/* defines */
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
 #define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */
-
 #define EEPROM_LAST_MODE  100
+
+struct configTable {
+  uint8_t mode;
+  uint16_t sweep_low_rpm = 250;
+  uint16_t sweep_high_rpm = 4000;
+  uint16_t sweep_interval = 1000;
+};
+extern struct configTable config;
 
 #endif

@@ -19,7 +19,7 @@
  *
  */
 
-#include "defines.h"
+#include "globals.h"
 #include "ardustim.h"
 #include "enums.h"
 #include "comms.h"
@@ -36,14 +36,9 @@ extern uint16_t wanted_rpm;
 /* External Globla Variables */
 extern wheels Wheels[];
 
-extern uint16_t sweep_low_rpm;
-extern uint16_t sweep_high_rpm;
-extern uint16_t sweep_rate;
-
 /* Volatile variables (USED in ISR's) */
 extern volatile uint8_t selected_wheel;
 extern volatile uint8_t sweep_direction;
-extern volatile uint8_t sweep_stage;
 extern volatile bool normal;
 extern volatile uint16_t edge_counter;
 extern volatile uint16_t new_OCR1A;
@@ -77,7 +72,7 @@ void commandParser()
       break;
 
     case 'f': //Set the fixed RPM value
-      mode = FIXED_RPM;
+      config.mode = FIXED_RPM;
       while(Serial.available() < 2) {} //Wait for the new RPM bytes
       wanted_rpm = word(Serial.read(), Serial.read());
       //wanted_rpm = 2000;
@@ -110,7 +105,7 @@ void commandParser()
       tmp_mode = Serial.read();
       if(tmp_mode <= POT_RPM)
       {
-        mode = tmp_mode;
+        config.mode = tmp_mode;
       }
       break;
 
@@ -146,11 +141,12 @@ void commandParser()
       break;
 
     case 's': //Set the high and low RPM for sweep mode
-      mode = LINEAR_SWEPT_RPM;
-      while(Serial.available() < 4) {} //Wait for 4 bytes representing the new low and high RPMs
+      config.mode = LINEAR_SWEPT_RPM;
+      while(Serial.available() < 6) {} //Wait for 4 bytes representing the new low and high RPMs
 
-      sweep_low_rpm = word(Serial.read(), Serial.read());
-      sweep_high_rpm = word(Serial.read(), Serial.read());
+      config.sweep_low_rpm = word(Serial.read(), Serial.read());
+      config.sweep_high_rpm = word(Serial.read(), Serial.read());
+      config.sweep_interval = word(Serial.read(), Serial.read());
 
       //sweep_low_rpm = 100;
       //sweep_high_rpm = 4000;

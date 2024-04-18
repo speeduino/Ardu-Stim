@@ -19,7 +19,7 @@
  *
  */
 
-#include "defines.h"
+#include "globals.h"
 #include "ardustim.h"
 #include "enums.h"
 #include "comms.h"
@@ -28,6 +28,8 @@
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
+
+struct configTable config;
 
 /* Sensistive stuff used in ISR's */
 volatile uint16_t adc0; /* POT RPM */
@@ -43,16 +45,15 @@ volatile uint8_t output_invert_mask = 0x00; /* Don't invert anything */
 volatile uint8_t sweep_direction = ASCENDING;
 volatile uint8_t prescaler_bits = 0;
 volatile uint8_t last_prescaler_bits = 0;
-volatile uint8_t mode = 0;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 uint32_t sweep_time_counter = 0;
-uint16_t sweep_interval_ms = 3;
 
 /* Less sensitive globals */
 uint8_t bitshift = 0;
-uint16_t sweep_low_rpm = 250;
-uint16_t sweep_high_rpm = 4000;
+
+
+
 
 wheels Wheels[MAX_WHEELS] = {
    /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array, whether the number of edges covers 360 or 720 degrees */
@@ -294,7 +295,7 @@ void loop()
 
   if(Serial.available() > 0) { commandParser(); }
 
-  if(mode == POT_RPM)
+  if(config.mode == POT_RPM)
   {
     if (adc0_read_complete == true)
     {
@@ -305,20 +306,21 @@ void loop()
       reset_new_OCR1A(tmp_rpm);
     }
   }
-  else if (mode == LINEAR_SWEPT_RPM)
+  else if (config.mode == LINEAR_SWEPT_RPM)
   {
-    if(millis() > (sweep_time_counter + sweep_interval_ms))
+    //if(millis() > (sweep_time_counter + sweep_interval_ms))
+    if(micros() > (sweep_time_counter + config.sweep_interval))
     {
-      sweep_time_counter = millis();
+      sweep_time_counter = micros();
       if(sweep_direction == ASCENDING)
       {
         wanted_rpm++;
-        if(wanted_rpm >= sweep_high_rpm) { sweep_direction = DESCENDING; }
+        if(wanted_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
       }
       else
       {
         wanted_rpm--;
-        if(wanted_rpm <= sweep_low_rpm) { sweep_direction = ASCENDING; }
+        if(wanted_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
       }
       reset_new_OCR1A(wanted_rpm);
     }
@@ -334,6 +336,7 @@ void reset_new_OCR1A(uint32_t new_rpm)
   uint8_t tmp_prescaler_bits;
   tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
   //tmp = (uint32_t)(8000000/(Wheels[selected_wheel].rpm_scaler * (new_rpm < 10 ? 10:new_rpm)));
+  uint64_t x = 800000000000ULL;
 
   get_prescaler_bits(&tmp,&tmp_prescaler_bits,&bitshift);
 

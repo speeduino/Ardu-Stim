@@ -40,7 +40,6 @@ void setRPM(uint32_t);
 /* General functions */
 void serialSetup();
 void display_new_wheel();
-void compute_sweep_stages(uint16_t *, uint16_t *);
 /* General functions */
 
 #endif
