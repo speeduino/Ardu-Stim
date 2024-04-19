@@ -1,11 +1,14 @@
 const serialport = require('serialport')
 const usb = require('usb').usb;
 const Readline = require('@serialport/parser-readline')
-const ByteLength = require('@serialport/parser-byte-length')
+//const ByteLength = require('@serialport/parser-byte-length')
+const ByteLengthParser = require('@serialport/parser-byte-length')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
-var onConnectInterval;
+var CONFIG_SIZE = 13;
+var onConnectIntervalConfig;
+var onConnectIntervalWheels;
 var isConnected=false;
 var currentRPM = 0;
 var initComplete = false;
@@ -119,7 +122,8 @@ function openSerialPort()
 function onSerialConnect()
 {
   console.log("Serial port opened");
-  onConnectInterval = setInterval(requestPatternList, 3000);
+  onConnectIntervalConfig = setInterval(requestConfig, 2500);
+  //onConnectIntervalWheels = setInterval(requestPatternList, 3000);
 
   //Activate the links
   document.getElementById("link_live").href = "#live";
@@ -183,12 +187,43 @@ function saveData()
   port.write("c"); //Send the command to perform EEPROM burn
 }
 
+function requestConfig()
+{
+  //Clear the interval
+  clearInterval(onConnectIntervalConfig);
+
+  //Attach the readline parser
+  const parser = port.pipe(new ByteLengthParser({ length: CONFIG_SIZE }));
+  parser.on('data', receiveConfig);
+
+  //Request the config from the arduino
+  port.write("C");
+  console.log("Requesting config");
+}
+
+function receiveConfig(data)
+{
+  console.log("Received config: " + data);
+  console.log("Mode: " + data[0]);
+
+  document.getElementById("rpmSelect").value = data[0];
+  document.getElementById("fixedRPM").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
+  document.getElementById("rpmSweepMin").value = (((data[8] & 0xff) << 8) | (data[7] & 0xff));
+  document.getElementById("rpmSweepMax").value = (((data[10] & 0xff) << 8) | (data[9] & 0xff));
+  document.getElementById("rpmSweepSpeed").value = (((data[12] & 0xff) << 8) | (data[11] & 0xff));
+  
+  port.unpipe();
+
+  setRPMMode();
+  requestPatternList();
+}
+
 var patternOptionCounter = 0;
 var numPatterns = 0;
 function requestPatternList()
 {
   //Clear the interval
-  clearInterval(onConnectInterval);
+  clearInterval(onConnectIntervalWheels);
 
   //Attach the readline parser
   const parser = port.pipe(new Readline({ delimiter: '\r\n' }));

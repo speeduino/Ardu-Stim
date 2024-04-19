@@ -29,15 +29,10 @@
 #include <math.h>
 #include <util/delay.h>
 
-/* File local variables */
-extern uint16_t wanted_rpm;
-
 /* External Globla Variables */
 extern wheels Wheels[];
 
 /* Volatile variables (USED in ISR's) */
-extern volatile uint8_t selected_wheel;
-extern volatile uint8_t sweep_direction;
 extern volatile bool normal;
 extern volatile uint16_t edge_counter;
 extern volatile uint16_t new_OCR1A;
@@ -63,6 +58,7 @@ void commandParser()
   char buf[80];
   byte tmp_wheel;
   byte tmp_mode;
+  void* pnt_Config = &config;
   if (cmdPending == false) { currentCommand = Serial.read(); }
 
   switch (currentCommand)
@@ -73,10 +69,11 @@ void commandParser()
     case 'f': //Set the fixed RPM value
       config.mode = FIXED_RPM;
       while(Serial.available() < 2) {} //Wait for the new RPM bytes
-      wanted_rpm = word(Serial.read(), Serial.read());
-      //wanted_rpm = 2000;
-      //reset_new_OCR1A(wanted_rpm);
-      setRPM(wanted_rpm);
+      config.rpm = word(Serial.read(), Serial.read());
+      config.fixed_rpm = config.rpm;
+      //config.rpm = 2000;
+      //reset_new_OCR1A(config.rpm);
+      setRPM(config.rpm);
       break;
 
     case 'c': //Save the current config
@@ -84,8 +81,10 @@ void commandParser()
       break;
 
     case 'C': //Send the current config
-      sizeof(config);
-
+      for(uint8_t x=0; x<sizeof(struct configTable); x++)
+      {
+        Serial.write(*((uint8_t *)pnt_Config + x)); //Each byte is simply the location in memory of the config Page + the offset
+      }
       break;
       
     case 'L': // send the list of wheel names
@@ -114,30 +113,30 @@ void commandParser()
       break;
 
     case 'N': //Send the number of the current wheel
-      Serial.println(selected_wheel);
+      Serial.println(config.wheel);
       break;
     
     case 'p': //Send the size of the current wheel
-      Serial.println(Wheels[selected_wheel].wheel_max_edges);
+      Serial.println(Wheels[config.wheel].wheel_max_edges);
       break;
 
     case 'P': //Send the pattern for the current wheel
-      numTeeth = pgm_read_word(Wheels[selected_wheel].wheel_max_edges);
+      numTeeth = pgm_read_word(Wheels[config.wheel].wheel_max_edges);
 
-      for(uint16_t x=0; x<Wheels[selected_wheel].wheel_max_edges; x++)
+      for(uint16_t x=0; x<Wheels[config.wheel].wheel_max_edges; x++)
       {
         if(x != 0) { Serial.print(","); }
 
-        byte tempByte = pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[x]);
+        byte tempByte = pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[x]);
         Serial.print(tempByte);
       }
       Serial.println("");
       //2nd row of data sent is the number of degrees the wheel runs over (360 or 720 typically)
-      Serial.println(Wheels[selected_wheel].wheel_degrees);
+      Serial.println(Wheels[config.wheel].wheel_degrees);
       break;
 
     case 'R': //Send the current RPM
-      Serial.println(wanted_rpm);
+      Serial.println(config.rpm);
       break;
 
     case 's': //Set the high and low RPM for sweep mode
@@ -157,14 +156,14 @@ void commandParser()
       tmp_wheel = Serial.read();
       if(tmp_wheel < MAX_WHEELS)
       {
-        selected_wheel = tmp_wheel;
+        config.wheel = tmp_wheel;
         display_new_wheel();
       }
       break;
 
     case 'X': //Just a test method for switching the to the next wheel
       select_next_wheel_cb();
-      strcpy_P(buf,Wheels[selected_wheel].decoder_name);
+      strcpy_P(buf,Wheels[config.wheel].decoder_name);
       Serial.println(buf);
       break;
 
@@ -204,7 +203,7 @@ void toggle_invert_secondary_cb()
 
 void display_new_wheel()
 {
-  reset_new_OCR1A(wanted_rpm);
+  reset_new_OCR1A(config.rpm);
   edge_counter = 0; // Reset to beginning of the wheel pattern */
 }
 
@@ -217,10 +216,10 @@ void display_new_wheel()
  */
 void select_next_wheel_cb()
 {
-  if (selected_wheel == (MAX_WHEELS-1))
-    selected_wheel = 0;
+  if (config.wheel == (MAX_WHEELS-1))
+    config.wheel = 0;
   else 
-    selected_wheel++;
+    config.wheel++;
   
   display_new_wheel();
 }
@@ -234,10 +233,10 @@ void select_next_wheel_cb()
  */
 void select_previous_wheel_cb()
 {
-  if (selected_wheel == 0)
-    selected_wheel = MAX_WHEELS-1;
+  if (config.wheel == 0)
+    config.wheel = MAX_WHEELS-1;
   else 
-    selected_wheel--;
+    config.wheel--;
   
   display_new_wheel();
 }
@@ -251,5 +250,5 @@ void setRPM(uint32_t newRPM)
   if (newRPM < 10)  { return; }
 
   reset_new_OCR1A(newRPM);
-  wanted_rpm = newRPM;
+  config.rpm = newRPM;
 }

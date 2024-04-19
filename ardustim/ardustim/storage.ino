@@ -12,18 +12,23 @@ void loadConfig()
   //if(true)
   {
     //New arduino
-    selected_wheel = 5; //36-1
-    wanted_rpm = 3000;
+    config.wheel = 5; //36-1
+    config.rpm = 3000;
     config.mode = POT_RPM;
   }
   else
   {
-    selected_wheel = EEPROM.read(EEPROM_CURRRENT_WHEEL);
+    config.wheel = EEPROM.read(EEPROM_CURRRENT_WHEEL);
     config.mode = EEPROM.read(EEPROM_CURRENT_RPM_MODE);
 
     byte highByte = EEPROM.read(EEPROM_CURRENT_RPM);
     byte lowByte =  EEPROM.read(EEPROM_CURRENT_RPM+1);
-    wanted_rpm = word(highByte, lowByte);
+    config.rpm = word(highByte, lowByte);
+
+    highByte = EEPROM.read(EEPROM_FIXED_RPM);
+    lowByte =  EEPROM.read(EEPROM_FIXED_RPM+1);
+    config.fixed_rpm = word(highByte, lowByte);
+    config.fixed_rpm = constrain(config.fixed_rpm, 100, TMP_RPM_CAP);
 
     highByte = EEPROM.read(EEPROM_SWEEP_RPM_MIN);
     lowByte =  EEPROM.read(EEPROM_SWEEP_RPM_MIN+1);
@@ -35,25 +40,35 @@ void loadConfig()
     config.sweep_high_rpm = word(highByte, lowByte);
     config.sweep_high_rpm = constrain(config.sweep_high_rpm, 100, TMP_RPM_CAP);
 
+    highByte = EEPROM.read(EEPROM_SWEEP_RPM_INT);
+    lowByte =  EEPROM.read(EEPROM_SWEEP_RPM_INT+1);
+    config.sweep_interval = word(highByte, lowByte);
+    config.sweep_interval = constrain(config.sweep_interval, 200, 10000);
+
     if(config.sweep_low_rpm >= config.sweep_high_rpm) { config.sweep_low_rpm = config.sweep_high_rpm - 100; }
 
     //Error checking
-    if(selected_wheel >= MAX_WHEELS) { selected_wheel = 5; }
+    if(config.wheel >= MAX_WHEELS) { config.wheel = 5; }
     if(config.mode >= MAX_MODES) { config.mode = FIXED_RPM; }
-    if(wanted_rpm > 15000) { wanted_rpm = 4000; }
+    if(config.rpm > 15000) { config.rpm = 4000; }
   }
 }
 
 void saveConfig()
 {
-  EEPROM.update(EEPROM_CURRRENT_WHEEL, selected_wheel);
+  EEPROM.update(EEPROM_CURRRENT_WHEEL, config.wheel);
   EEPROM.update(EEPROM_CURRENT_RPM_MODE, config.mode);
   EEPROM.update(EEPROM_VERSION, EEPROM_CURRENT_VERSION);
 
-  byte highByte = highByte(wanted_rpm);
-  byte lowByte = lowByte(wanted_rpm);
+  byte highByte = highByte(config.rpm);
+  byte lowByte = lowByte(config.rpm);
   EEPROM.update(EEPROM_CURRENT_RPM, highByte);
   EEPROM.update(EEPROM_CURRENT_RPM+1, lowByte);
+
+  highByte = highByte(config.fixed_rpm);
+  lowByte = lowByte(config.fixed_rpm);
+  EEPROM.update(EEPROM_FIXED_RPM, highByte);
+  EEPROM.update(EEPROM_FIXED_RPM+1, lowByte);
 
   highByte = highByte(config.sweep_low_rpm);
   lowByte = lowByte(config.sweep_low_rpm);
@@ -64,5 +79,10 @@ void saveConfig()
   lowByte = lowByte(config.sweep_high_rpm);
   EEPROM.update(EEPROM_SWEEP_RPM_MAX, highByte);
   EEPROM.update(EEPROM_SWEEP_RPM_MAX+1, lowByte);
+
+  highByte = highByte(config.sweep_interval);
+  lowByte = lowByte(config.sweep_interval);
+  EEPROM.update(EEPROM_SWEEP_RPM_INT, highByte);
+  EEPROM.update(EEPROM_SWEEP_RPM_INT+1, lowByte);
 
 }

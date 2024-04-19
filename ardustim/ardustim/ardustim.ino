@@ -42,12 +42,12 @@ volatile bool adc1_read_complete = false;
 volatile bool reset_prescaler = false;
 volatile bool normal = true;
 volatile uint8_t output_invert_mask = 0x00; /* Don't invert anything */
-volatile uint8_t sweep_direction = ASCENDING;
 volatile uint8_t prescaler_bits = 0;
 volatile uint8_t last_prescaler_bits = 0;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
 uint32_t sweep_time_counter = 0;
+uint8_t sweep_direction = ASCENDING;
 
 /* Less sensitive globals */
 uint8_t bitshift = 0;
@@ -122,8 +122,8 @@ wheels Wheels[MAX_WHEELS] = {
 
 /* Initialization */
 void setup() {
-  serialSetup();
   loadConfig();
+  serialSetup();
 
   cli(); // stop interrupts
 
@@ -214,7 +214,7 @@ void setup() {
   // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
   ADCSRA |= B01000000;
   /* Make sure we are using the DEFAULT RPM on startup */
-  reset_new_OCR1A(wanted_rpm); 
+  reset_new_OCR1A(config.rpm); 
 
 } // End setup
 
@@ -255,19 +255,19 @@ ISR(ADC_vect){
  */
 ISR(TIMER1_COMPA_vect) {
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
-  PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[selected_wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+  PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
   /* Normal direction  overflow handling */
   if (normal)
   {
     edge_counter++;
-    if (edge_counter == Wheels[selected_wheel].wheel_max_edges) {
+    if (edge_counter == Wheels[config.wheel].wheel_max_edges) {
       edge_counter = 0;
     }
   }
   else
   {
     if (edge_counter == 0)
-      edge_counter = Wheels[selected_wheel].wheel_max_edges;
+      edge_counter = Wheels[config.wheel].wheel_max_edges;
     edge_counter--;
   }
   /* The tables are in flash so we need pgm_read_byte() */
@@ -300,7 +300,7 @@ void loop()
       adc0_read_complete = false;
       tmp_rpm = adc0 << TMP_RPM_SHIFT;
       if (tmp_rpm > TMP_RPM_CAP) { tmp_rpm = TMP_RPM_CAP; }
-      wanted_rpm = tmp_rpm;
+      config.rpm = tmp_rpm;
       reset_new_OCR1A(tmp_rpm);
     }
   }
@@ -312,16 +312,20 @@ void loop()
       sweep_time_counter = micros();
       if(sweep_direction == ASCENDING)
       {
-        wanted_rpm++;
-        if(wanted_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
+        config.rpm++;
+        if(config.rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
       }
       else
       {
-        wanted_rpm--;
-        if(wanted_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
+        config.rpm--;
+        if(config.rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
       }
-      reset_new_OCR1A(wanted_rpm);
+      reset_new_OCR1A(config.rpm);
     }
+  }
+  else if (config.mode == FIXED_RPM)
+  {
+
   }
 
 }
@@ -332,9 +336,9 @@ void reset_new_OCR1A(uint32_t new_rpm)
   uint32_t tmp;
   uint8_t bitshift;
   uint8_t tmp_prescaler_bits;
-  tmp = (uint32_t)(8000000.0/(Wheels[selected_wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
-  //tmp = (uint32_t)(8000000/(Wheels[selected_wheel].rpm_scaler * (new_rpm < 10 ? 10:new_rpm)));
-  uint64_t x = 800000000000ULL;
+  tmp = (uint32_t)(8000000.0/(Wheels[config.wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
+  //tmp = (uint32_t)(8000000/(Wheels[config.wheel].rpm_scaler * (new_rpm < 10 ? 10:new_rpm)));
+  //uint64_t x = 800000000000ULL;
 
   get_prescaler_bits(&tmp,&tmp_prescaler_bits,&bitshift);
 

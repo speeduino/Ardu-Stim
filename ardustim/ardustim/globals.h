@@ -22,13 +22,18 @@
 #define __GLOBALS_H__
 
 #include "Arduino.h"
+#include "wheel_defs.h"
  
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
 #define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */
 #define EEPROM_LAST_MODE  100
 
 struct configTable {
+  uint8_t version;
+  uint16_t rpm = 6000;                                                     
+  uint8_t wheel = FOUR_TWENTY_A;
   uint8_t mode;
+  uint16_t fixed_rpm = 2500;
   uint16_t sweep_low_rpm = 250;
   uint16_t sweep_high_rpm = 4000;
   uint16_t sweep_interval = 1000;

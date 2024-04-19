@@ -7,6 +7,8 @@
 #define EEPROM_CURRENT_RPM      4 //Note this is 2 bytes
 #define EEPROM_SWEEP_RPM_MIN    6 //Note this is 2 bytes
 #define EEPROM_SWEEP_RPM_MAX    8 //Note this is 2 bytes
+#define EEPROM_SWEEP_RPM_INT    10 //Note this is 2 bytes
+#define EEPROM_FIXED_RPM        12 //Note this is 2 bytes
 
 void loadConfig();
 void saveConfig();
