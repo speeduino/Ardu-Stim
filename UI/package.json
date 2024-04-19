@@ -8,7 +8,7 @@
     "start": "electron .",
     "install": "electron-rebuild -f",
     "package-mac": "electron-builder --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
-    "package-mac-workflow": "electron-builder --publish-never --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
+    "package-mac-workflow": "electron-builder --publish never --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
     "package-win": "electron-builder --win",
     "package-linux": "electron-builder --linux",
     "package-linux-workflow": "electron-builder --publish never --linux",
