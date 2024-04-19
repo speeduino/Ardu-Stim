@@ -1,0 +1,79 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  Build-for-linux:
+    name: Run npm on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libusb-1.0-0 libusb-1.0-0-dev libudev-dev
+          version: 1.0
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19.x'
+      - name: Install Electron and build
+        run: |
+          npm install electron-rebuild -g
+          npm install electron-builder -g
+          npm install
+          npm run package-linux-workflow
+      - name: Save .appimage as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artefact for linux build
+          path: dist/*.AppImage
+
+  Build-for-mac:
+    name: Run npm on x64 macos
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node, Electron and built
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19.x'
+      - name: Install Electron and build
+        run: |
+          python3 -m pip install setuptools
+          npm install electron-rebuild -g
+          npm install electron-builder -g
+          npm install
+          npm run package-mac-workflow
+      - name: Save .dmg as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artefact for Mac build
+          path: dist/*.dmg
+
+  Build-for-win:
+    name: Run npm on x64 Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node, Electron and built
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19.x'
+      - name: Install Electron and build
+        run: |
+          npm install electron-rebuild -g
+          npm install electron-builder -g
+          npm install
+          npm run package-win
+      - name: Save .exe as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artefact for Win build
+          path: dist

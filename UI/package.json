@@ -7,9 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "install": "electron-rebuild -f",
-    "package-mac": "electron-builder --mac",
+    "package-mac": "electron-builder --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
+    "package-mac-workflow": "electron-builder --publish-never --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
     "package-win": "electron-builder --win",
     "package-linux": "electron-builder --linux",
+    "package-linux-workflow": "electron-builder --publish never --linux",
     "package-arm": "electron-builder --linux --arch=armv7l"
   },
   "repository": {
