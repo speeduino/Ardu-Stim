@@ -1,6 +1,6 @@
 {
   "name": "Ardu-Stim",
-  "version": "0.0.4",
+  "version": "0.9.0",
   "description": "Ardu-Stim engine simulator - Speeduino Version",
   "main": "main.js",
   "scripts": {
