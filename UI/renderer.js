@@ -181,10 +181,21 @@ function uploadFW()
 
 }
 
-function saveData()
+function saveData(showCheck)
 {
   //Request the arduino save the current config
   port.write("c"); //Send the command to perform EEPROM burn
+
+  //Check if we redo the checkmark animation
+  if(showCheck)
+  {
+    var checkmark = document.getElementById("saveCheck");
+    checkmark.style.animation = 'none';
+    checkmark.offsetHeight; /* trigger reflow */
+    checkmark.style.opacity = 1; 
+    checkmark.style.visibility  = "visible";
+    checkmark.style.animation = null; 
+  }
 }
 
 function requestConfig()
@@ -331,7 +342,7 @@ function updatePattern()
   port.write(buffer); //Send the new pattern ID
 
   //Send the command to save the pattern to EEPROM
-  saveData();
+  saveData(false);
 
   //Request the new pattern
   port.write("P"); //Send the command to read the new pattern out

@@ -1044,18 +1044,31 @@ input, select, textarea {
 		text-decoration: none;
 	}
 
-		.icon:before {
-			-moz-osx-font-smoothing: grayscale;
-			-webkit-font-smoothing: antialiased;
-			font-family: FontAwesome;
-			font-style: normal;
-			font-weight: normal;
-			text-transform: none !important;
-		}
+	.icon:before {
+		-moz-osx-font-smoothing: grayscale;
+		-webkit-font-smoothing: antialiased;
+		font-family: FontAwesome;
+		font-style: normal;
+		font-weight: normal;
+		text-transform: none !important;
+	}
 
-		.icon > .label {
-			display: none;
-		}
+	.icon > .label {
+		display: none;
+	}
+
+	@keyframes fadeOut {
+		0% {opacity: 1;}
+		100% {opacity: 0;}
+	}
+		
+	.fadeOut {
+		animation-name: fadeOut;
+		animation-duration: 5s;
+        animation-fill-mode: both;
+		font-size: larger;
+		color: darkgreen;
+	}
 
 /* Nav */
 
