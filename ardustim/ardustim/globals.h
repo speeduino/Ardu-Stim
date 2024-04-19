@@ -35,4 +35,15 @@ struct configTable {
 };
 extern struct configTable config;
 
+/* Tie things wheel related into one nicer structure ... */
+typedef struct _wheels wheels;
+struct _wheels {
+  const char *decoder_name PROGMEM;
+  const unsigned char *edge_states_ptr PROGMEM;
+  const float rpm_scaler;
+  //const uint16_t rpm_scaler;
+  const uint16_t wheel_max_edges;
+  const uint16_t wheel_degrees;
+};
+
 #endif

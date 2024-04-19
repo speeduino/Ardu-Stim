@@ -23,7 +23,6 @@
 #include "ardustim.h"
 #include "enums.h"
 #include "comms.h"
-#include "structures.h"
 #include "storage.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
@@ -85,6 +84,7 @@ void commandParser()
       break;
 
     case 'C': //Send the current config
+      sizeof(config);
 
       break;
       
@@ -123,7 +123,7 @@ void commandParser()
 
     case 'P': //Send the pattern for the current wheel
       numTeeth = pgm_read_word(Wheels[selected_wheel].wheel_max_edges);
-      //PROGMEM_readAnything (&table[i], thisOne);
+
       for(uint16_t x=0; x<Wheels[selected_wheel].wheel_max_edges; x++)
       {
         if(x != 0) { Serial.print(","); }

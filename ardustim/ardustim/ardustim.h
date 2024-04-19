@@ -22,14 +22,12 @@
 #define __ARDUSTIM_H__
 
 #include <stdint.h>
-#include "structures.h"
 #include <Arduino.h>
 
 /* Structures */
 
 /* Prototypes */
 int check_and_adjust_tcnt_limits(uint32_t *, uint32_t *);  
-sweep_step * build_sweep_steps(uint32_t *, uint32_t *, uint8_t *);
 void reset_new_OCR1A(uint32_t);
 uint8_t get_bitshift_from_prescaler(uint8_t *);
 void get_prescaler_bits(uint32_t *, uint8_t *, uint8_t *);

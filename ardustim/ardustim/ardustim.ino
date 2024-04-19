@@ -252,8 +252,6 @@ ISR(ADC_vect){
 
 /* Pumps the pattern out of flash to the port 
  * The rate at which this runs is dependent on what OCR1A is set to
- * the sweeper in timer2 alters this on the fly to alow changing of RPM
- * in a very nice way
  */
 ISR(TIMER1_COMPA_vect) {
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
