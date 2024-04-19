@@ -24,7 +24,6 @@
 #include "enums.h"
 #include "comms.h"
 #include "storage.h"
-#include "user_defaults.h"
 #include "wheel_defs.h"
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
@@ -289,8 +288,6 @@ void loop()
   /* Just handle the Serial UI, everything else is in 
    * interrupt handlers or callbacks from SerialUI.
    */
-
-
   if(Serial.available() > 0) { commandParser(); }
 
   if(config.mode == POT_RPM)
@@ -300,8 +297,6 @@ void loop()
       adc0_read_complete = false;
       tmp_rpm = adc0 << TMP_RPM_SHIFT;
       if (tmp_rpm > TMP_RPM_CAP) { tmp_rpm = TMP_RPM_CAP; }
-      config.rpm = tmp_rpm;
-      reset_new_OCR1A(tmp_rpm);
     }
   }
   else if (config.mode == LINEAR_SWEPT_RPM)
@@ -312,22 +307,32 @@ void loop()
       sweep_time_counter = micros();
       if(sweep_direction == ASCENDING)
       {
-        config.rpm++;
-        if(config.rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
+        tmp_rpm = config.rpm + 1;
+        if(tmp_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
       }
       else
       {
-        config.rpm--;
-        if(config.rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
+        tmp_rpm = config.rpm - 1;
+        if(tmp_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
       }
-      reset_new_OCR1A(config.rpm);
     }
   }
   else if (config.mode == FIXED_RPM)
   {
-
+    tmp_rpm = config.fixed_rpm;
   }
+  setRPM(tmp_rpm);
+}
 
+/*!
+ * Validates the new user requested RPM and sets it if valid. 
+ */ 
+void setRPM(uint16_t newRPM)
+{
+  if (newRPM < 10)  { return; }
+
+  if(config.rpm != newRPM) { reset_new_OCR1A(newRPM); }
+  config.rpm = newRPM;
 }
 
 

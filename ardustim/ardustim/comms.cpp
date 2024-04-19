@@ -69,11 +69,7 @@ void commandParser()
     case 'f': //Set the fixed RPM value
       config.mode = FIXED_RPM;
       while(Serial.available() < 2) {} //Wait for the new RPM bytes
-      config.rpm = word(Serial.read(), Serial.read());
-      config.fixed_rpm = config.rpm;
-      //config.rpm = 2000;
-      //reset_new_OCR1A(config.rpm);
-      setRPM(config.rpm);
+      config.fixed_rpm = word(Serial.read(), Serial.read());
       break;
 
     case 'c': //Save the current config
@@ -239,16 +235,4 @@ void select_previous_wheel_cb()
     config.wheel--;
   
   display_new_wheel();
-}
-
-
-/*!
- * Validates the new user requested RPM and sets it if valid. 
- */ 
-void setRPM(uint32_t newRPM)
-{
-  if (newRPM < 10)  { return; }
-
-  reset_new_OCR1A(newRPM);
-  config.rpm = newRPM;
 }

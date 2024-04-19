@@ -1,7 +1,6 @@
 #include "storage.h"
 #include "EEPROM.h"
 #include "wheel_defs.h"
-#include "user_defaults.h"
 #include "ardustim.h"
 #include "enums.h"
 #include "globals.h"
@@ -9,17 +8,23 @@
 void loadConfig()
 {
   if(EEPROM.read(EEPROM_VERSION) == 255)
-  //if(true)
   {
     //New arduino
     config.wheel = 5; //36-1
     config.rpm = 3000;
     config.mode = POT_RPM;
+
+    config.fixed_rpm = 3500;
+    config.sweep_high_rpm = 6000;
+    config.sweep_low_rpm = 1000;
+    config.sweep_interval = 1000;
+
+    saveConfig();
   }
   else
   {
-    config.wheel = EEPROM.read(EEPROM_CURRRENT_WHEEL);
-    config.mode = EEPROM.read(EEPROM_CURRENT_RPM_MODE);
+    config.wheel = EEPROM.read(EEPROM_WHEEL);
+    config.mode = EEPROM.read(EEPROM_RPM_MODE);
 
     byte highByte = EEPROM.read(EEPROM_CURRENT_RPM);
     byte lowByte =  EEPROM.read(EEPROM_CURRENT_RPM+1);
@@ -56,8 +61,8 @@ void loadConfig()
 
 void saveConfig()
 {
-  EEPROM.update(EEPROM_CURRRENT_WHEEL, config.wheel);
-  EEPROM.update(EEPROM_CURRENT_RPM_MODE, config.mode);
+  EEPROM.update(EEPROM_WHEEL, config.wheel);
+  EEPROM.update(EEPROM_RPM_MODE, config.mode);
   EEPROM.update(EEPROM_VERSION, EEPROM_CURRENT_VERSION);
 
   byte highByte = highByte(config.rpm);
