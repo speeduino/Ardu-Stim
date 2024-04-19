@@ -122,7 +122,7 @@ function openSerialPort()
 function onSerialConnect()
 {
   console.log("Serial port opened");
-  onConnectIntervalConfig = setInterval(requestConfig, 2500);
+  onConnectIntervalConfig = setInterval(requestConfig, 2000);
   //onConnectIntervalWheels = setInterval(requestPatternList, 3000);
 
   //Activate the links
@@ -217,7 +217,7 @@ function receiveConfig(data)
   console.log("Received config: " + data);
   console.log("Mode: " + data[0]);
 
-  document.getElementById("rpmSelect").value = data[0];
+  document.getElementById("rpmSelect").value = data[4];
   document.getElementById("fixedRPM").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
   document.getElementById("rpmSweepMin").value = (((data[8] & 0xff) << 8) | (data[7] & 0xff));
   document.getElementById("rpmSweepMax").value = (((data[10] & 0xff) << 8) | (data[9] & 0xff));
