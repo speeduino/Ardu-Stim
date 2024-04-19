@@ -13,6 +13,9 @@ jobs:
   Build-for-linux:
     name: Run npm on Ubuntu
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'UI' # Here the path to the folder where package-lock.json is located.
     steps:
       - uses: actions/checkout@v4
       - uses: awalsh128/cache-apt-pkgs-action@latest
@@ -38,6 +41,9 @@ jobs:
   Build-for-mac:
     name: Run npm on x64 macos
     runs-on: macos-12
+    defaults:
+      run:
+        working-directory: 'UI' # Here the path to the folder where package-lock.json is located.
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node, Electron and built
@@ -60,6 +66,9 @@ jobs:
   Build-for-win:
     name: Run npm on x64 Windows
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: 'UI' # Here the path to the folder where package-lock.json is located.
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node, Electron and built
