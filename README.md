@@ -15,9 +15,11 @@ Ardustim is an engine simulator built on the Arduino platform. It produces simul
 
 This version is a fork of the original by David Andruczyk [https://gitlab.com/libreems-suite/ardu-stim](https://gitlab.com/libreems-suite/ardu-stim) and is intended to provide a more modern, cross platform GUI as well as continued expansion of the trigger pattern library. It was primarily developed for use by the Speeduino community, but can be utilised for testing virtually any aftermarket ECU system
 
+It is designed to run on an Arduino Nano, but will also work with Arduino Uno boards. 
+
 ## Wiring
 
-- **Arduino Uno**
+- **Arduino Nano or Uno**
   - pin `8` will provide the `crank` or primary wheel signal
   - pin `9` will provide the `cam` or secondary wheel signal
 - **Arduino Mega**
@@ -34,7 +36,7 @@ The source code can be built in either PlatformIO or the Arduino IDE and does no
 
 Simply open the `ardustim` sub-folder in PlatformIO or the Arduino IDE and it should compile up.
 
-Intended hardware platform is the Arduino Nano or Diecimila.
+Intended hardware platform is the Arduino Nano or Uno.
 
 ## Installing GUI from Source
 
