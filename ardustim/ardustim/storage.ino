@@ -11,7 +11,7 @@ void loadConfig()
   {
     //New arduino
     config.wheel = 5; //36-1
-    config.rpm = 3000;
+    currentStatus.rpm = 3000;
     config.mode = POT_RPM;
 
     config.fixed_rpm = 3500;
@@ -28,7 +28,7 @@ void loadConfig()
 
     byte highByte = EEPROM.read(EEPROM_CURRENT_RPM);
     byte lowByte =  EEPROM.read(EEPROM_CURRENT_RPM+1);
-    config.rpm = word(highByte, lowByte);
+    currentStatus.rpm = word(highByte, lowByte);
 
     highByte = EEPROM.read(EEPROM_FIXED_RPM);
     lowByte =  EEPROM.read(EEPROM_FIXED_RPM+1);
@@ -52,10 +52,19 @@ void loadConfig()
 
     if(config.sweep_low_rpm >= config.sweep_high_rpm) { config.sweep_low_rpm = config.sweep_high_rpm - 100; }
 
+    config.useCompression = EEPROM.read(EEPROM_USE_COMPRESSION);
+    config.compressionType = EEPROM.read(EEPROM_COMPRESSION_TYPE);
+    highByte = EEPROM.read(EEPROM_COMPRESSION_RPM);
+    lowByte = EEPROM.read(EEPROM_COMPRESSION_RPM+1);
+    config.compressionRPM = word(highByte, lowByte);
+    //config.compressionType = COMPRESSION_TYPE_6CYL_4STROKE;
+
     //Error checking
     if(config.wheel >= MAX_WHEELS) { config.wheel = 5; }
     if(config.mode >= MAX_MODES) { config.mode = FIXED_RPM; }
-    if(config.rpm > 15000) { config.rpm = 4000; }
+    if(currentStatus.rpm > 15000) { currentStatus.rpm = 4000; }
+    if(config.compressionType > COMPRESSION_TYPE_8CYL_4STROKE) { config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE; }
+    if(config.compressionRPM > 1000) { config.compressionRPM = 400; }
   }
 }
 
@@ -65,8 +74,8 @@ void saveConfig()
   EEPROM.update(EEPROM_RPM_MODE, config.mode);
   EEPROM.update(EEPROM_VERSION, EEPROM_CURRENT_VERSION);
 
-  byte highByte = highByte(config.rpm);
-  byte lowByte = lowByte(config.rpm);
+  byte highByte = highByte(currentStatus.rpm);
+  byte lowByte = lowByte(currentStatus.rpm);
   EEPROM.update(EEPROM_CURRENT_RPM, highByte);
   EEPROM.update(EEPROM_CURRENT_RPM+1, lowByte);
 
@@ -90,4 +99,10 @@ void saveConfig()
   EEPROM.update(EEPROM_SWEEP_RPM_INT, highByte);
   EEPROM.update(EEPROM_SWEEP_RPM_INT+1, lowByte);
 
+  EEPROM.update(EEPROM_USE_COMPRESSION, config.useCompression);
+  EEPROM.update(EEPROM_COMPRESSION_TYPE, config.compressionType);
+  highByte = highByte(config.compressionRPM);
+  lowByte = lowByte(config.compressionRPM);
+  EEPROM.update(EEPROM_COMPRESSION_RPM, highByte);
+  EEPROM.update(EEPROM_COMPRESSION_RPM+1, lowByte);
 }

@@ -6,7 +6,7 @@ const ByteLengthParser = require('@serialport/parser-byte-length')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
-var CONFIG_SIZE = 13;
+var CONFIG_SIZE = 15;
 var onConnectIntervalConfig;
 var onConnectIntervalWheels;
 var isConnected=false;
@@ -215,13 +215,16 @@ function requestConfig()
 function receiveConfig(data)
 {
   console.log("Received config: " + data);
-  console.log("Mode: " + data[0]);
+  console.log("Mode: " + data[2]);
 
-  document.getElementById("rpmSelect").value = data[4];
-  document.getElementById("fixedRPM").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
-  document.getElementById("rpmSweepMin").value = (((data[8] & 0xff) << 8) | (data[7] & 0xff));
-  document.getElementById("rpmSweepMax").value = (((data[10] & 0xff) << 8) | (data[9] & 0xff));
-  document.getElementById("rpmSweepSpeed").value = (((data[12] & 0xff) << 8) | (data[11] & 0xff));
+  document.getElementById("rpmSelect").value = data[2];
+  document.getElementById("fixedRPM").value = (((data[4] & 0xff) << 8) | (data[3] & 0xff));
+  document.getElementById("rpmSweepMin").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
+  document.getElementById("rpmSweepMax").value = (((data[8] & 0xff) << 8) | (data[7] & 0xff));
+  document.getElementById("rpmSweepSpeed").value = (((data[10] & 0xff) << 8) | (data[9] & 0xff));
+  document.getElementById("compressionEnable").value = data[11];
+  document.getElementById("compressionMode").value = data[12];
+  document.getElementById("compressionRPM").value = (((data[14] & 0xff) << 8) | (data[13] & 0xff));
   
   port.unpipe();
 
@@ -623,6 +626,7 @@ window.onload = function ()
     refreshSerialPorts();
     redrawGears(toothPatterns[0]);
     window.location.hash = '#connect';
+    //window.location.hash = '#live';
     checkForUpdates();
     //animateGauges();
 

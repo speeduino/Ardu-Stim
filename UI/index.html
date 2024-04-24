@@ -80,6 +80,30 @@
 							<input type="range" id="rpmSweepSpeed" min="200" max="4000" step="10" value="3000" onChange="setSweepRPM()" disabled>
 						</div>
 					</div>
+					<div class="row">
+						<div class="col-7">Enable compression: </div>
+						<div class="col-2">
+							<input type="checkbox" id="compressionEnable" onChange="toggleCompression()">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-7">Configuration: </div>
+						<div class="col-2">
+							<select id="compressionMode" onChange="setCompressionMode()" disabled>
+								<option value="1">2-cyl 4 stroke</option>
+								<option value="3">4-cyl 4 stroke</option>
+								<option value="4">6-cyl 4 stroke</option>
+								<option value="5">8-cyl 4 stroke</option>
+							  </select>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-7">Compression RPM: </div>
+						<div class="col-2">
+							<input type="number" id="compressionRPM" min="20" max="1000" step="1" value="400" onChange="setCompressionRPM()" disabled>
+						</div>
+					</div>
+
                     <div>
                       <br />
                       <center><input type='button' value="Save Config" id="btnSave" onclick="saveData(true);" /><div id="saveCheck" class="icon fa-check fadeOut" style="visibility:hidden; display:inline-block;margin-left: 0.75em;"></div></center>

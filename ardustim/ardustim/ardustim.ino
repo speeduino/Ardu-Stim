@@ -29,6 +29,7 @@
 #include <EEPROM.h>
 
 struct configTable config;
+struct status currentStatus;
 
 /* Sensistive stuff used in ISR's */
 volatile uint16_t adc0; /* POT RPM */
@@ -39,12 +40,13 @@ volatile uint8_t analog_port = 0;
 volatile bool adc0_read_complete = false;
 volatile bool adc1_read_complete = false;
 volatile bool reset_prescaler = false;
-volatile bool normal = true;
 volatile uint8_t output_invert_mask = 0x00; /* Don't invert anything */
 volatile uint8_t prescaler_bits = 0;
 volatile uint8_t last_prescaler_bits = 0;
 volatile uint16_t new_OCR1A = 5000; /* sane default */
 volatile uint16_t edge_counter = 0;
+volatile uint32_t cycleStartTime = micros();
+volatile uint32_t cycleDuration = 0;
 uint32_t sweep_time_counter = 0;
 uint8_t sweep_direction = ASCENDING;
 
@@ -213,7 +215,7 @@ void setup() {
   // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
   ADCSRA |= B01000000;
   /* Make sure we are using the DEFAULT RPM on startup */
-  reset_new_OCR1A(config.rpm); 
+  reset_new_OCR1A(currentStatus.rpm); 
 
 } // End setup
 
@@ -252,22 +254,17 @@ ISR(ADC_vect){
 /* Pumps the pattern out of flash to the port 
  * The rate at which this runs is dependent on what OCR1A is set to
  */
-ISR(TIMER1_COMPA_vect) {
+ISR(TIMER1_COMPA_vect) 
+{
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
   PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
-  /* Normal direction  overflow handling */
-  if (normal)
+  
+  edge_counter++;
+  if (edge_counter == Wheels[config.wheel].wheel_max_edges) 
   {
-    edge_counter++;
-    if (edge_counter == Wheels[config.wheel].wheel_max_edges) {
-      edge_counter = 0;
-    }
-  }
-  else
-  {
-    if (edge_counter == 0)
-      edge_counter = Wheels[config.wheel].wheel_max_edges;
-    edge_counter--;
+    edge_counter = 0;
+    cycleDuration = micros() - cycleStartTime;
+    cycleStartTime = micros();
   }
   /* The tables are in flash so we need pgm_read_byte() */
 
@@ -301,18 +298,17 @@ void loop()
   }
   else if (config.mode == LINEAR_SWEPT_RPM)
   {
-    //if(millis() > (sweep_time_counter + sweep_interval_ms))
     if(micros() > (sweep_time_counter + config.sweep_interval))
     {
       sweep_time_counter = micros();
       if(sweep_direction == ASCENDING)
       {
-        tmp_rpm = config.rpm + 1;
+        tmp_rpm = currentStatus.rpm + 1;
         if(tmp_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
       }
       else
       {
-        tmp_rpm = config.rpm - 1;
+        tmp_rpm = currentStatus.rpm - 1;
         if(tmp_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
       }
     }
@@ -321,7 +317,55 @@ void loop()
   {
     tmp_rpm = config.fixed_rpm;
   }
-  setRPM(tmp_rpm);
+  currentStatus.base_rpm = tmp_rpm;
+  currentStatus.compressionModifier = calculateCompressionModifier();
+
+  if(currentStatus.compressionModifier >= currentStatus.base_rpm ) { currentStatus.compressionModifier = 0; }
+  setRPM( (currentStatus.base_rpm - currentStatus.compressionModifier) );
+}
+
+uint16_t calculateCompressionModifier()
+{
+  if( (currentStatus.rpm > config.compressionRPM) || (config.useCompression != true) ) { return 0; }
+  //if( currentStatus.base_rpm > 400 ) { return 0;}
+
+  uint16_t crankAngle = calculateCurrentCrankAngle();
+  uint16_t modAngle = crankAngle;
+
+  uint16_t compressionModifier = 0;
+  switch(config.compressionType)
+  {
+    case COMPRESSION_TYPE_2CYL_4STROKE:
+      modAngle = modAngle / 2;
+      compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+    case COMPRESSION_TYPE_4CYL_4STROKE:
+      modAngle = (crankAngle % 180) ;
+      compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+      break;
+    case COMPRESSION_TYPE_6CYL_4STROKE:
+      modAngle = crankAngle % 120;
+      compressionModifier = pgm_read_byte(&sin_100_120[modAngle]);
+      break;
+    case COMPRESSION_TYPE_8CYL_4STROKE:
+      modAngle = crankAngle % 90;
+      compressionModifier = pgm_read_byte(&sin_100_90[modAngle]);
+      break;
+  }
+  
+  return compressionModifier;
+}
+
+uint16_t calculateCurrentCrankAngle()
+{
+  if(cycleDuration == 0) { return 0; }
+
+  uint32_t cycleTime = micros() - cycleStartTime;
+  if( pgm_read_byte(&Wheels[config.wheel].wheel_degrees) == 720 ) { cycleTime = cycleTime / 2; } 
+  
+  uint16_t tmpCrankAngle = ((cycleTime * 360U) / cycleDuration);
+  while(tmpCrankAngle > 360) { tmpCrankAngle -= 360; }
+
+  return tmpCrankAngle;
 }
 
 /*!
@@ -331,8 +375,8 @@ void setRPM(uint16_t newRPM)
 {
   if (newRPM < 10)  { return; }
 
-  if(config.rpm != newRPM) { reset_new_OCR1A(newRPM); }
-  config.rpm = newRPM;
+  if(currentStatus.rpm != newRPM) { reset_new_OCR1A( newRPM ); }
+  currentStatus.rpm = newRPM;
 }
 
 

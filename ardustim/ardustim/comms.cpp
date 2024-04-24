@@ -132,7 +132,7 @@ void commandParser()
       break;
 
     case 'R': //Send the current RPM
-      Serial.println(config.rpm);
+      Serial.println(currentStatus.rpm);
       break;
 
     case 's': //Set the high and low RPM for sweep mode
@@ -199,7 +199,7 @@ void toggle_invert_secondary_cb()
 
 void display_new_wheel()
 {
-  reset_new_OCR1A(config.rpm);
+  reset_new_OCR1A(currentStatus.rpm);
   edge_counter = 0; // Reset to beginning of the wheel pattern */
 }
 
