@@ -12,6 +12,7 @@ void loadConfig()
     //New arduino
     config.wheel = 5; //36-1
     currentStatus.rpm = 3000;
+    currentStatus.base_rpm = 3000;
     config.mode = POT_RPM;
 
     config.fixed_rpm = 3500;
@@ -63,6 +64,7 @@ void loadConfig()
     if(config.wheel >= MAX_WHEELS) { config.wheel = 5; }
     if(config.mode >= MAX_MODES) { config.mode = FIXED_RPM; }
     if(currentStatus.rpm > 15000) { currentStatus.rpm = 4000; }
+    if(currentStatus.base_rpm > 15000) { currentStatus.base_rpm = 4000; }
     if(config.compressionType > COMPRESSION_TYPE_8CYL_4STROKE) { config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE; }
     if(config.compressionRPM > 1000) { config.compressionRPM = 400; }
   }

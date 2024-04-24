@@ -39,7 +39,6 @@ extern volatile uint16_t new_OCR1A;
 
 bool cmdPending;
 byte currentCommand;
-uint16_t numTeeth;
 
 //! Initializes the serial port and sets up the Menu
 /*!
@@ -117,8 +116,6 @@ void commandParser()
       break;
 
     case 'P': //Send the pattern for the current wheel
-      numTeeth = pgm_read_word(Wheels[config.wheel].wheel_max_edges);
-
       for(uint16_t x=0; x<Wheels[config.wheel].wheel_max_edges; x++)
       {
         if(x != 0) { Serial.print(","); }

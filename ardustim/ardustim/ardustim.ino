@@ -281,7 +281,7 @@ ISR(TIMER1_COMPA_vect)
 
 void loop() 
 {
-  uint16_t tmp_rpm = 0;
+  uint16_t tmp_rpm = currentStatus.base_rpm;
   /* Just handle the Serial UI, everything else is in 
    * interrupt handlers or callbacks from SerialUI.
    */
@@ -298,29 +298,32 @@ void loop()
   }
   else if (config.mode == LINEAR_SWEPT_RPM)
   {
+    
     if(micros() > (sweep_time_counter + config.sweep_interval))
     {
       sweep_time_counter = micros();
       if(sweep_direction == ASCENDING)
       {
-        tmp_rpm = currentStatus.rpm + 1;
+        tmp_rpm = currentStatus.base_rpm + 1;
         if(tmp_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
       }
       else
       {
-        tmp_rpm = currentStatus.rpm - 1;
+        tmp_rpm = currentStatus.base_rpm - 1;
         if(tmp_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
       }
     }
+    
   }
   else if (config.mode == FIXED_RPM)
   {
     tmp_rpm = config.fixed_rpm;
   }
   currentStatus.base_rpm = tmp_rpm;
-  currentStatus.compressionModifier = calculateCompressionModifier();
 
+  currentStatus.compressionModifier = calculateCompressionModifier();
   if(currentStatus.compressionModifier >= currentStatus.base_rpm ) { currentStatus.compressionModifier = 0; }
+
   setRPM( (currentStatus.base_rpm - currentStatus.compressionModifier) );
 }
 
@@ -349,6 +352,10 @@ uint16_t calculateCompressionModifier()
     case COMPRESSION_TYPE_8CYL_4STROKE:
       modAngle = crankAngle % 90;
       compressionModifier = pgm_read_byte(&sin_100_90[modAngle]);
+      break;
+    default:
+      modAngle = (crankAngle % 180) ;
+      compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
       break;
   }
   
