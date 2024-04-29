@@ -71,8 +71,13 @@ void commandParser()
       config.fixed_rpm = word(Serial.read(), Serial.read());
       break;
 
-    case 'c': //Save the current config
-      saveConfig();
+    case 'c': //Receive a full config buffer
+      //uint8_t targetBytes = (sizeof(struct configTable)-1); //No byte is sent for the version
+      while(Serial.available() < (sizeof(struct configTable)-1) ) {} //Wait for all bytes
+      for(uint8_t x=1; x<(sizeof(struct configTable)); x++)
+      {
+        *((uint8_t *)pnt_Config + x) = Serial.read(); //Read each byte into the config table
+      }
       break;
 
     case 'C': //Send the current config
@@ -132,7 +137,7 @@ void commandParser()
       Serial.println(currentStatus.rpm);
       break;
 
-    case 's': //Set the high and low RPM for sweep mode
+    case 'r': //Set the high and low RPM for sweep mode
       config.mode = LINEAR_SWEPT_RPM;
       while(Serial.available() < 6) {} //Wait for 4 bytes representing the new low and high RPMs
 
@@ -142,6 +147,10 @@ void commandParser()
 
       //sweep_low_rpm = 100;
       //sweep_high_rpm = 4000;
+      break;
+
+    case 's': //Save the current config
+      saveConfig();
       break;
 
     case 'S': //Set the current wheel

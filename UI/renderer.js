@@ -6,7 +6,7 @@ const ByteLengthParser = require('@serialport/parser-byte-length')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
-var CONFIG_SIZE = 15;
+const CONFIG_SIZE = 17;
 var onConnectIntervalConfig;
 var onConnectIntervalWheels;
 var isConnected=false;
@@ -184,7 +184,7 @@ function uploadFW()
 function saveData(showCheck)
 {
   //Request the arduino save the current config
-  port.write("c"); //Send the command to perform EEPROM burn
+  port.write("s"); //Send the command to perform EEPROM burn
 
   //Check if we redo the checkmark animation
   if(showCheck)
@@ -225,11 +225,35 @@ function receiveConfig(data)
   document.getElementById("compressionEnable").value = data[11];
   document.getElementById("compressionMode").value = data[12];
   document.getElementById("compressionRPM").value = (((data[14] & 0xff) << 8) | (data[13] & 0xff));
+  document.getElementById("compressionOffset").value = (((data[16] & 0xff) << 8) | (data[15] & 0xff));
   
   port.unpipe();
 
   setRPMMode();
   requestPatternList();
+}
+
+function sendConfig()
+{
+  var newRPM = parseInt(document.getElementById('fixedRPM').value);
+  //console.log(`Desired RPM: ${newRPM}`);
+
+  var configBuffer = Buffer.alloc(CONFIG_SIZE); // +1 is for the 'c' command character
+  configBuffer[0] = 0x63; // 'c' character command
+  configBuffer[1] = parseInt(document.getElementById('patternSelect').value);
+  configBuffer[2] = parseInt(document.getElementById('rpmSelect').value);
+  configBuffer.writeInt16LE(parseInt(document.getElementById('fixedRPM').value), 3);
+  configBuffer.writeInt16LE(parseInt(document.getElementById('rpmSweepMin').value), 5);
+  configBuffer.writeInt16LE(parseInt(document.getElementById('rpmSweepMax').value), 7);
+  configBuffer.writeInt16LE(parseInt(document.getElementById('rpmSweepSpeed').value), 9);
+  configBuffer[11] = document.getElementById('compressionEnable').checked;
+  configBuffer[12] = parseInt(document.getElementById('compressionMode').value);
+  configBuffer.writeInt16LE(parseInt(document.getElementById('compressionRPM').value), 13);
+  configBuffer.writeInt16LE(parseInt(document.getElementById('compressionOffset').value), 15);
+
+  console.log("Sending full config: ", configBuffer);
+
+  port.write(configBuffer);
 }
 
 var patternOptionCounter = 0;
@@ -416,9 +440,6 @@ function setRPMMode()
   //If the new mode is fixed RPM or linear sweep, then send the RPM set values for them
   if(newMode == 0)
   {
-    //Sweep RPM mode
-    setSweepRPM();
-
     //Update the text box enablement
     document.getElementById("rpmSweepMin").disabled = false;
     document.getElementById("rpmSweepMax").disabled = false;
@@ -427,9 +448,6 @@ function setRPMMode()
   }
   else if (newMode == 1)
   {
-    //Fixed RPM mode
-    setFixedRPM();
-    
     //Update the text box enablement
     document.getElementById("fixedRPM").disabled = false;
     document.getElementById("rpmSweepMin").disabled = true;
@@ -446,38 +464,9 @@ function setRPMMode()
     document.getElementById("rpmSweepSpeed").disabled = true;
     document.getElementById("fixedRPM").disabled = true;
   }
-    
   
-}
-
-function setFixedRPM()
-{
-  var newRPM = parseInt(document.getElementById('fixedRPM').value);
-  //console.log(`Desired RPM: ${newRPM}`);
-
-  var rpmBuffer = Buffer.alloc(3);
-  rpmBuffer[0] = 0x66; // Ascii 'f'
-  rpmBuffer.writeInt16LE(newRPM, 1);
-  //console.log(rpmBuffer);
-
-  port.write(rpmBuffer);
-}
-
-function setSweepRPM()
-{
-  var newRPM_min = parseInt(document.getElementById('rpmSweepMin').value);
-  var newRPM_max = parseInt(document.getElementById('rpmSweepMax').value);
-  var newRPMSpeed = parseInt(document.getElementById('rpmSweepSpeed').value);
-  console.log(`New sweep speed: ${newRPMSpeed}`);
-
-  var rpmBuffer = Buffer.alloc(7);
-  rpmBuffer[0] = 0x73; // Ascii 's'
-  rpmBuffer.writeUInt16LE(newRPM_min, 1);
-  rpmBuffer.writeUInt16LE(newRPM_max, 3);
-  rpmBuffer.writeUInt16LE(newRPMSpeed, 5);
-  //console.log(rpmBuffer);
-
-  port.write(rpmBuffer);
+  sendConfig();
+  
 }
 
 function redrawGears(pattern, degrees)
@@ -567,6 +556,17 @@ function receiveRPM(data)
   //console.log(`New RPM: ${currentRPM}`);
 }
 
+function toggleCompression()
+{
+  var state = document.getElementById('compressionEnable').checked
+
+  document.getElementById('compressionMode').disabled = !state
+  document.getElementById('compressionRPM').disabled = !state
+  document.getElementById('compressionOffset').disabled = !state
+
+  sendConfig();
+}
+
 function updateRPM()
 {
   console.log("Requesting new RPM");
@@ -625,8 +625,8 @@ window.onload = function ()
 {
     refreshSerialPorts();
     redrawGears(toothPatterns[0]);
-    window.location.hash = '#connect';
-    //window.location.hash = '#live';
+    //window.location.hash = '#connect';
+    window.location.hash = '#live';
     checkForUpdates();
     //animateGauges();
 

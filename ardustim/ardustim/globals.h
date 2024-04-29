@@ -45,11 +45,14 @@ struct configTable
   uint16_t sweep_high_rpm = 4000;
   uint16_t sweep_interval = 1000;
 
+  //11
   bool useCompression = false;
   uint8_t compressionType = 0;
-  uint16_t compressionRPM = 400; 
-};
+  uint16_t compressionRPM = 400;
+  uint16_t compressionOffset = 0;
+} __attribute__ ((packed));
 extern struct configTable config;
+
 
 struct status 
 {
