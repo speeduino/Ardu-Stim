@@ -1,14 +1,14 @@
 {
   "name": "Ardu-Stim",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Ardu-Stim engine simulator - Speeduino Version",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "install": "electron-rebuild -f",
-    "package-mac": "electron-builder --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
-    "package-mac-workflow": "electron-builder --publish never --mac --universal -c.mac.x64ArchFiles='*+(avrdude|libavrdude*.dylib)'",
+    "package-mac": "electron-builder --mac",
+    "package-mac-workflow": "electron-builder --publish never --mac",
     "package-win": "electron-builder --win",
     "package-linux": "electron-builder --linux",
     "package-linux-workflow": "electron-builder --publish never --linux",
