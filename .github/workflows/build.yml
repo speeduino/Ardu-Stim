@@ -77,7 +77,7 @@ jobs:
           node-version: '19.x'
       - name: Install Electron and build
         run: |
-          python3 --break-system-packages -m pip install setuptools
+          python3 -m pip install --break-system-packages setuptools
           npm install electron-rebuild -g
           npm install electron-builder -g
           npm install
