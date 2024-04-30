@@ -23,7 +23,7 @@ jobs:
           packages: libusb-1.0-0 libusb-1.0-0-dev libudev-dev
           version: 1.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '19.x'
       - name: Install Electron and build
@@ -35,19 +35,19 @@ jobs:
       - name: Save .appimage as artefact
         uses: actions/upload-artifact@v4
         with:
-          name: Artefact for linux build
+          name: Ardu-Stim  linux
           path: UI/dist/*.AppImage
 
-  Build-for-mac:
-    name: Run npm on x64 macos
-    runs-on: macos-12
+  Build-for-mac-x86_64:
+    name: Run npm on x86_64 macos
+    runs-on: macos-13 #As of Apr 2024 macos-13 will give an intel host and macos-14 will be aarm64
     defaults:
       run:
         working-directory: 'UI' # Here the path to the folder where package-lock.json is located.
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node, Electron and built
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '19.x'
       - name: Install Electron and build
@@ -60,7 +60,32 @@ jobs:
       - name: Save .dmg as artefact
         uses: actions/upload-artifact@v4
         with:
-          name: Artefact for Mac build
+          name: Ardu-Stim Mac-x86_64
+          path: UI/dist/*.dmg
+
+  Build-for-mac-arm64:
+    name: Run npm on arm64 macos
+    runs-on: macos-14 #As of Apr 2024 macos-13 will give an intel host and macos-14 will be aarm64
+    defaults:
+      run:
+        working-directory: 'UI' # Here the path to the folder where package-lock.json is located.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node, Electron and built
+        uses: actions/setup-node@v4
+        with:
+          node-version: '19.x'
+      - name: Install Electron and build
+        run: |
+          python3 -m pip install setuptools
+          npm install electron-rebuild -g
+          npm install electron-builder -g
+          npm install
+          npm run package-mac-workflow
+      - name: Save .dmg as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ardu-Stim Mac-arm64
           path: UI/dist/*.dmg
 
   Build-for-win:
@@ -72,7 +97,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node, Electron and built
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '19.x'
       - name: Install Electron and build
@@ -84,5 +109,5 @@ jobs:
       - name: Save .exe as artefact
         uses: actions/upload-artifact@v4
         with:
-          name: Artefact for Win build
+          name: Ardu-Stim Win 64
           path: UI/dist/*.exe
