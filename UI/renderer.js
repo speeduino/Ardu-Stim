@@ -242,14 +242,14 @@ function sendConfig()
   configBuffer[0] = 0x63; // 'c' character command
   configBuffer[1] = parseInt(document.getElementById('patternSelect').value);
   configBuffer[2] = parseInt(document.getElementById('rpmSelect').value);
-  configBuffer.writeInt16LE(parseInt(document.getElementById('fixedRPM').value), 3);
-  configBuffer.writeInt16LE(parseInt(document.getElementById('rpmSweepMin').value), 5);
-  configBuffer.writeInt16LE(parseInt(document.getElementById('rpmSweepMax').value), 7);
-  configBuffer.writeInt16LE(parseInt(document.getElementById('rpmSweepSpeed').value), 9);
+  configBuffer.writeUInt16LE(parseInt(document.getElementById('fixedRPM').value), 3);
+  configBuffer.writeUInt16LE(parseInt(document.getElementById('rpmSweepMin').value), 5);
+  configBuffer.writeUInt16LE(parseInt(document.getElementById('rpmSweepMax').value), 7);
+  configBuffer.writeUInt16LE(parseInt(document.getElementById('rpmSweepSpeed').value), 9);
   configBuffer[11] = document.getElementById('compressionEnable').checked;
   configBuffer[12] = parseInt(document.getElementById('compressionMode').value);
-  configBuffer.writeInt16LE(parseInt(document.getElementById('compressionRPM').value), 13);
-  configBuffer.writeInt16LE(parseInt(document.getElementById('compressionOffset').value), 15);
+  configBuffer.writeUInt16LE(parseInt(document.getElementById('compressionRPM').value), 13);
+  configBuffer.writeUInt16LE(parseInt(document.getElementById('compressionOffset').value), 15);
 
   console.log("Sending full config: ", configBuffer);
 
@@ -427,15 +427,8 @@ function setRPMMode()
 {
   //Change between pot, fixed and sweep RPM modes
 
+  
   var newMode = parseInt(document.getElementById('rpmSelect').value);
-
-  const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
-  console.log(`Sending 'M' command to change RPM mode to ${newMode}`);
-
-  var buffer = Buffer.alloc(2);
-  buffer[0] = 0x4D; // Ascii 'M'
-  buffer[1] = newMode;
-  port.write(buffer); //Send the new pattern ID
 
   //If the new mode is fixed RPM or linear sweep, then send the RPM set values for them
   if(newMode == 0)
@@ -625,8 +618,8 @@ window.onload = function ()
 {
     refreshSerialPorts();
     redrawGears(toothPatterns[0]);
-    //window.location.hash = '#connect';
-    window.location.hash = '#live';
+    window.location.hash = '#connect';
+    //window.location.hash = '#live';
     checkForUpdates();
     //animateGauges();
 

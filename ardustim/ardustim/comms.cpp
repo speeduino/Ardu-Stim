@@ -56,19 +56,12 @@ void commandParser()
 {
   char buf[80];
   byte tmp_wheel;
-  byte tmp_mode;
   void* pnt_Config = &config;
   if (cmdPending == false) { currentCommand = Serial.read(); }
 
   switch (currentCommand)
   {
     case 'a':
-      break;
-
-    case 'f': //Set the fixed RPM value
-      config.mode = FIXED_RPM;
-      while(Serial.available() < 2) {} //Wait for the new RPM bytes
-      config.fixed_rpm = word(Serial.read(), Serial.read());
       break;
 
     case 'c': //Receive a full config buffer
@@ -96,15 +89,6 @@ void commandParser()
       {
         strcpy_P(buf,Wheels[x].decoder_name);
         Serial.println(buf);
-      }
-      break;
-
-    case 'M': ///Change the RPM mode
-      while(Serial.available() < 1) {} //Wait for the new mode byte
-      tmp_mode = Serial.read();
-      if(tmp_mode <= POT_RPM)
-      {
-        config.mode = tmp_mode;
       }
       break;
 

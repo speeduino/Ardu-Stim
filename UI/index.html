@@ -89,7 +89,7 @@
 					<div class="row">
 						<div class="col-7">Configuration: </div>
 						<div class="col-2">
-							<select id="compressionMode" onChange="setCompressionMode()" disabled>
+							<select id="compressionMode" onChange="sendConfig()" disabled>
 								<option value="1">2-cyl 4 stroke</option>
 								<option value="3">4-cyl 4 stroke</option>
 								<option value="4">6-cyl 4 stroke</option>
@@ -98,15 +98,15 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-7">Compression RPM: </div>
-						<div class="col-2">
-							<input type="number" id="compressionRPM" min="20" max="1000" step="1" value="400" onChange="setCompressionRPM()" disabled>
+						<div class="col-7">Compression below: </div>
+						<div class="col-4">
+							<input type="number" id="compressionRPM" min="20" max="1000" step="1" value="400" onChange="sendConfig()" disabled> RPM
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-7">Offset (Deg): </div>
 						<div class="col-2">
-							<input type="number" id="compressionOffset" min="0" max="359" step="1" value="0" onChange="setCompressionRPM()" disabled>
+							<input type="number" id="compressionOffset" min="0" max="359" step="1" value="0" onChange="sendConfig()" disabled>
 						</div>
 					</div>
 

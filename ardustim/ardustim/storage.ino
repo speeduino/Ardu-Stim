@@ -58,6 +58,9 @@ void loadConfig()
     highByte = EEPROM.read(EEPROM_COMPRESSION_RPM);
     lowByte = EEPROM.read(EEPROM_COMPRESSION_RPM+1);
     config.compressionRPM = word(highByte, lowByte);
+    highByte = EEPROM.read(EEPROM_COMPRESSION_OFFSET);
+    lowByte = EEPROM.read(EEPROM_COMPRESSION_OFFSET+1);
+    config.compressionOffset = word(highByte, lowByte);
     //config.compressionType = COMPRESSION_TYPE_6CYL_4STROKE;
 
     //Error checking
@@ -67,6 +70,7 @@ void loadConfig()
     if(currentStatus.base_rpm > 15000) { currentStatus.base_rpm = 4000; }
     if(config.compressionType > COMPRESSION_TYPE_8CYL_4STROKE) { config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE; }
     if(config.compressionRPM > 1000) { config.compressionRPM = 400; }
+    if(config.compressionOffset > 359) { config.compressionOffset = 0; }
   }
 }
 
@@ -107,4 +111,8 @@ void saveConfig()
   lowByte = lowByte(config.compressionRPM);
   EEPROM.update(EEPROM_COMPRESSION_RPM, highByte);
   EEPROM.update(EEPROM_COMPRESSION_RPM+1, lowByte);
+  highByte = highByte(config.compressionOffset);
+  lowByte = lowByte(config.compressionOffset);
+  EEPROM.update(EEPROM_COMPRESSION_OFFSET, highByte);
+  EEPROM.update(EEPROM_COMPRESSION_OFFSET+1, lowByte);
 }
