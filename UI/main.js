@@ -11,9 +11,17 @@ var avrdudeIsRunning = false;
 
 function createWindow () {
   // Create the browser window.
+  windowWidth = 1024;
+  windowHeight = 700;
+  if(process.platform == "win32") 
+  {
+    windowWidth = 1037;
+    windowHeight = 725;
+  }
+
   win = new BrowserWindow({
-    width: 1024,
-    height: 700, 
+    width: windowWidth,
+    height: windowHeight, 
     backgroundColor: '#312450', 
     webPreferences: {
       contextIsolation: false,
@@ -172,7 +180,7 @@ ipcMain.on('uploadFW', (e, args) => {
     avrdudeErr = avrdudeErr + data;
 
     //This is a hack to try and detect old nano bootloader vs new. There does not seem to be a 'nice' way to do this that I can find. 
-    if(data.includes("resp=0x00"))
+    if(data.includes("resp=0x00") || data.includes("resp=0x01"))
     {
       avrdudeRetry = true;
       child.kill();
