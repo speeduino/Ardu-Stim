@@ -608,16 +608,16 @@ input, select, textarea {
     overflow-x: hidden;
   }
 
-		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
-			-moz-animation: none !important;
-			-webkit-animation: none !important;
-			-ms-animation: none !important;
-			animation: none !important;
-			-moz-transition: none !important;
-			-webkit-transition: none !important;
-			-ms-transition: none !important;
-			transition: none !important;
-		}
+	body.is-preload *, body.is-preload *:before, body.is-preload *:after {
+		-moz-animation: none !important;
+		-webkit-animation: none !important;
+		-ms-animation: none !important;
+		animation: none !important;
+		-moz-transition: none !important;
+		-webkit-transition: none !important;
+		-ms-transition: none !important;
+		transition: none !important;
+	}
 
 	body, input, textarea, select {
 		font-family: 'Source Sans Pro', sans-serif;
@@ -1262,28 +1262,34 @@ input, select, textarea {
 		transition: min-height 0.5s ease-in-out, max-height 0.5s ease-in-out;
 	}
 
+	#main a {
+		text-decoration: underline;
+		color: #0f57a8;
+		font: inherit;
+	}
+
+	#main > .panel {
+		-moz-transition: opacity 0.25s ease-in-out;
+		-webkit-transition: opacity 0.25s ease-in-out;
+		-ms-transition: opacity 0.25s ease-in-out;
+		transition: opacity 0.25s ease-in-out;
+		margin-bottom: 0;
+		position: relative;
+		padding: 1.0em 1.0em 1.0em 2.0em;
+		width: 100%;
+	}
+
+	#main > .panel.inactive {
+		opacity: 0;
+	}
+
+	@media screen and (max-width: 736px) {
+
 		#main > .panel {
-			-moz-transition: opacity 0.25s ease-in-out;
-			-webkit-transition: opacity 0.25s ease-in-out;
-			-ms-transition: opacity 0.25s ease-in-out;
-			transition: opacity 0.25s ease-in-out;
-			margin-bottom: 0;
-			position: relative;
-			padding: 1.0em 1.0em 1.0em 2.0em;
-			width: 100%;
+			padding: 2em 1.5em 1.5em 1.5em;
 		}
 
-			#main > .panel.inactive {
-				opacity: 0;
-			}
-
-			@media screen and (max-width: 736px) {
-
-				#main > .panel {
-					padding: 2em 1.5em 1.5em 1.5em;
-				}
-
-			}
+	}
 
 			#main > .panel.intro {
 				padding: 0;
