@@ -43,78 +43,78 @@
 						</ul>	
 					</article>
 
-						<!-- Live -->
-							<article id="live" class="panel">
-                <div class="row">
-                  <div class="column40">
-                    <div class="row">
-                      <div class="col-5">RPM Mode: </div>
-                      <div class="col-2">
-                        <select id="rpmSelect" onChange="setRPMMode()">
-                          <option value="2">Use potentiometer</option>
-                          <option value="1">Fixed RPM</option>
-                          <option value="0">Sweep</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-5">Fixed RPM: </div>
-                      <div class="col-1">
-                        <input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500" onChange="sendConfig()" disabled>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-5">RPM Sweep range: </div>
-                      <div class="col-3">
-                        <input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100" onChange="sendConfig()" disabled>
-                      </div>
-                      
-                      <div class="col-2">
-                        <input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="sendConfig()" disabled>
-                      </div>
-                    </div>
-					<div class="row">
-						<div class="col-5">RPM Sweep speed: </div>
-						<div class="col-2">
-							<input type="range" id="rpmSweepSpeed" min="200" max="4000" step="10" value="3000" onChange="sendConfig()" disabled>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-7">Enable compression: </div>
-						<div class="col-2">
-							<input type="checkbox" id="compressionEnable" onChange="toggleCompression()">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-7">Configuration: </div>
-						<div class="col-2">
-							<select id="compressionMode" onChange="sendConfig()" disabled>
-								<option value="1">2-cyl 4 stroke</option>
-								<option value="3">4-cyl 4 stroke</option>
-								<option value="4">6-cyl 4 stroke</option>
-								<option value="5">8-cyl 4 stroke</option>
-							  </select>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-7">Compression below: </div>
-						<div class="col-4">
-							<input type="number" id="compressionRPM" min="20" max="1000" step="1" value="400" onChange="sendConfig()" disabled> RPM
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-7">Offset (Deg): </div>
-						<div class="col-2">
-							<input type="number" id="compressionOffset" min="0" max="359" step="1" value="0" onChange="sendConfig()" disabled>
-						</div>
-					</div>
+				<!-- Live -->
+					<article id="live" class="panel">
+						<div class="row">
+							<div class="column40">
+								<div class="row">
+									<div class="col-5">RPM Mode: </div>
+									<div class="col-2">
+										<select id="rpmSelect" onChange="setRPMMode()">
+										<option value="2">Use potentiometer</option>
+										<option value="1">Fixed RPM</option>
+										<option value="0">Sweep</option>
+										</select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-5">Fixed RPM: </div>
+									<div class="col-1">
+										<input type="number" id="fixedRPM" min="0" max="10000" step="1" value="2500" onChange="sendConfig()" disabled>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-5">RPM Sweep range: </div>
+									<div class="col-3">
+										<input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100" onChange="sendConfig()" disabled>
+									</div>
+								
+									<div class="col-2">
+										<input type="number" id="rpmSweepMax" min="0" max="10000" step="1" value="6000" onChange="sendConfig()" disabled>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-5">RPM Sweep speed: </div>
+									<div class="col-2">
+										<input type="range" id="rpmSweepSpeed" min="200" max="4000" step="10" value="3000" onChange="sendConfig()" disabled>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-7"><span class="tooltip">Enable compression: <span class="tooltiptext">When Enabled, this simulates RPM 'waves' that are common during cranking as each cylinder compresses. The effect will only be active below a set RPM value</span></span></div>
+									<div class="col-2">
+										<input type="checkbox" id="compressionEnable" onChange="toggleCompression()">
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-7">Configuration: </div>
+									<div class="col-2">
+										<select id="compressionMode" onChange="sendConfig()" disabled>
+											<option value="1">2-cyl 4 stroke</option>
+											<option value="3">4-cyl 4 stroke</option>
+											<option value="4">6-cyl 4 stroke</option>
+											<option value="5">8-cyl 4 stroke</option>
+										</select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-7"><span class="tooltip">Compression below: <span class="tooltiptext">If Compression is enabled, it will function when the RPM (Regardless of Mode) is below this value</span></span></div>
+									<div class="col-4">
+										<input type="number" id="compressionRPM" min="20" max="1000" step="1" value="400" onChange="sendConfig()" disabled> RPM
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-7"><span class="tooltip">Offset (Deg): <span class="tooltiptext">Moves where the compression waves occur within a 0-359 degree range</span></span></div>
+									<div class="col-2">
+										<input type="number" id="compressionOffset" min="0" max="359" step="1" value="0" onChange="sendConfig()" disabled>
+									</div>
+								</div>
 
-                    <div>
-                      <br />
-                      <center><input type='button' value="Save Config" id="btnSave" onclick="saveData(true);" /><div id="saveCheck" class="icon fa-check fadeOut" style="visibility:hidden; display:inline-block;margin-left: 0.75em;"></div></center>
-                    </div>
-                  </div>
-                  
+								<div>
+									<br />
+									<center><input type='button' value="Save Config" id="btnSave" onclick="saveData(true);" /><div id="saveCheck" class="icon fa-check fadeOut" style="visibility:hidden; display:inline-block;margin-left: 0.75em;"></div></center>
+								</div>
+							</div>
+					
 							<div class="column60" style="text-align: center;">
 								<canvas data-type="radial-gauge"
 										data-units="RPM"

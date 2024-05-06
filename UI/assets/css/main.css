@@ -1462,23 +1462,23 @@ input, select, textarea {
 		font-size: 0.75em;
 	}
 
-		#footer a {
-			color: #ddd;
-			color: rgba(255, 255, 255, 0.65);
-			-moz-transition: color .25s ease-in-out;
-			-webkit-transition: color .25s ease-in-out;
-			-ms-transition: color .25s ease-in-out;
-			transition: color .25s ease-in-out;
-		}
+	#footer a {
+		color: #ddd;
+		color: rgba(255, 255, 255, 0.65);
+		-moz-transition: color .25s ease-in-out;
+		-webkit-transition: color .25s ease-in-out;
+		-ms-transition: color .25s ease-in-out;
+		transition: color .25s ease-in-out;
+	}
 
-			#footer a:hover {
-				color: white;
-			}
+	#footer a:hover {
+		color: white;
+	}
 
-		#footer .copyright {
-			list-style: none;
-			padding-left: 0;
-		}
+	#footer .copyright {
+		list-style: none;
+		padding-left: 0;
+	}
 
 			#footer .copyright li {
 				display: inline-block;
