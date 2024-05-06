@@ -38,12 +38,11 @@ function refreshSerialPorts()
             newOption.innerHTML = ports[i].path;
             if(ports[i].vendorId == "2341")
             {
-              //Arduino device
+              //Arduino Mega device
               if(ports[i].productId == "0010" || ports[i].productId == "0042") 
               { 
                 //Mega2560
                 newOption.innerHTML = newOption.innerHTML + " (Arduino Mega)"; 
-                isMega = true;
               }
             }
             else if(ports[i].vendorId == "16c0")
@@ -57,6 +56,15 @@ function refreshSerialPorts()
             }
             else if(ports[i].vendorId == "16c0")
             {
+            }
+            else if(ports[i].vendorId == "1a86")
+            {
+              //Arduino Nano device
+              if(ports[i].productId == "7523") 
+              { 
+                //Nano
+                newOption.innerHTML = newOption.innerHTML + " (Arduino Nano)"; 
+              }
             }
             
             select.add(newOption);
