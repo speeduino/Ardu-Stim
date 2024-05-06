@@ -1,6 +1,6 @@
 {
   "name": "Ardu-Stim",
-  "version": "0.9.1",
+  "version": "1.0.0",
   "description": "Ardu-Stim engine simulator - Speeduino Version",
   "main": "main.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "email": "sales@speeduino.com",
     "url": "https://speeduino.com"
   },
-  "license": "ISC",
+  "license": "GPL v3",
   "bugs": {
     "url": "https://github.com/speeduino/Ardu-Stim/Issues"
   },
