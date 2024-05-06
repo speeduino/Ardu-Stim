@@ -17,7 +17,7 @@ Ardustim is an engine simulator built on the Arduino platform. It produces simul
 
 This version is a fork of the original by David Andruczyk [https://gitlab.com/libreems-suite/ardu-stim](https://gitlab.com/libreems-suite/ardu-stim) and is intended to provide a more modern, cross platform GUI as well as continued expansion of the trigger pattern library. It was primarily developed for use by the Speeduino community, but can be utilised for testing virtually any aftermarket ECU system
 
-It is designed to run on an Arduino Nano, but will also work with Arduino Uno boards. 
+It is designed to run on an Arduino Nano, but will also work with Arduino Uno and Mega boards. 
 
 ## Wiring
 
@@ -30,7 +30,7 @@ It is designed to run on an Arduino Nano, but will also work with Arduino Uno bo
   - pin `52` will provide the `cam` or secondary wheel signal
   - Pin `51` will provide a `2nd cam` or tertiary wheel signal. This is for simulating some dual cam patterns
 
-Example for `Arduino Nano` connected to `Speeduino v0.4 Series` board:
+Example for `Arduino Nano` connected to `Speeduino v0.4` ECU:
 
 <div align="center"><img src="https://github.com/speeduino/Ardu-Stim/raw/master/docs/nano-v0.4-wiring.png" alt="Ardu-Stim Wiring" width="80%" /></div>
 
@@ -47,13 +47,13 @@ The first time you connect Ardu-Stim to an Arduino Nano board, you need to uploa
 
 <div align="center"><img src="https://github.com/speeduino/Ardu-Stim/raw/master/docs/upload-firmware.png" alt="Ardu-Stim Wiring" width="80%" /></div>
 
-**Note:** This only needs to be performed with a new Arduino Nano or if upgrading from an earlier version.
+**Note:** This only needs to be performed with a new Arduino Nano or if upgrading from an earlier version. The automated uploading of firmware is ONLY available for Arduino Nano boards. If using another board you will need to manually compile and upload the firmware (Not the GUI)
 
 ## Firmware Build
 
-The firmwaresource code can be built in either PlatformIO or the Arduino IDE and does not have any dependencies on 3rd party libraries that were used in the original version of Ardustim (Eg SerialUI)
+Optionally, the firmware source code can be built in either PlatformIO or the Arduino IDE and does not have any dependencies on 3rd party libraries that were used in the original version of Ardustim (Eg SerialUI)
 
-Simply open the `ardustim` sub-folder in PlatformIO or the Arduino IDE and it should compile up.
+Simply open the `ardustim` sub-folder in PlatformIO or the Arduino IDE and it should compile without issue.
 
 Intended hardware platform is the Arduino Nano or Uno.
 
