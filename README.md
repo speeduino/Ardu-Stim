@@ -11,7 +11,9 @@
 
 ## Ardustim
 
-Ardustim is an engine simulator built on the Arduino platform. It produces simulated crank and cam signals that can be used for testing aftermarket ECUs as well as being a useful tool for the development of firmware for these
+Ardustim is an engine simulator built on the Arduino platform. It produces simulated crank and cam signals that can be used for testing aftermarket ECUs as well as being a useful tool for the development of firmware for these. It supports a large number of simulated rtigger patterns as well as multiple options for output speed (Eg Using an external pot, a fixed value or a sweep range)
+
+<div align="center"><img src="https://github.com/speeduino/Ardu-Stim/raw/master/docs/demo.gif" alt="Ardu-Stim Demo" width="400" /></div>
 
 This version is a fork of the original by David Andruczyk [https://gitlab.com/libreems-suite/ardu-stim](https://gitlab.com/libreems-suite/ardu-stim) and is intended to provide a more modern, cross platform GUI as well as continued expansion of the trigger pattern library. It was primarily developed for use by the Speeduino community, but can be utilised for testing virtually any aftermarket ECU system
 
@@ -22,17 +24,34 @@ It is designed to run on an Arduino Nano, but will also work with Arduino Uno bo
 - **Arduino Nano or Uno**
   - pin `8` will provide the `crank` or primary wheel signal
   - pin `9` will provide the `cam` or secondary wheel signal
+  - Pin `10` will provide a `2nd cam` or tertiary wheel signal. This is for simulating some dual cam patterns
 - **Arduino Mega**
   - pin `53` will provide the `crank` or primary wheel signal
   - pin `52` will provide the `cam` or secondary wheel signal
+  - Pin `51` will provide a `2nd cam` or tertiary wheel signal. This is for simulating some dual cam patterns
 
-Example for `Arduino Uno` connected to `Speeduino v0.4 Series` board with `Arduino Mega`:
+Example for `Arduino Nano` connected to `Speeduino v0.4 Series` board:
 
-![ArduStim wiring](docs/uno-v04-wiring.png)
+![ArduStim wiring](docs/nano-v04-wiring.png)
 
-## Build
+### RPM Potentiometer
 
-The source code can be built in either PlatformIO or the Arduino IDE and does not have any dependencies on 3rd party libraries that were used in the original version of Ardustim (Eg SerialUI)
+An optional potentiometer can be added to control the RPM value (With the relevant RPM mode selected). This should be connect to pin A0 if in use. 
+
+## Installing and Using
+
+Ardu-Stim is distributed as a ready-to-run binary for Windows, Mac (Intel and Arm) and linux (AppImage) so no installation is required. Simply down the latest release (https://github.com/speeduino/Ardu-Stim/releases/latest) and 
+
+### First time Connection
+The first time you connect Ardu-Stim to an Arduino Nano board, you need to upload the included firmware to it. Plug the Nano into your PC and then select the port from the list. Press the upload firmware button and wait for this to complete
+
+![Upload Firmware](docs/upload-firmware.png)
+
+**Note:** This only needs to be performed with a new Arduino Nano or if upgrading from an earlier version
+
+## Firmware Build
+
+The firmwaresource code can be built in either PlatformIO or the Arduino IDE and does not have any dependencies on 3rd party libraries that were used in the original version of Ardustim (Eg SerialUI)
 
 Simply open the `ardustim` sub-folder in PlatformIO or the Arduino IDE and it should compile up.
 
