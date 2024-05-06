@@ -32,7 +32,7 @@ It is designed to run on an Arduino Nano, but will also work with Arduino Uno bo
 
 Example for `Arduino Nano` connected to `Speeduino v0.4 Series` board:
 
-![ArduStim wiring](docs/nano-v0.4-wiring.png)
+<div align="center"><img src="https://github.com/speeduino/Ardu-Stim/raw/master/docs/nano-v0.4-wiring.png" alt="Ardu-Stim Wiring" width="80%" /></div>
 
 ### RPM Potentiometer
 
@@ -45,7 +45,7 @@ Ardu-Stim is distributed as a ready-to-run binary for Windows, Mac (Intel and Ar
 ### First time Connection
 The first time you connect Ardu-Stim to an Arduino Nano board, you need to upload the included firmware to it. Plug the Nano into your PC and then select the port from the list. Press the upload firmware button and wait for this to complete
 
-![Upload Firmware](docs/upload-firmware.png)
+<div align="center"><img src="https://github.com/speeduino/Ardu-Stim/raw/master/docs/upload-firmware.png" alt="Ardu-Stim Wiring" width="80%" /></div>
 
 **Note:** This only needs to be performed with a new Arduino Nano or if upgrading from an earlier version.
 
