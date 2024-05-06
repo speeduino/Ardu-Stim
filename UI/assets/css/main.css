@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");
-@import url("font-awesome.min.css");
-@import url("all.min.css");
+@import url("../fontawesome/css/all.min.css");
 
 /*
 	Astral by HTML5 UP
@@ -1080,101 +1079,104 @@ input, select, textarea {
 		cursor: default;
 	}
 
-		#nav a {
-			position: relative;
-			display: inline-block;
-			color: #ffffff;
-			width: 1em;
-			height: 1em;
-			line-height: 0.9em;
-			font-size: 2.5em;
-			margin: 0 0.25em 0 0.25em;
-			opacity: 0.35;
-			outline: 0;
-			-moz-transition: opacity .25s ease-in-out;
-			-webkit-transition: opacity .25s ease-in-out;
-			-ms-transition: opacity .25s ease-in-out;
-			transition: opacity .25s ease-in-out;
+	#nav a {
+		position: relative;
+		display: inline-block;
+		color: #ffffff;
+		width: 1em;
+		height: 1em;
+		line-height: 0.9em;
+		font-size: 2.5em;
+		margin: 0 0.25em 0 0.25em;
+		opacity: 0.35;
+		outline: 0;
+		-moz-transition: opacity .25s ease-in-out;
+		-webkit-transition: opacity .25s ease-in-out;
+		-ms-transition: opacity .25s ease-in-out;
+		transition: opacity .25s ease-in-out;
+	}
+
+	#nav a.icon:before {
+		padding-right: 0;
+	}
+
+	#nav a:before {
+		font-size: 0.8em;
+	}
+
+	#nav a:after {
+		content: '';
+		display: block;
+		position: absolute;
+		left: 50%;
+		bottom: -0.75em;
+		margin-left: -0.5em;
+		border-bottom: solid 0em #ffffff;
+		border-left: solid 0.5em transparent;
+		border-right: solid 0.5em transparent;
+		-moz-transition: border-bottom-width .25s ease-in-out;
+		-webkit-transition: border-bottom-width .25s ease-in-out;
+		-ms-transition: border-bottom-width .25s ease-in-out;
+		transition: border-bottom-width .25s ease-in-out;
+	}
+
+	#nav a span {
+		display: block;
+		position: absolute;
+		background: #222222;
+		color: #ffffff;
+		top: -2.75em;
+		top: 3.15em;
+		font-size: 0.3em;
+		height: 2.05em;
+		line-height: 2.05em;
+		left: 50%;
+		opacity: 0;
+		-moz-transition: opacity .25s ease-in-out;
+		-webkit-transition: opacity .25s ease-in-out;
+		-ms-transition: opacity .25s ease-in-out;
+		transition: opacity .25s ease-in-out;
+		width: 5.5em;
+		margin-left: -2.75em;
+	}
+
+	#nav a span:after {
+		content: ' ';
+		display: block;
+		position: absolute;
+		bottom: -0.4em;
+		left: 50%;
+		margin-left: -0.6em;
+		border-top: solid 0.6em #222222;
+	}
+
+	#nav a:hover {
+		opacity: 1.0;
+	}
+
+	#nav a:hover span {
+		opacity: 1.0;
+	}
+
+	#nav a.active {
+		opacity: 1.0;
+	}
+
+	#nav a.active:after {
+		border-bottom-width: 0.5em;
+	}
+
+	#nav a.active span {
+		opacity: 0.0;
+	}
+
+	@media screen and (max-width: 980px) {
+
+		#nav a span {
+			display: none;
 		}
 
-			#nav a.icon:before {
-				padding-right: 0;
-			}
-
-			#nav a:before {
-				font-size: 0.8em;
-			}
-
-			#nav a:after {
-				content: '';
-				display: block;
-				position: absolute;
-				left: 50%;
-				bottom: -0.75em;
-				margin-left: -0.5em;
-				border-bottom: solid 0em #ffffff;
-				border-left: solid 0.5em transparent;
-				border-right: solid 0.5em transparent;
-				-moz-transition: border-bottom-width .25s ease-in-out;
-				-webkit-transition: border-bottom-width .25s ease-in-out;
-				-ms-transition: border-bottom-width .25s ease-in-out;
-				transition: border-bottom-width .25s ease-in-out;
-			}
-
-			#nav a span {
-				display: block;
-				position: absolute;
-				background: #222222;
-				color: #ffffff;
-				top: -2.75em;
-				font-size: 0.3em;
-				height: 2.25em;
-				line-height: 2.25em;
-				left: 50%;
-				opacity: 0;
-				-moz-transition: opacity .25s ease-in-out;
-				-webkit-transition: opacity .25s ease-in-out;
-				-ms-transition: opacity .25s ease-in-out;
-				transition: opacity .25s ease-in-out;
-				width: 5.5em;
-				margin-left: -2.75em;
-			}
-
-				#nav a span:after {
-					content: '';
-					display: block;
-					position: absolute;
-					bottom: -0.4em;
-					left: 50%;
-					margin-left: -0.6em;
-					border-top: solid 0.6em #222222;
-					border-left: solid 0.6em transparent;
-					border-right: solid 0.6em transparent;
-				}
-
-			#nav a:hover {
-				opacity: 1.0;
-			}
-
-				#nav a:hover span {
-					opacity: 1.0;
-				}
-
-			#nav a.active {
-				opacity: 1.0;
-			}
-
-				#nav a.active:after {
-					border-bottom-width: 0.5em;
-				}
-
-		@media screen and (max-width: 980px) {
-
-			#nav a span {
-				display: none;
-			}
-
-		}
+	}
 
 /* Wrapper */
 
