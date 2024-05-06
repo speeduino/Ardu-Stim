@@ -51,6 +51,14 @@ function createWindow () {
     // when you should delete the corresponding element.
     win = null
   })
+
+  // Open links in external browser
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:')) {
+      require('electron').shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
 }
 
 app.allowRendererProcessReuse = false;
