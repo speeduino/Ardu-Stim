@@ -1,12 +1,9 @@
 <div align="center">
 
-<img src="https://github.com/speeduino/wiki.js/raw/master/img/Speeduino%20logo_med.png" alt="Speeduino" width="600" />
+![Twisted-Builds-Logo-Color-Transparent](https://github.com/twisted-builds-llc/Ardu-Stim/assets/58715445/edc9c506-2bd1-47ee-b60c-be68f2eae811)
 
-[![Release](https://img.shields.io/github/release/speeduino/Ardu-Stim.svg)](https://github.com/speeduino/Ardu-Stim/releases/latest)
-[![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/speeduino/Ardu-Stim/blob/master/LICENSE)
-[![https://img.shields.io/discord/879495735912071269 ](https://img.shields.io/discord/879495735912071269?label=Discord&logo=Discord)](https://discord.gg/YWCEexaNDe)
 
-##### This is the Speeduino fork of the ardustim engine simulator.
+##### This is the Twisted Builds LLC fork of the Speeduino fork of the ardustim engine simulator.
 </div>
 
 ## Ardu-Stim
