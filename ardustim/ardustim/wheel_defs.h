@@ -134,6 +134,7 @@
    JEEP2000,  /* Jeep 4.0 6cyl aka jeep2000 */
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
+   THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    MAX_WHEELS,
  }WheelType;
 
@@ -199,6 +200,7 @@
  const char Jeep_2000_friendly_name[] PROGMEM = "Jeep 2000";
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
+ const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1463,5 +1465,25 @@
       0,0,0,0,0,0,0,0,0,0, //56-60
    };
 
+ /* 36-2 with second trigger pulse across teeth 33-34 on first rotation */
+ const unsigned char thirty_six_minus_two_with_second_trigger[] PROGMEM =
+   { /* 36-2 + single tooth cam */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 1-5 */
+     1,0,1,0,3,2,3,2,1,0, /* Teeth 6-10, cam in here somewhere - length/position not accurate to actual engine*/
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-34, 35th tooth missing */
+     0,0,                 /* 36th tooth MISSING */
+     1,0,1,0,1,0,1,0,1,0, /* Revolution 2  Teeth 1-5 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-34, 35th tooth missing  */
+     0,0                  /* 36th MISSING tooth */
+   };
 
   #endif
