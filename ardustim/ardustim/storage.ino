@@ -20,6 +20,11 @@ void loadConfig()
     config.sweep_low_rpm = 1000;
     config.sweep_interval = 1000;
 
+    config.useCompression = false;
+    config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE;
+    config.compressionRPM = 400;
+    config.compressionOffset = 0;
+
     saveConfig();
   }
   else
