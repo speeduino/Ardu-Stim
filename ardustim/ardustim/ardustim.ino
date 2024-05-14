@@ -368,7 +368,7 @@ uint16_t calculateCurrentCrankAngle()
   if(cycleDuration == 0) { return 0; }
 
   uint32_t cycleTime = micros() - cycleStartTime;
-  if( pgm_read_byte(&Wheels[config.wheel].wheel_degrees) == 720 ) { cycleTime = cycleTime / 2; } 
+  if( Wheels[config.wheel].wheel_degrees == 720 ) { cycleTime = cycleTime * 2; } 
   
   uint16_t tmpCrankAngle = ((cycleTime * 360U) / cycleDuration);
   tmpCrankAngle += config.compressionOffset;
