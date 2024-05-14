@@ -119,6 +119,7 @@ wheels Wheels[MAX_WHEELS] = {
   { Jeep_2000_friendly_name, jeep_2000, 1.5, 360, 720},
   { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
+  { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 1.0, 144, 720 },
 };
 
 /* Initialization */
