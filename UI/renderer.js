@@ -193,6 +193,7 @@ function saveData(showCheck)
 {
   //Request the arduino save the current config
   port.write("s"); //Send the command to perform EEPROM burn
+  console.log("Sending 's' command to save config ")
 
   //Check if we redo the checkmark animation
   if(showCheck)
@@ -225,6 +226,7 @@ function receiveConfig(data)
   console.log("Received config: " + data);
   console.log("Mode: " + data[2]);
 
+  document.getElementById("patternSelect").value = data[1];
   document.getElementById("rpmSelect").value = data[2];
   document.getElementById("fixedRPM").value = (((data[4] & 0xff) << 8) | (data[3] & 0xff));
   document.getElementById("rpmSweepMin").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
@@ -323,7 +325,7 @@ function refreshPatternList(data)
   { 
     port.unpipe(); 
 
-    //Request the currently selected patter
+    //Request the currently selected pattern
     port.write("N"); //Send the command to issue the current pattern number
     const parser = port.pipe(new Readline({ delimiter: '\r\n' })); //Attach the readline parser
     parser.on('data', refreshPatternNumber);
@@ -336,7 +338,12 @@ function refreshPatternNumber(data)
   var select = document.getElementById('patternSelect')
   var patternID = parseInt(data);
   port.unpipe();
+
+  //Temporarily disable the onchange event while we set the initial value
+  var changeFunction = select.onchange;
   select.value = patternID;
+  select.onchange = changeFunction;
+
   console.log("Currently selected Pattern: " + patternID);
   updatePatternQueue();
 }
@@ -466,7 +473,7 @@ function setRPMMode()
     document.getElementById("fixedRPM").disabled = true;
   }
   
-  sendConfig();
+  if(initComplete) { sendConfig(); }
   
 }
 
