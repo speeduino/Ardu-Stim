@@ -330,7 +330,7 @@ void loop()
 
 uint16_t calculateCompressionModifier()
 {
-  if( (currentStatus.rpm > config.compressionRPM) || (config.useCompression != true) ) { return 0; }
+  if( (currentStatus.base_rpm > config.compressionRPM) || (config.useCompression != true) ) { return 0; }
   //if( currentStatus.base_rpm > 400 ) { return 0;}
 
   uint16_t crankAngle = calculateCurrentCrankAngle();
@@ -359,6 +359,14 @@ uint16_t calculateCompressionModifier()
       compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
       break;
   }
+
+  //RPM scaler - Varies the amplitude of the compression modifier based on how far below the compression RPM point we are. Eg:
+  //If the compression RPM value is 400
+  //At 300rpm the amplitude will be 75%
+  //At 200rpm the amplitude will be 50%
+  //At 100rpm the amplitude will be 25% etc
+  //Base RPM must be below 650 to prevent overflow
+  if(config.compressionDynamic && (currentStatus.base_rpm < 655U) ) { compressionModifier = (compressionModifier * currentStatus.base_rpm) / config.compressionRPM; }
   
   return compressionModifier;
 }

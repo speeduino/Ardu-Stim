@@ -50,6 +50,7 @@ struct configTable
   uint8_t compressionType = 0;
   uint16_t compressionRPM = 400;
   uint16_t compressionOffset = 0;
+  bool compressionDynamic = false;
 } __attribute__ ((packed));
 extern struct configTable config;
 

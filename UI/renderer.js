@@ -6,7 +6,7 @@ const ByteLengthParser = require('@serialport/parser-byte-length')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
-const CONFIG_SIZE = 17;
+const CONFIG_SIZE = 18;
 var onConnectIntervalConfig;
 var onConnectIntervalWheels;
 var isConnected=false;
@@ -236,6 +236,7 @@ function receiveConfig(data)
   document.getElementById("compressionMode").value = data[12];
   document.getElementById("compressionRPM").value = (((data[14] & 0xff) << 8) | (data[13] & 0xff));
   document.getElementById("compressionOffset").value = (((data[16] & 0xff) << 8) | (data[15] & 0xff));
+  document.getElementById("compressionDynamic").value = data[17];
   
   port.unpipe();
 
@@ -260,6 +261,7 @@ function sendConfig()
   configBuffer[12] = parseInt(document.getElementById('compressionMode').value);
   configBuffer.writeUInt16LE(parseInt(document.getElementById('compressionRPM').value), 13);
   configBuffer.writeUInt16LE(parseInt(document.getElementById('compressionOffset').value), 15);
+  configBuffer[16] = document.getElementById('compressionDynamic').checked;
 
   console.log("Sending full config: ", configBuffer);
 
@@ -568,6 +570,7 @@ function toggleCompression()
 {
   var state = document.getElementById('compressionEnable').checked
 
+  document.getElementById('compressionDynamic').disabled = !state
   document.getElementById('compressionMode').disabled = !state
   document.getElementById('compressionRPM').disabled = !state
   document.getElementById('compressionOffset').disabled = !state

@@ -64,7 +64,7 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-5">RPM Sweep range: </div>
+									<div class="col-5">Sweep range: </div>
 									<div class="col-3">
 										<input type="number" id="rpmSweepMin" min="0" max="10000" step="1" value="100" onChange="sendConfig()" disabled>
 									</div>
@@ -74,15 +74,22 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-5">RPM Sweep speed: </div>
+									<div class="col-5">Sweep speed: </div>
 									<div class="col-2">
 										<input type="range" id="rpmSweepSpeed" min="200" max="4000" step="10" value="3000" onChange="sendConfig()" disabled>
 									</div>
 								</div>
+								<hr />
 								<div class="row">
 									<div class="col-7"><span class="tooltip">Enable compression: <span class="tooltiptext">When Enabled, this simulates RPM 'waves' that are common during cranking as each cylinder compresses. The effect will only be active below a set RPM value</span></span></div>
 									<div class="col-2">
 										<input type="checkbox" id="compressionEnable" onChange="toggleCompression()">
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-7"><span class="tooltip">Dynamic amplitude: <span class="tooltiptext">When Enabled, the amplitude of the waves will change based on how far the RPM is below the compression RPM setting. If disabled, the wave amplitude will always be 100rpm</span></span></div>
+									<div class="col-2">
+										<input type="checkbox" id="compressionDynamic" onChange="sendConfig()" disabled>
 									</div>
 								</div>
 								<div class="row">
