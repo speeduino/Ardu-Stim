@@ -23,6 +23,8 @@
 
 #include "Arduino.h"
 #include "wheel_defs.h"
+
+#define VERSION 2
  
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
 #define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */

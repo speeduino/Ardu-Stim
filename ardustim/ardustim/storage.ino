@@ -7,6 +7,7 @@
 
 void loadConfig()
 {
+  config.version = VERSION;
   if(EEPROM.read(EEPROM_VERSION) == 255)
   {
     //New arduino
@@ -83,7 +84,7 @@ void saveConfig()
 {
   EEPROM.update(EEPROM_WHEEL, config.wheel);
   EEPROM.update(EEPROM_RPM_MODE, config.mode);
-  EEPROM.update(EEPROM_VERSION, EEPROM_CURRENT_VERSION);
+  EEPROM.update(EEPROM_VERSION, VERSION);
 
   byte highByte = highByte(currentStatus.rpm);
   byte lowByte = lowByte(currentStatus.rpm);

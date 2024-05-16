@@ -1,6 +1,3 @@
-
-#define EEPROM_CURRENT_VERSION  1
-
 #define EEPROM_VERSION          1
 #define EEPROM_WHEEL            2
 #define EEPROM_RPM_MODE         3

@@ -1,12 +1,13 @@
 const serialport = require('serialport')
 const usb = require('usb').usb;
 const Readline = require('@serialport/parser-readline')
-//const ByteLength = require('@serialport/parser-byte-length')
 const ByteLengthParser = require('@serialport/parser-byte-length')
+const InterByteTimeoutParser = require('@serialport/parser-inter-byte-timeout')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
 const CONFIG_SIZE = 18;
+const FW_VERSION = 2;
 var onConnectIntervalConfig;
 var onConnectIntervalWheels;
 var isConnected=false;
@@ -213,8 +214,11 @@ function requestConfig()
   clearInterval(onConnectIntervalConfig);
 
   //Attach the readline parser
-  const parser = port.pipe(new ByteLengthParser({ length: CONFIG_SIZE }));
+
+  //Attach the version check parser
+  parser = port.pipe(new InterByteTimeoutParser({ maxBufferSize: CONFIG_SIZE, interval: 1500 }));
   parser.on('data', receiveConfig);
+
 
   //Request the config from the arduino
   port.write("C");
@@ -225,6 +229,14 @@ function receiveConfig(data)
 {
   console.log("Received config: " + data);
   console.log("Mode: " + data[2]);
+
+  if(data.length == 0) 
+  { 
+    console.log("TIMEOUT: No config data received");
+    alert("Timeout connecting to arduino. Try uploading firmware again.");
+    modalLoading.remove();
+  }
+  if(data.length != CONFIG_SIZE) { console.log("Incorrect amount of config data received"); }
 
   document.getElementById("patternSelect").value = data[1];
   document.getElementById("rpmSelect").value = data[2];
@@ -240,8 +252,20 @@ function receiveConfig(data)
   
   port.unpipe();
 
-  setRPMMode();
-  requestPatternList();
+  if(data[0] == FW_VERSION)
+  {
+    setRPMMode();
+    requestPatternList();
+  }
+  else
+  {
+    console.log("Firmware version mismatch. Expected: ", FW_VERSION, " Received: ", data[0]);
+    alert("Firmware version mismatch. Please press the 'Upload Firmware' button to update the firmware.");
+    //Drop the modal loading window
+    modalLoading.remove();
+    window.location.hash = '#connect';
+    initComplete = false;
+  }
 }
 
 function sendConfig()
