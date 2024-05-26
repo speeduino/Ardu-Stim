@@ -19,9 +19,8 @@ function refreshSerialPorts()
     serialport.list().then((ports) => {
         console.log('Serial ports found: ', ports);
       
-        if (ports.length === 0) {
-          document.getElementById('serialDetectError').textContent = 'No ports discovered'
-        }
+        if (ports.length === 0) { document.getElementById('serialDetectError').textContent = 'No ports discovered'; }
+        else { document.getElementById('serialDetectError').textContent = ''; }
       
         select = document.getElementById('portsSelect');
 
