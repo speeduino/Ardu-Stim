@@ -340,8 +340,9 @@ uint16_t calculateCompressionModifier()
   switch(config.compressionType)
   {
     case COMPRESSION_TYPE_2CYL_4STROKE:
-      modAngle = modAngle / 2;
+      modAngle = crankAngle / 2;
       compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+      break;
     case COMPRESSION_TYPE_4CYL_4STROKE:
       modAngle = (crankAngle % 180) ;
       compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
