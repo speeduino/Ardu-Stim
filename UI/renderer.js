@@ -243,11 +243,11 @@ function receiveConfig(data)
   document.getElementById("rpmSweepMin").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
   document.getElementById("rpmSweepMax").value = (((data[8] & 0xff) << 8) | (data[7] & 0xff));
   document.getElementById("rpmSweepSpeed").value = (((data[10] & 0xff) << 8) | (data[9] & 0xff));
-  document.getElementById("compressionEnable").value = data[11];
+  document.getElementById("compressionEnable").checked = data[11];
   document.getElementById("compressionMode").value = data[12];
   document.getElementById("compressionRPM").value = (((data[14] & 0xff) << 8) | (data[13] & 0xff));
   document.getElementById("compressionOffset").value = (((data[16] & 0xff) << 8) | (data[15] & 0xff));
-  document.getElementById("compressionDynamic").value = data[17];
+  document.getElementById("compressionDynamic").checked = data[17];
   
   port.unpipe();
 
@@ -255,6 +255,13 @@ function receiveConfig(data)
   {
     setRPMMode();
     requestPatternList();
+
+    //Enable or disabled the compression settings
+    var compressionState = document.getElementById('compressionEnable').checked
+    document.getElementById('compressionDynamic').disabled = !compressionState
+    document.getElementById('compressionMode').disabled = !compressionState
+    document.getElementById('compressionRPM').disabled = !compressionState
+    document.getElementById('compressionOffset').disabled = !compressionState
   }
   else
   {
