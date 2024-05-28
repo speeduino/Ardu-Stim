@@ -12,6 +12,7 @@ var onConnectIntervalConfig;
 var onConnectIntervalWheels;
 var isConnected=false;
 var currentRPM = 0;
+var rpmRequestPending = false;
 var initComplete = false;
 
 function refreshSerialPorts()
@@ -575,7 +576,8 @@ function enableRPM()
   {
     RPMInterval = setInterval(updateRPM, 100);
     const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
-    parser.on('data', receiveRPM);  
+    parser.on('data', receiveRPM);
+    rpmRequestPending = false;
   }
   
 }
@@ -593,6 +595,7 @@ function receiveRPM(data)
 {
   console.log(`Received RPM: ${data}`);
   currentRPM = parseInt(data);
+  rpmRequestPending = false;
   //console.log(`New RPM: ${currentRPM}`);
 }
 
@@ -610,10 +613,14 @@ function toggleCompression()
 
 function updateRPM()
 {
-  console.log("Requesting new RPM");
-  port.write("R"); //Request next RPM read
-  document.gauges[0].value = currentRPM;
-  //console.log(`New gauge RPM: ${document.gauges[0].value}`);
+  if(rpmRequestPending == false)
+  {
+    console.log("Requesting new RPM");
+    port.write("R"); //Request next RPM read
+    document.gauges[0].value = currentRPM;
+    rpmRequestPending = true;
+    //console.log(`New gauge RPM: ${document.gauges[0].value}`);
+  }
 }
 
 async function checkForUpdates()
