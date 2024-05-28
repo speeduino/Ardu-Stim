@@ -661,17 +661,17 @@
     };
   
  /* Lotus 36-1-1-1-1 wheel, missing teeth at
-  * 36,32,17 and 14
+  * 14, 17, 32 and 36
   */
  const unsigned char lotus_thirty_six_minus_one_one_one_one[] PROGMEM = 
-   { /* 36-1 */
+   { /* 36-1-1-1-1 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 1-5 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 6-10 */
-     1,0,1,0,1,0,0,0,1,0, /* teeth 11-15 */
-     1,0,0,0,1,0,1,0,1,0, /* teeth 16-20 */
+     1,0,1,0,1,0,0,0,1,0, /* teeth 11-13, MISSING 14, 15 */
+     1,0,0,0,1,0,1,0,1,0, /* teeth 16, MISSING 17, 18-20 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 21-25 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 26-30 */
-     1,0,0,0,1,0,1,0,1,0, /* teeth 31-35 */
+     1,0,0,0,1,0,1,0,1,0, /* teeth 31, MISSING 32, 33-35 */
      0,0                  /* MISSING 36th tooth */
    }; 
  const unsigned char honda_rc51_with_cam[] PROGMEM = 
