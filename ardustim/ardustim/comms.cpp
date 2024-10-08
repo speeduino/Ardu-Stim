@@ -31,12 +31,12 @@
 
 /* External Globla Variables */
 extern wheels Wheels[];
+extern bool analog_map_mode;
 
 /* Volatile variables (USED in ISR's) */
 extern volatile bool normal;
 extern volatile uint16_t edge_counter;
 extern volatile uint16_t new_OCR1A;
-
 bool cmdPending;
 byte currentCommand;
 
@@ -190,6 +190,16 @@ void toggle_invert_secondary_cb()
 void display_new_wheel()
 {
   reset_new_OCR1A(currentStatus.rpm);
+  edge_counter = 0; // Reset to beginning of the wheel pattern */
+  analog_map_mode = false;  //default to standard mode */
+  while (edge_counter < Wheels[config.wheel].wheel_max_edges)
+  {
+    if (pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]) >= 10)   /* lets see if any values of this wheel are 10 or more */
+    {
+      analog_map_mode = true;  /* we are in analog mode*/    
+    }
+    edge_counter++;
+  } 
   edge_counter = 0; // Reset to beginning of the wheel pattern */
 }
 

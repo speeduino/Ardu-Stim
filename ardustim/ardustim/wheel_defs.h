@@ -62,6 +62,10 @@
    * combinations of numbers mean all of the related teeth are present, 
    * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
    */
+  /*  for analog output to simulate a MAP sensor being used as a CAM sensor.
+      0X is no crank signal 1X is crank signal, X is a value of 1 thru 10 
+      for the scaled output of the DAC
+  */
 
   
   /* Wheel types we know about...
@@ -72,6 +76,7 @@
    * RPM scaling factor (num_edges/120 for crank wheels)
    * Number of edges in the edge array above, needed by the ISR 
    */
+
  typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
@@ -135,6 +140,7 @@
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
+   THIRTY_SIX_MINUS_ONE_MAP_AS_CAM, // 23-1 but with map sensor used as cam signal
    MAX_WHEELS,
  }WheelType;
 
@@ -201,7 +207,10 @@
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
+ const char thirty_six_minus_one_MAP_as_CAM_friendly_name[] PROGMEM = "36-1 with MAP as cam";
 
+ 
+ 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
@@ -1485,5 +1494,26 @@
      1,0,1,0,1,0,1,0,0,0, /* Teeth 31-34, 35th tooth missing  */
      0,0                  /* 36th MISSING tooth */
    };
+
+
+
+  /* V-twin using map sensor as cam signal */
+ const unsigned char thirty_six_minus_one_MAP_as_CAM[] PROGMEM =
+   { /* 36-1 + MAP as cam */
+     19, 9, 17, 6, 14, 3, 2, 3, 16, 7, 19, 9,  /*12*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*24*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*36*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*48*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*60*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*72*/
+     19, 9, 19, 9, 9, 9, 19, 9, 19, 9, 19, 9, /*84*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*96*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*108*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*120*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*132*/
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9  /*144*/
+
+   };
+
 
   #endif

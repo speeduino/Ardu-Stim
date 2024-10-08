@@ -57,6 +57,13 @@ Simply open the `ardustim` sub-folder in PlatformIO or the Arduino IDE and it sh
 
 Intended hardware platform is the Arduino Nano or Uno.
 
+## Map sensor Configuration
+The wheel defination is diffrent in the a 10 or over is a tooth on the flywheel.  1x = a tooth
+The right hand digit specifies the vaccum signal to output for a MAP sensor input.  0-9 for the output amount.
+Since the Uno doesn't have a real DAC onboard it uses a simple R-2R network and can be made from a about 20 1K resistors on pins 2-7.
+Is only a 6 bit DAC as the lower 2 pins of portd are used for the serial communications, plus you only have 10 settings of 0-9.
+
+
 ## Installing GUI from Source
 
 ### Pre-Requisites
