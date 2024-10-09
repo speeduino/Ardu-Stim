@@ -212,11 +212,11 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
       end = newEnd - diff;
       var dataNow = toothPattern[i];
       if (dataNow >= 10) {dataNow = dataNow - 10;}
-      dataNow = dataNow*.2*depth;
+      dataNow = (1-dataNow*.1)*depth*3;
       /*
       * values of 10 and over have 10 subtracted, this just leaves the 0-9 of the MAP pressure
       */
-      c.arc(x, y, (radius + dataNow), start, end, false);
+      c.arc(x, y, (radius - dataNow), start, end, false);
       lastEnd = newEnd;
     }
   }
