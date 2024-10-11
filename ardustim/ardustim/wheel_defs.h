@@ -140,7 +140,7 @@
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
-   THIRTY_SIX_MINUS_ONE_MAP_AS_CAM, // 23-1 but with map sensor used as cam signal
+   THIRTY_SIX_MINUS_TWO_MAP_AS_CAM, // 36-2 but with map sensor used as cam signal
    MAX_WHEELS,
  }WheelType;
 
@@ -207,7 +207,7 @@
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
- const char thirty_six_minus_one_MAP_as_CAM_friendly_name[] PROGMEM = "36-1 with MAP as cam";
+ const char thirty_six_minus_two_MAP_as_CAM_friendly_name[] PROGMEM = "36-2 with MAP as cam";
 
  
  
@@ -1498,20 +1498,24 @@
 
 
   /* V-twin using map sensor as cam signal */
- const unsigned char thirty_six_minus_one_MAP_as_CAM[] PROGMEM =
-   { /* 36-1 + MAP as cam */
-     19, 9, 17, 6, 14, 3, 2, 3, 16, 7, 19, 9,  /*12*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*24*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*36*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*48*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*60*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*72*/
-     19, 9, 19, 9, 9, 9, 19, 9, 19, 9, 19, 9, /*84*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*96*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*108*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*120*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9, /*132*/
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 9, 19, 9  /*144*/
+ const unsigned char thirty_six_minus_two_MAP_as_CAM[] PROGMEM =
+   { /* 36-2 + MAP as cam */
+     9, 8, 8, 18, 7, 17, 7, 16, 6, 
+     15, 5, 14, 4, 14, 3, 14, 4, 14, 
+     4, 14, 4, 14, 5, 15, 5, 16, 6, 
+     16, 6, 17, 7, 17, 8, 18, 8, 19, 
+     9, 19, 9, 19, 9, 19, 9, 19, 9, 
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 
+     9, 19, 9, 19, 9, 19, 9, 19, 9, 
+     19, 9, 19, 9, 19, 9, 19, 9, 9, 
+     9, 9, 9, 19, 9, 19, 9, 19, 9, 
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 
+     9, 19, 9, 19, 9, 19, 9, 19, 9, 
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 
+     9, 19, 9, 19, 9, 19, 9, 19, 9, 
+     19, 9, 19, 9, 19, 9, 19, 9, 19, 
+     9, 19, 9, 19, 9, 19, 9, 19, 9, 
+     19, 9, 19, 9, 19, 9, 19, 9, 9
 
    };
 
