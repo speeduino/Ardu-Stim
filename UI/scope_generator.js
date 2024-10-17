@@ -128,8 +128,11 @@ function draw_cam_scope(toothPattern, depth, radius, width, line) {
   {
     for (var i = 0; i <= (teeth * 2)-1; i++) {
       var newEnd;
-      var dataNow = toothPattern[i];
-      if (dataNow >= 10) {dataNow = dataNow - 10;}
+      dataNow = toothPattern[i];
+      while (dataNow >= 10)
+      {
+        dataNow -= 10;
+      }
       dataNow = depth - dataNow*.1*depth;
       newEnd = lastEnd + toothWidth;
       c.lineTo(newEnd, dataNow);

@@ -6,7 +6,7 @@ const InterByteTimeoutParser = require('@serialport/parser-inter-byte-timeout')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
-const CONFIG_SIZE = 18;
+const CONFIG_SIZE = 20;
 const FW_VERSION = 2;
 var onConnectIntervalConfig;
 var onConnectIntervalWheels;

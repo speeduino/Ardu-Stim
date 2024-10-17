@@ -128,8 +128,25 @@ function draw_crank_gear(toothPattern, depth, radius, width, line, halfspeed) {
 
       start = lastEnd + diff;
       end = newEnd - diff;
-      /* any value of 10 and over means a crank tooth*/
-      if (toothPattern[i] >= 10)
+
+      /*
+      * Values to use within a wheel definition.
+      * 0 means no tooth on any wheel definition
+      * 1 means crank tooth
+      * 2 means cam1 tooth
+      * 4 means cam2 tooth
+      *
+      * combinations of numbers mean all of the related teeth are present,
+      * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2
+      */
+      dataNow = (toothPattern[i]);
+      remainder = 0;
+      while (dataNow >= 10)
+      {
+        dataNow -= 10;
+        remainder ++;
+      }
+      if (remainder == 1 || remainder == 3 || remainder == 5 || remainder == 7 )
       {
         c.arc(x, y, radius, start, end, false);
       } else
@@ -158,6 +175,7 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
   var x = canvas.width / 2;
   var y = canvas.height / 2
   var lastEnd = 0;
+  if(analogMapMode) { teeth = teeth / 2; }
   var teeth = toothPattern.length / 2;
   var analogMapMode = 0;
   depth = (radius / 100) * depth;
@@ -166,6 +184,7 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
   {
     if (toothPattern[i] >= 10) {analogMapMode = 1;}
   }
+  if(analogMapMode) { teeth = teeth / 2; }
   c.beginPath();
   //Draw an inner ring
   c.arc(x, y, radius/5, 0, 2 * Math.PI);
@@ -191,6 +210,7 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
       * combinations of numbers mean all of the related teeth are present,
       * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2
       */
+
       if (toothPattern[i] == 2 || toothPattern[i] == 3 || toothPattern[i] == 6 || toothPattern[i] == 7)
       {
         c.arc(x, y, radius, start, end, false);
@@ -200,23 +220,40 @@ function draw_cam_gear(toothPattern, depth, radius, width, line) {
       }
       lastEnd = newEnd;
     }
-  } else /* MAP simulation mode */
+  } else /* CAM GEAR for MAP simulation mode */
   {
     for (var i = 0; i <= (teeth * 2)-1; i++)
-    {
+  {
 
       var start, end, newEnd, diff;
       diff = ((((100 - width) / 100) / 2) * arcToRad(teeth));
       newEnd = lastEnd + arcToRad(teeth);
       start = lastEnd + diff;
       end = newEnd - diff;
-      var dataNow = toothPattern[i];
-      if (dataNow >= 10) {dataNow = dataNow - 10;}
-      dataNow = (1-dataNow*.1)*depth*3;
       /*
-      * values of 10 and over have 10 subtracted, this just leaves the 0-9 of the MAP pressure
+      * Values to use within a wheel definition.
+      * 0 means no tooth on any wheel definition
+      * 1 means crank tooth
+      * 2 means cam1 tooth
+      * 4 means cam2 tooth
+      *
+      * combinations of numbers mean all of the related teeth are present,
+      * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2
       */
-      c.arc(x, y, (radius - dataNow), start, end, false);
+      dataNow = (toothPattern[i]);
+      remainder = 0;
+      while (dataNow >= 10)
+      {
+        dataNow -= 10;
+        remainder ++;
+      }
+      if (remainder == 2 || remainder == 3 || remainder == 6 || remainder == 7)
+      {
+        c.arc(x, y, radius, start, end, false);
+      } else
+      {
+        c.arc(x, y, (radius - depth), start, end, false);
+      }
       lastEnd = newEnd;
     }
   }
