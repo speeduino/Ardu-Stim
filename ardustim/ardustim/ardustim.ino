@@ -122,7 +122,7 @@ wheels Wheels[MAX_WHEELS] = {
   { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
   { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 0.6, 144, 720 },
-  { thirty_six_minus_two_MAP_as_CAM_friendly_name, thirty_six_minus_two_MAP_as_CAM, 0.6, 144, 720 },
+  { eighteen_minus_one_ABmode_MAP_as_CAM_friendly_name, eighteen_minus_one_ABmode_MAP_as_CAM, 0.6, 144, 720 },
 };
 
 /* Initialization */
@@ -270,7 +270,7 @@ ISR(TIMER1_COMPA_vect)
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
   /* OR output the crank signal and then output the MAP value*/
 
-  if (analog_map_mode == false)  //normal mode
+  if (config.analogMode == false)  //normal mode
   {
     PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
   }
@@ -279,14 +279,22 @@ ISR(TIMER1_COMPA_vect)
     int x = pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);
     if (x >= 10)
     {
-      digitalWrite(8, HIGH);
-      x=x-10;
+      int y = (x / 10U) % 10;
+      PORTB = output_invert_mask ^ y ;   /* Write it to the port */;
+      int z = x;
+      while (z>10)
+      {
+        z = z-10;
+      }
+      PORTD = portD_1_mask & z *28; /*mask out the serial port pins, and write the data to the port */
+      
     }
     else
     {
-      digitalWrite(8, LOW);
+      PORTD = portD_1_mask & (x*28); /*mask out the serial port pins, and write the data to the port */
+      PORTB = output_invert_mask ^ 0;   /* Write it to the port */;
     }
-    PORTD = portD_1_mask & (x*28); /*mask out the serial port pins, and write the data to the port */
+    
   }
 
   edge_counter++;
@@ -355,6 +363,7 @@ void loop()
   if(currentStatus.compressionModifier >= currentStatus.base_rpm ) { currentStatus.compressionModifier = 0; }
 
   setRPM( (currentStatus.base_rpm - currentStatus.compressionModifier) );
+  
 }
 
 uint16_t calculateCompressionModifier()

@@ -46,6 +46,7 @@ struct configTable
   uint16_t sweep_low_rpm = 250;
   uint16_t sweep_high_rpm = 4000;
   uint16_t sweep_interval = 1000;
+  bool analogMode = false;
 
   //11
   bool useCompression = false;

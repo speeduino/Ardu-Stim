@@ -191,12 +191,12 @@ void display_new_wheel()
 {
   reset_new_OCR1A(currentStatus.rpm);
   edge_counter = 0; // Reset to beginning of the wheel pattern */
-  analog_map_mode = false;  //default to standard mode */
+  config.analogMode = false;  //default to standard mode */
   while (edge_counter < Wheels[config.wheel].wheel_max_edges)
   {
     if (pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]) >= 10)   /* lets see if any values of this wheel are 10 or more */
     {
-      analog_map_mode = true;  /* we are in analog mode*/    
+      config.analogMode = true;  /* we are in analog mode*/    
     }
     edge_counter++;
   } 

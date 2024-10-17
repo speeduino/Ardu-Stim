@@ -62,9 +62,13 @@
    * combinations of numbers mean all of the related teeth are present, 
    * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
    */
+
   /*  for analog output to simulate a MAP sensor being used as a CAM sensor.
-      0X is no crank signal 1X is crank signal, X is a value of 1 thru 10 
-      for the scaled output of the DAC
+      right hand digit is map pressure, left digit works like other modes:
+      0 means no tooth
+      1 means crank1 tooth
+      2 means crank 2 tooth
+      3 means both crank 1 and 2
   */
 
   
@@ -140,7 +144,7 @@
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
-   THIRTY_SIX_MINUS_TWO_MAP_AS_CAM, // 36-2 but with map sensor used as cam signal
+   EIGHTEEN_MINUS_ONE_ABMODE_MAP_AS_CAM, // 18-1 using AB signals for crank and with map sensor used as cam signal
    MAX_WHEELS,
  }WheelType;
 
@@ -207,7 +211,7 @@
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
- const char thirty_six_minus_two_MAP_as_CAM_friendly_name[] PROGMEM = "36-2 with MAP as cam";
+ const char eighteen_minus_one_ABmode_MAP_as_CAM_friendly_name[] PROGMEM = "18-1 ABmode MAP asCAM";
 
  
  
@@ -1497,26 +1501,18 @@
 
 
 
-  /* V-twin using map sensor as cam signal */
- const unsigned char thirty_six_minus_two_MAP_as_CAM[] PROGMEM =
-   { /* 36-2 + MAP as cam */
-     9, 8, 8, 18, 7, 17, 7, 16, 6, 
-     15, 5, 14, 4, 14, 3, 14, 4, 14, 
-     4, 14, 4, 14, 5, 15, 5, 16, 6, 
-     16, 6, 17, 7, 17, 8, 18, 8, 19, 
-     9, 19, 9, 19, 9, 19, 9, 19, 9, 
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 
-     9, 19, 9, 19, 9, 19, 9, 19, 9, 
-     19, 9, 19, 9, 19, 9, 19, 9, 9, 
-     9, 9, 9, 19, 9, 19, 9, 19, 9, 
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 
-     9, 19, 9, 19, 9, 19, 9, 19, 9, 
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 
-     9, 19, 9, 19, 9, 19, 9, 19, 9, 
-     19, 9, 19, 9, 19, 9, 19, 9, 19, 
-     9, 19, 9, 19, 9, 19, 9, 19, 9, 
-     19, 9, 19, 9, 19, 9, 19, 9, 9
-
+  /* V-twin using AB mode with 2 crank sensors and map sensor as cam signal */
+ const unsigned char eighteen_minus_one_ABmode_MAP_as_CAM[] PROGMEM =
+   { /* 18-1 AB mode + MAP as cam */
+    29, 8, 8, 8, 7, 7, 17, 36, 26, 5, 15, 34, 24, 4, 13, 34, 24, 4, 
+    14, 34, 24, 4, 15, 35, 25, 6, 16, 36, 26, 7, 17, 37, 28, 8, 18, 
+    39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 
+    29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 
+    9, 19, 39, 29, 9, 9, 9, 9, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 
+    39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 
+    29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 
+    9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 
+    19, 39, 29, 9, 19, 39
    };
 
 
