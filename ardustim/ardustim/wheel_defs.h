@@ -136,6 +136,8 @@
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
+   GM_40_OSS, // GM 40 tooth wheel no skips for transmission OSS simulation
+
    MAX_WHEELS,
  }WheelType;
 
@@ -199,10 +201,11 @@
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
  const char Jeep_2000_4cyl_friendly_name[] PROGMEM = "Jeep 2000 4cyl";
- const char Jeep_2000_6Cyl_friendly_name[] PROGMEM = "Jeep 2000 6 cyl";
+ const char Jeep_2000_6cyl_friendly_name[] PROGMEM = "Jeep 2000 6 cyl";
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
+ const char GM_40_Tooth_Trans_OSS_friendly_name[] PROGMEM = "GM 40 tooth OSS wheel for Transmissions";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1528,4 +1531,18 @@
      0,0                  /* 36th MISSING tooth */
    };
 
-  #endif
+   // GM 40 tooth OSS wheel for transmission simulation. Simple on/off 40 teeth for 360* of rotation with no missing teeth.
+   //Added by Dale Follett of Twisted Builds LLC 02-23-2025 for transmission controller simulation.
+  const unsigned char GM40toothOSS[] PROGMEM = 
+   {
+      1,0,1,0,1,0,1,0,1,0, // Teeth 0-5
+      1,0,1,0,1,0,1,0,1,0, // Teeth 6-10
+      1,0,1,0,1,0,1,0,1,0, // Teeth 11-15
+      1,0,1,0,1,0,1,0,1,0, // Teeth 16-20
+      1,0,1,0,1,0,1,0,1,0, // Teeth 21-25
+      1,0,1,0,1,0,1,0,1,0, // Teeth 26-30
+      1,0,1,0,1,0,1,0,1,0, // Teeth 31-35
+      1,0,1,0,1,0,1,0,1,0, // Teeth 36-40
+   };
+
+#endif

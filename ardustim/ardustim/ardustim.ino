@@ -117,10 +117,11 @@ wheels Wheels[MAX_WHEELS] = {
   { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.333, 144, 720 },
   { Suzuki_DRZ400_friendly_name, suzuki_DRZ400,0.6, 72, 360},
   { Jeep_2000_4cyl_friendly_name, jeep_2000_4cyl, 1.5, 360, 720},
-  { Jeep_2000_6cyl_friendly_name, jeep_2000_6cyl, 1.5, 360, 720},
+  { Jeep_2000_6cyl_friendly_name, jeep_2000_6cyl, 1.5, 360, 720 },
   { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
   { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 0.6, 144, 720 },
+  { GM_40_Tooth_Trans_OSS_friendly_name, GM40toothOSS, 1.0, 80, 360 },
 };
 
 /* Initialization */
