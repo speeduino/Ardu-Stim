@@ -23,6 +23,8 @@
 
 #include "Arduino.h"
 #include "wheel_defs.h"
+
+#define VERSION 2
  
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
 #define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */
@@ -50,6 +52,7 @@ struct configTable
   uint8_t compressionType = 0;
   uint16_t compressionRPM = 400;
   uint16_t compressionOffset = 0;
+  bool compressionDynamic = false;
 } __attribute__ ((packed));
 extern struct configTable config;
 

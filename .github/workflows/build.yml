@@ -28,7 +28,7 @@ jobs:
           node-version: '19.x'
       - name: Install Electron and build
         run: |
-          npm install electron-rebuild -g
+          npm install @electron/rebuild -g
           npm install electron-builder -g
           npm install
           npm run package-linux-workflow
@@ -53,7 +53,7 @@ jobs:
       - name: Install Electron and build
         run: |
           python3 -m pip install setuptools
-          npm install electron-rebuild -g
+          npm install @electron/rebuild -g
           npm install electron-builder -g
           npm install
           npm run package-mac-workflow
@@ -63,7 +63,9 @@ jobs:
           name: Ardu-Stim Mac-x86_64
           path: UI/dist/*.dmg
 
+  # This build does NOT work. macos-14 arm64 makes code signing mandatory and applications built on it without signing will report as 'damaged'. See: https://github.com/electron-userland/electron-builder/issues/7602
   Build-for-mac-arm64:
+    if: false #Disables this job. See note above. 
     name: Run npm on arm64 macos
     runs-on: macos-14 #As of Apr 2024 macos-13 will give an intel host and macos-14 will be aarm64
     defaults:
@@ -78,7 +80,7 @@ jobs:
       - name: Install Electron and build
         run: |
           brew install python-setuptools 
-          npm install electron-rebuild -g
+          npm install @electron/rebuild -g
           npm install electron-builder -g
           npm install
           npm run package-mac-workflow
@@ -102,7 +104,7 @@ jobs:
           node-version: '19.x'
       - name: Install Electron and build
         run: |
-          npm install electron-rebuild -g
+          npm install @electron/rebuild -g
           npm install electron-builder -g
           npm install
           npm run package-win

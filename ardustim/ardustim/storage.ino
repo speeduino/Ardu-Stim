@@ -7,6 +7,7 @@
 
 void loadConfig()
 {
+  config.version = VERSION;
   if(EEPROM.read(EEPROM_VERSION) == 255)
   {
     //New arduino
@@ -19,6 +20,11 @@ void loadConfig()
     config.sweep_high_rpm = 6000;
     config.sweep_low_rpm = 1000;
     config.sweep_interval = 1000;
+
+    config.useCompression = false;
+    config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE;
+    config.compressionRPM = 400;
+    config.compressionOffset = 0;
 
     saveConfig();
   }
@@ -78,7 +84,7 @@ void saveConfig()
 {
   EEPROM.update(EEPROM_WHEEL, config.wheel);
   EEPROM.update(EEPROM_RPM_MODE, config.mode);
-  EEPROM.update(EEPROM_VERSION, EEPROM_CURRENT_VERSION);
+  EEPROM.update(EEPROM_VERSION, VERSION);
 
   byte highByte = highByte(currentStatus.rpm);
   byte lowByte = lowByte(currentStatus.rpm);

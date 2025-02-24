@@ -1,16 +1,18 @@
 const serialport = require('serialport')
 const usb = require('usb').usb;
 const Readline = require('@serialport/parser-readline')
-//const ByteLength = require('@serialport/parser-byte-length')
 const ByteLengthParser = require('@serialport/parser-byte-length')
+const InterByteTimeoutParser = require('@serialport/parser-inter-byte-timeout')
 const {ipcRenderer} = require("electron")
 var port = new serialport('/dev/tty-usbserial1', { autoOpen: false })
 
-const CONFIG_SIZE = 17;
+const CONFIG_SIZE = 18;
+const FW_VERSION = 2;
 var onConnectIntervalConfig;
 var onConnectIntervalWheels;
 var isConnected=false;
 var currentRPM = 0;
+var rpmRequestPending = false;
 var initComplete = false;
 
 function refreshSerialPorts()
@@ -18,9 +20,8 @@ function refreshSerialPorts()
     serialport.list().then((ports) => {
         console.log('Serial ports found: ', ports);
       
-        if (ports.length === 0) {
-          document.getElementById('serialDetectError').textContent = 'No ports discovered'
-        }
+        if (ports.length === 0) { document.getElementById('serialDetectError').textContent = 'No ports discovered'; }
+        else { document.getElementById('serialDetectError').textContent = ''; }
       
         select = document.getElementById('portsSelect');
 
@@ -193,6 +194,7 @@ function saveData(showCheck)
 {
   //Request the arduino save the current config
   port.write("s"); //Send the command to perform EEPROM burn
+  console.log("Sending 's' command to save config ")
 
   //Check if we redo the checkmark animation
   if(showCheck)
@@ -212,8 +214,11 @@ function requestConfig()
   clearInterval(onConnectIntervalConfig);
 
   //Attach the readline parser
-  const parser = port.pipe(new ByteLengthParser({ length: CONFIG_SIZE }));
+
+  //Attach the version check parser
+  parser = port.pipe(new InterByteTimeoutParser({ maxBufferSize: CONFIG_SIZE, interval: 1500 }));
   parser.on('data', receiveConfig);
+
 
   //Request the config from the arduino
   port.write("C");
@@ -225,20 +230,49 @@ function receiveConfig(data)
   console.log("Received config: " + data);
   console.log("Mode: " + data[2]);
 
+  if(data.length == 0) 
+  { 
+    console.log("TIMEOUT: No config data received");
+    alert("Timeout connecting to arduino. Try uploading firmware again.");
+    modalLoading.remove();
+  }
+  if(data.length != CONFIG_SIZE) { console.log("Incorrect amount of config data received"); }
+
+  document.getElementById("patternSelect").value = data[1];
   document.getElementById("rpmSelect").value = data[2];
   document.getElementById("fixedRPM").value = (((data[4] & 0xff) << 8) | (data[3] & 0xff));
   document.getElementById("rpmSweepMin").value = (((data[6] & 0xff) << 8) | (data[5] & 0xff));
   document.getElementById("rpmSweepMax").value = (((data[8] & 0xff) << 8) | (data[7] & 0xff));
   document.getElementById("rpmSweepSpeed").value = (((data[10] & 0xff) << 8) | (data[9] & 0xff));
-  document.getElementById("compressionEnable").value = data[11];
+  document.getElementById("compressionEnable").checked = data[11];
   document.getElementById("compressionMode").value = data[12];
   document.getElementById("compressionRPM").value = (((data[14] & 0xff) << 8) | (data[13] & 0xff));
   document.getElementById("compressionOffset").value = (((data[16] & 0xff) << 8) | (data[15] & 0xff));
+  document.getElementById("compressionDynamic").checked = data[17];
   
   port.unpipe();
 
-  setRPMMode();
-  requestPatternList();
+  if(data[0] == FW_VERSION)
+  {
+    setRPMMode();
+    requestPatternList();
+
+    //Enable or disabled the compression settings
+    var compressionState = document.getElementById('compressionEnable').checked
+    document.getElementById('compressionDynamic').disabled = !compressionState
+    document.getElementById('compressionMode').disabled = !compressionState
+    document.getElementById('compressionRPM').disabled = !compressionState
+    document.getElementById('compressionOffset').disabled = !compressionState
+  }
+  else
+  {
+    console.log("Firmware version mismatch. Expected: ", FW_VERSION, " Received: ", data[0]);
+    alert("Firmware version mismatch. Please press the 'Upload Firmware' button to update the firmware.");
+    //Drop the modal loading window
+    modalLoading.remove();
+    window.location.hash = '#connect';
+    initComplete = false;
+  }
 }
 
 function sendConfig()
@@ -258,6 +292,7 @@ function sendConfig()
   configBuffer[12] = parseInt(document.getElementById('compressionMode').value);
   configBuffer.writeUInt16LE(parseInt(document.getElementById('compressionRPM').value), 13);
   configBuffer.writeUInt16LE(parseInt(document.getElementById('compressionOffset').value), 15);
+  configBuffer[16] = document.getElementById('compressionDynamic').checked;
 
   console.log("Sending full config: ", configBuffer);
 
@@ -323,7 +358,7 @@ function refreshPatternList(data)
   { 
     port.unpipe(); 
 
-    //Request the currently selected patter
+    //Request the currently selected pattern
     port.write("N"); //Send the command to issue the current pattern number
     const parser = port.pipe(new Readline({ delimiter: '\r\n' })); //Attach the readline parser
     parser.on('data', refreshPatternNumber);
@@ -336,7 +371,12 @@ function refreshPatternNumber(data)
   var select = document.getElementById('patternSelect')
   var patternID = parseInt(data);
   port.unpipe();
+
+  //Temporarily disable the onchange event while we set the initial value
+  var changeFunction = select.onchange;
   select.value = patternID;
+  select.onchange = changeFunction;
+
   console.log("Currently selected Pattern: " + patternID);
   updatePatternQueue();
 }
@@ -466,7 +506,7 @@ function setRPMMode()
     document.getElementById("fixedRPM").disabled = true;
   }
   
-  sendConfig();
+  if(initComplete) { sendConfig(); }
   
 }
 
@@ -536,7 +576,8 @@ function enableRPM()
   {
     RPMInterval = setInterval(updateRPM, 100);
     const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
-    parser.on('data', receiveRPM);  
+    parser.on('data', receiveRPM);
+    rpmRequestPending = false;
   }
   
 }
@@ -554,6 +595,7 @@ function receiveRPM(data)
 {
   console.log(`Received RPM: ${data}`);
   currentRPM = parseInt(data);
+  rpmRequestPending = false;
   //console.log(`New RPM: ${currentRPM}`);
 }
 
@@ -561,6 +603,7 @@ function toggleCompression()
 {
   var state = document.getElementById('compressionEnable').checked
 
+  document.getElementById('compressionDynamic').disabled = !state
   document.getElementById('compressionMode').disabled = !state
   document.getElementById('compressionRPM').disabled = !state
   document.getElementById('compressionOffset').disabled = !state
@@ -570,10 +613,14 @@ function toggleCompression()
 
 function updateRPM()
 {
-  console.log("Requesting new RPM");
-  port.write("R"); //Request next RPM read
-  document.gauges[0].value = currentRPM;
-  //console.log(`New gauge RPM: ${document.gauges[0].value}`);
+  if(rpmRequestPending == false)
+  {
+    console.log("Requesting new RPM");
+    port.write("R"); //Request next RPM read
+    document.gauges[0].value = currentRPM;
+    rpmRequestPending = true;
+    //console.log(`New gauge RPM: ${document.gauges[0].value}`);
+  }
 }
 
 async function checkForUpdates()

@@ -26,6 +26,7 @@ function createWindow () {
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
+      backgroundThrottling: false,
     },
   });
 

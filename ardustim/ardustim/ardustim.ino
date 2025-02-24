@@ -116,9 +116,11 @@ wheels Wheels[MAX_WHEELS] = {
   { Toyota_4AGE_CAS_friendly_name, toyota_4AGE_CAS, 0.333, 144, 720 },
   { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.333, 144, 720 },
   { Suzuki_DRZ400_friendly_name, suzuki_DRZ400,0.6, 72, 360},
-  { Jeep_2000_friendly_name, jeep_2000, 1.5, 360, 720},
+  { Jeep_2000_4cyl_friendly_name, jeep_2000_4cyl, 1.5, 360, 720},
+  { Jeep_2000_6cyl_friendly_name, jeep_2000_6cyl, 1.5, 360, 720},
   { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
+  { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 0.6, 144, 720 },
 };
 
 /* Initialization */
@@ -329,7 +331,7 @@ void loop()
 
 uint16_t calculateCompressionModifier()
 {
-  if( (currentStatus.rpm > config.compressionRPM) || (config.useCompression != true) ) { return 0; }
+  if( (currentStatus.base_rpm > config.compressionRPM) || (config.useCompression != true) ) { return 0; }
   //if( currentStatus.base_rpm > 400 ) { return 0;}
 
   uint16_t crankAngle = calculateCurrentCrankAngle();
@@ -339,8 +341,9 @@ uint16_t calculateCompressionModifier()
   switch(config.compressionType)
   {
     case COMPRESSION_TYPE_2CYL_4STROKE:
-      modAngle = modAngle / 2;
+      modAngle = crankAngle / 2;
       compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+      break;
     case COMPRESSION_TYPE_4CYL_4STROKE:
       modAngle = (crankAngle % 180) ;
       compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
@@ -358,6 +361,14 @@ uint16_t calculateCompressionModifier()
       compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
       break;
   }
+
+  //RPM scaler - Varies the amplitude of the compression modifier based on how far below the compression RPM point we are. Eg:
+  //If the compression RPM value is 400
+  //At 300rpm the amplitude will be 75%
+  //At 200rpm the amplitude will be 50%
+  //At 100rpm the amplitude will be 25% etc
+  //Base RPM must be below 650 to prevent overflow
+  if(config.compressionDynamic && (currentStatus.base_rpm < 655U) ) { compressionModifier = (compressionModifier * currentStatus.base_rpm) / config.compressionRPM; }
   
   return compressionModifier;
 }
@@ -367,7 +378,7 @@ uint16_t calculateCurrentCrankAngle()
   if(cycleDuration == 0) { return 0; }
 
   uint32_t cycleTime = micros() - cycleStartTime;
-  if( pgm_read_byte(&Wheels[config.wheel].wheel_degrees) == 720 ) { cycleTime = cycleTime / 2; } 
+  if( Wheels[config.wheel].wheel_degrees == 720 ) { cycleTime = cycleTime * 2; } 
   
   uint16_t tmpCrankAngle = ((cycleTime * 360U) / cycleDuration);
   tmpCrankAngle += config.compressionOffset;

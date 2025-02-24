@@ -131,9 +131,11 @@
    TOYOTA_4AGE_CAS,           /*Toyota 4AGE CAS, 4 teeth and one cam tooth*/
    TOYOTA_4AGZE,           /*Toyota 4AGZE, 24 teeth and one cam tooth*/
    SUZUKI_DRZ400,         /* Suzuki DRZ-400 6 coil "tooths", 2 uneven crank tooths */
-   JEEP2000,  /* Jeep 4.0 6cyl aka jeep2000 */
+   JEEP2000_4CYL,  /* Jeep 2.5 4cyl aka jeep2000_4cyl */
+   JEEP2000_6CYL,  /* Jeep 4.0 6cyl aka jeep2000_6cyl */
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
+   THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    MAX_WHEELS,
  }WheelType;
 
@@ -196,9 +198,11 @@
  const char Toyota_4AGE_CAS_friendly_name[] PROGMEM = "Toyota 4AGE";
  const char Toyota_4AGZE_friendly_name[] PROGMEM = "Toyota 4AGZE";
  const char Suzuki_DRZ400_friendly_name[] PROGMEM = "Suzuki DRZ400";
- const char Jeep_2000_friendly_name[] PROGMEM = "Jeep 2000";
+ const char Jeep_2000_4cyl_friendly_name[] PROGMEM = "Jeep 2000 4cyl";
+ const char Jeep_2000_6Cyl_friendly_name[] PROGMEM = "Jeep 2000 6 cyl";
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
+ const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -659,17 +663,17 @@
     };
   
  /* Lotus 36-1-1-1-1 wheel, missing teeth at
-  * 36,32,17 and 14
+  * 14, 17, 32 and 36
   */
  const unsigned char lotus_thirty_six_minus_one_one_one_one[] PROGMEM = 
-   { /* 36-1 */
+   { /* 36-1-1-1-1 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 1-5 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 6-10 */
-     1,0,1,0,1,0,0,0,1,0, /* teeth 11-15 */
-     1,0,0,0,1,0,1,0,1,0, /* teeth 16-20 */
+     1,0,1,0,1,0,0,0,1,0, /* teeth 11-13, MISSING 14, 15 */
+     1,0,0,0,1,0,1,0,1,0, /* teeth 16, MISSING 17, 18-20 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 21-25 */
      1,0,1,0,1,0,1,0,1,0, /* teeth 26-30 */
-     1,0,0,0,1,0,1,0,1,0, /* teeth 31-35 */
+     1,0,0,0,1,0,1,0,1,0, /* teeth 31, MISSING 32, 33-35 */
      0,0                  /* MISSING 36th tooth */
    }; 
  const unsigned char honda_rc51_with_cam[] PROGMEM = 
@@ -1361,44 +1365,84 @@
       1,1,1,1,1,1,0,0,0,0,0,0
   };
 
-  const unsigned char jeep_2000[] PROGMEM = 
-   { /* Every number represents 2 degrees */
-     0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20 */
-     0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40 */
+  const unsigned char jeep_2000_4cyl[] PROGMEM = 
+    { /* Every number represents 2 degrees. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 40-60. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 60-80. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 80-100.  */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 100-120 Tooth #1 at 114* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 120-140 Tooth #2 at 134* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 140-160 Tooth #3 at 154* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 160-180 Tooth #4 at 174* for 2* duration. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 180-200. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 200-220. */
+      0,0,0,0,0,0,0,2,2,2,  /* Degrees 220-240. Camshaft is active from 146* to 506* (total = 360*). */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 240-260. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 260-280. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 280-300. Tooth #5 at 294* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 300-320. Tooth #6 at 314* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 320-340. Tooth #7 at 334* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 340-360. Tooth #8 at 354* for 2* duration. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 360-380. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 380-400. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 400-420. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 420-440. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 440-460. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 460-480. Tooth #9 at 474* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 480-500. Tooth #10 at 494* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 500-520. Tooth #11 at 514* for 2* duration. */
+      2,2,2,2,2,2,3,2,2,2,  /* Degrees 520-540. Tooth #12 at 534* for 2* duration. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 540-560. */
+      2,2,2,2,2,2,2,2,2,2,  /* Degrees 560-580. */
+      2,2,2,2,2,2,2,0,0,0,  /* Degrees 580-600. Camshaft is down at 596. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 600-620. */
+      0,0,0,0,0,0,0,0,0,0,  /* Degrees 620-640. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 640-660. Tooth #13 at 654* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 660-680. Tooth #14 at 674* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0,  /* Degrees 680-700. Tooth #15 at 694* for 2* duration. */
+      0,0,0,0,0,0,1,0,0,0  /* Degrees 700-720. Tooth #16 at 714* for 2* duration. */
+   };
+
+  const unsigned char jeep_2000_6cyl[] PROGMEM = 
+   { /* Every number represents 2 degrees. */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 0-20. */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 20-40. */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 40-60. Tooth #1 at 54* for 2* duration. */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 60-80. Tooth #2 at 74* for 2* duration. */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 80-100. Tooth #3 at 94* for 2* duration. */
      0,0,0,0,0,0,0,1,0,0,  /* Degrees 100-120. Tooth #4 at 114* for 2* duration. */
-     0,0,0,0,0,0,0,0,0,0,  /* Degrees 120-140 */
-     0,0,0,2,2,2,2,2,2,2,  /* Degrees 140-160. Camshaft is active from 146* to 506* (total = 360*) */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 160-180. Tooth #5 at 174* for 2* duration */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 180-200. Tooth #6 at 194* for 2* duration */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 200-220. Tooth #7 at 214* for 2* duration */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 220-240. Tooth #8 at 234* for 2* duration */
-     2,2,2,2,2,2,2,2,2,2,  /* Degrees 240-260 */
-     2,2,2,2,2,2,2,2,2,2,  /* Degrees 260-280 */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 280-300. Tooth #9 at 294* for 2* duration */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 300-320. Tooth #9 at 314* for 2* duration */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 320-340. Tooth #9 at 334* for 2* duration */
-     2,2,2,2,2,2,2,3,2,2,  /* Degrees 340-360. Tooth #9 at 354* for 2* duration */
-     2,2,2,2,2,2,2,2,2,2,  /* Degrees 360-380 */
-     2,2,2,2,2,2,2,2,2,2,  /* Degrees 380-400 */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 120-140. */
+     0,0,0,2,2,2,2,2,2,2,  /* Degrees 140-160. Camshaft is active from 146* to 506* (total = 360*). */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 160-180. Tooth #5 at 174* for 2* duration. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 180-200. Tooth #6 at 194* for 2* duration. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 200-220. Tooth #7 at 214* for 2* duration. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 220-240. Tooth #8 at 234* for 2* duration. */
+     2,2,2,2,2,2,2,2,2,2,  /* Degrees 240-260. */
+     2,2,2,2,2,2,2,2,2,2,  /* Degrees 260-280. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 280-300. Tooth #9 at 294* for 2* duration. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 300-320. Tooth #9 at 314* for 2* duration. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 320-340. Tooth #9 at 334* for 2* duration. */
+     2,2,2,2,2,2,2,3,2,2,  /* Degrees 340-360. Tooth #9 at 354* for 2* duration. */
+     2,2,2,2,2,2,2,2,2,2,  /* Degrees 360-380. */
+     2,2,2,2,2,2,2,2,2,2,  /* Degrees 380-400. */
      2,2,2,2,2,2,2,3,2,2,  /* Degrees 400-420. Tooth #10 at 414* for 2* duration. */
      2,2,2,2,2,2,2,3,2,2,  /* Degrees 420-440. Tooth #11 at 434* for 2* duration. */
      2,2,2,2,2,2,2,3,2,2,  /* Degrees 440-460. Tooth #12 at 454* for 2* duration. */
      2,2,2,2,2,2,2,3,2,2,  /* Degrees 460-480. Tooth #13 at 474* for 2* duration. */
-     2,2,2,2,2,2,2,2,2,2,  /* Degrees 480-500 */
-     2,2,2,0,0,0,0,0,0,0,  /* Degrees 500-520. Camshaft is down at 506 */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 520-540. Tooth #14 at 534* for 2* duration */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 540-560. Tooth #15 at 554* for 2* duration */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 560-580. Tooth #16 at 574* for 2* duration */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 580-600. Tooth #17 at 594* for 2* duration */
-     0,0,0,0,0,0,0,0,0,0,  /* Degrees 600-620 */
-     0,0,0,0,0,0,0,0,0,0,  /* Degrees 620-640 */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 640-660. Tooth #18 at 654* for 2* duration */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 660-680. Tooth #19 at 674* for 2* duration */
-     0,0,0,0,0,0,0,1,0,0,  /* Degrees 680-700. Tooth #20 at 694* for 2* duration */
-     0,0,0,0,0,0,0,1,0,0  /* Degrees 700-720. Tooth #21 at 714* for 2* duration */
+     2,2,2,2,2,2,2,2,2,2,  /* Degrees 480-500. */
+     2,2,2,0,0,0,0,0,0,0,  /* Degrees 500-520. Camshaft is down at 506. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 520-540. Tooth #14 at 534* for 2* duration. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 540-560. Tooth #15 at 554* for 2* duration. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 560-580. Tooth #16 at 574* for 2* duration. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 580-600. Tooth #17 at 594* for 2* duration. */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 600-620. */
+     0,0,0,0,0,0,0,0,0,0,  /* Degrees 620-640. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 640-660. Tooth #18 at 654* for 2* duration. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 660-680. Tooth #19 at 674* for 2* duration. */
+     0,0,0,0,0,0,0,1,0,0,  /* Degrees 680-700. Tooth #20 at 694* for 2* duration. */
+     0,0,0,0,0,0,0,1,0,0  /* Degrees 700-720. Tooth #21 at 714* for 2* duration. */
    };
 
    const unsigned char bmw_n20[] PROGMEM = 
@@ -1463,5 +1507,25 @@
       0,0,0,0,0,0,0,0,0,0, //56-60
    };
 
+ /* 36-2 with second trigger pulse across teeth 33-34 on first rotation */
+ const unsigned char thirty_six_minus_two_with_second_trigger[] PROGMEM =
+   { /* 36-2 + single tooth cam */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 1-5 */
+     1,0,1,0,3,2,3,2,1,0, /* Teeth 6-10, cam in here somewhere - length/position not accurate to actual engine*/
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-34, 35th tooth missing */
+     0,0,                 /* 36th tooth MISSING */
+     1,0,1,0,1,0,1,0,1,0, /* Revolution 2  Teeth 1-5 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 6-10 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 11-15 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 16-20 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 21-25 */
+     1,0,1,0,1,0,1,0,1,0, /* Teeth 26-30 */
+     1,0,1,0,1,0,1,0,0,0, /* Teeth 31-34, 35th tooth missing  */
+     0,0                  /* 36th MISSING tooth */
+   };
 
   #endif
