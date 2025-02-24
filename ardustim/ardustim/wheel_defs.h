@@ -63,6 +63,14 @@
    * eg  3 means crank and cam1, 5 means crank and cam2, 6 means cam1 and cam2, 7 means crank, cam1 and cam2 
    */
 
+  /*  for analog output to simulate a MAP sensor being used as a CAM sensor.
+      right hand digit is map pressure, left digit works like other modes:
+      0 means no tooth
+      1 means crank1 tooth
+      2 means crank 2 tooth
+      3 means both crank 1 and 2
+  */
+
   
   /* Wheel types we know about...
    * This enumerations is the INDEX into the Wheels[] array of structures
@@ -72,6 +80,7 @@
    * RPM scaling factor (num_edges/120 for crank wheels)
    * Number of edges in the edge array above, needed by the ISR 
    */
+
  typedef enum { 
    DIZZY_FOUR_CYLINDER,  /* 2 evenly spaced teeth */
    DIZZY_SIX_CYLINDER,   /* 3 evenly spaced teeth */
@@ -136,6 +145,7 @@
    BMW_N20, //BMW N20 58x and custom cam wheels
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
+   EIGHTEEN_MINUS_ONE_ABMODE_MAP_AS_CAM, // 18-1 using AB signals for crank and with map sensor used as cam signal
    MAX_WHEELS,
  }WheelType;
 
@@ -203,7 +213,10 @@
  const char BMW_N20_friendly_name[] PROGMEM = "BMW N20";
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
+ const char eighteen_minus_one_ABmode_MAP_as_CAM_friendly_name[] PROGMEM = "18-1 ABmode MAP asCAM";
 
+ 
+ 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
@@ -1527,5 +1540,22 @@
      1,0,1,0,1,0,1,0,0,0, /* Teeth 31-34, 35th tooth missing  */
      0,0                  /* 36th MISSING tooth */
    };
+
+
+
+  /* V-twin using AB mode with 2 crank sensors and map sensor as cam signal */
+ const unsigned char eighteen_minus_one_ABmode_MAP_as_CAM[] PROGMEM =
+   { /* 18-1 AB mode + MAP as cam */
+    29, 8, 8, 8, 7, 7, 17, 36, 26, 5, 15, 34, 24, 4, 13, 34, 24, 4, 
+    14, 34, 24, 4, 15, 35, 25, 6, 16, 36, 26, 7, 17, 37, 28, 8, 18, 
+    39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 
+    29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 
+    9, 19, 39, 29, 9, 9, 9, 9, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 
+    39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 
+    29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 
+    9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 19, 39, 29, 9, 
+    19, 39, 29, 9, 19, 39
+   };
+
 
   #endif

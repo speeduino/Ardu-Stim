@@ -10,6 +10,6 @@
 #define EEPROM_COMPRESSION_TYPE 15
 #define EEPROM_COMPRESSION_RPM  16 //Note this is 2 bytes
 #define EEPROM_COMPRESSION_OFFSET 18 //Note this is 2 bytes
-
+#define EEPROM_ANALOG_MODE        20 
 void loadConfig();
 void saveConfig();

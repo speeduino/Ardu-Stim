@@ -25,13 +25,14 @@ void loadConfig()
     config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE;
     config.compressionRPM = 400;
     config.compressionOffset = 0;
-
+    config.analogMode = false;
     saveConfig();
   }
   else
   {
     config.wheel = EEPROM.read(EEPROM_WHEEL);
     config.mode = EEPROM.read(EEPROM_RPM_MODE);
+    config.analogMode = EEPROM.read(EEPROM_ANALOG_MODE);
 
     byte highByte = EEPROM.read(EEPROM_CURRENT_RPM);
     byte lowByte =  EEPROM.read(EEPROM_CURRENT_RPM+1);
@@ -121,4 +122,5 @@ void saveConfig()
   lowByte = lowByte(config.compressionOffset);
   EEPROM.update(EEPROM_COMPRESSION_OFFSET, highByte);
   EEPROM.update(EEPROM_COMPRESSION_OFFSET+1, lowByte);
+  EEPROM.update(EEPROM_ANALOG_MODE, config.analogMode);
 }

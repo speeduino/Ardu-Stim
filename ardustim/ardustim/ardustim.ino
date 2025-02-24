@@ -49,6 +49,8 @@ volatile uint32_t cycleStartTime = micros();
 volatile uint32_t cycleDuration = 0;
 uint32_t sweep_time_counter = 0;
 uint8_t sweep_direction = ASCENDING;
+volatile bool analog_map_mode = false; /*mode to convert cam signal to analog for using MAP as CAM sensor */
+const byte portD_1_mask = B11111100; /*mask for analog port to not step on serial port*/
 
 /* Less sensitive globals */
 uint8_t bitshift = 0;
@@ -121,6 +123,7 @@ wheels Wheels[MAX_WHEELS] = {
   { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
   { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 0.6, 144, 720 },
+  { eighteen_minus_one_ABmode_MAP_as_CAM_friendly_name, eighteen_minus_one_ABmode_MAP_as_CAM, 0.6, 144, 720 },
 };
 
 /* Initialization */
@@ -203,6 +206,12 @@ void setup() {
   ADCSRA |= B00001000;
 
 //  pinMode(7, OUTPUT); /* Debug pin for Saleae to track sweep ISR execution speed */
+  pinMode(2, OUTPUT);  /* pins 2-7 for R-R2 DAC */
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
   pinMode(8, OUTPUT); /* Primary (crank usually) output */
   pinMode(9, OUTPUT); /* Secondary (cam1 usually) output */
   pinMode(10, OUTPUT); /* Tertiary (cam2 usually) output */
@@ -211,6 +220,7 @@ void setup() {
   pinMode(53, OUTPUT); /* crank */
   pinMode(52, OUTPUT); /* cam 1 */
   pinMode(51, OUTPUT); /* untested - should be cam2*/
+
 #endif
 
   sei(); // Enable interrupts
@@ -259,8 +269,35 @@ ISR(ADC_vect){
 ISR(TIMER1_COMPA_vect) 
 {
   /* This is VERY simple, just walk the array and wrap when we hit the limit */
-  PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
-  
+  /* OR output the crank signal and then output the MAP value*/
+
+  if (config.analogMode == false)  //normal mode
+  {
+    PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+  }
+  else // analog map mode 
+  {
+    int x = pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);
+    if (x >= 10)
+    {
+      int y = (x / 10U) % 10;
+      PORTB = output_invert_mask ^ y ;   /* Write it to the port */;
+      int z = x;
+      while (z>10)
+      {
+        z = z-10;
+      }
+      PORTD = portD_1_mask & z *28; /*mask out the serial port pins, and write the data to the port */
+      
+    }
+    else
+    {
+      PORTD = portD_1_mask & (x*28); /*mask out the serial port pins, and write the data to the port */
+      PORTB = output_invert_mask ^ 0;   /* Write it to the port */;
+    }
+    
+  }
+
   edge_counter++;
   if (edge_counter == Wheels[config.wheel].wheel_max_edges) 
   {
@@ -327,6 +364,7 @@ void loop()
   if(currentStatus.compressionModifier >= currentStatus.base_rpm ) { currentStatus.compressionModifier = 0; }
 
   setRPM( (currentStatus.base_rpm - currentStatus.compressionModifier) );
+  
 }
 
 uint16_t calculateCompressionModifier()
