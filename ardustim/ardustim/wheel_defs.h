@@ -137,7 +137,7 @@
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    GM_40_OSS, // GM 40 tooth wheel no skips for transmission OSS simulation
-
+   FORD_36_1_BOTH_CAMS, // Ford 36-1 both camshafts - this wheel is pulled from a oscilloscope reading of a 1.6L Ford four cylinder TiVCT from a 2012 Ford Fiesta
    MAX_WHEELS,
  }WheelType;
 
@@ -206,6 +206,7 @@
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
  const char GM_40_Tooth_Trans_OSS_friendly_name[] PROGMEM = "GM 40 tooth OSS wheel for Transmissions";
+ const char Ford_36_1_both_camshafts_friendly_name[] PROGMEM = "Ford 36-1 both camshafts from 1.6L TiVCT";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1544,5 +1545,31 @@
       1,0,1,0,1,0,1,0,1,0, // Teeth 31-35
       1,0,1,0,1,0,1,0,1,0, // Teeth 36-40
    };
+
+   //Ford 1.6L TiVCT Crank/Cam pattern. 36-1 Crank, 1 tooth half moon cam, both intake and exhaust.
+   //720 degrees of crankshaft rotation.
+   //Added by Dale Follett of Twisted Builds LLC 03-09-2025.
+
+  const unsigned char Ford361bothcam[] PROGMEM = 
+    {
+      //First crank rotation - this is the first tooth after missing
+      1,0,1,0,1,0,1,0,1,0, // Teeth 0-5
+      1,0,1,0,1,0,1,0,1,0, // Teeth 6-10
+      1,0,1,6,7,6,7,6,7,6, // Teeth 11-15, Inbetween tooth 12 & 13 both cams go high.
+      7,6,7,6,7,6,7,6,7,6, // Teeth 16-20
+      7,6,7,6,7,6,7,6,7,6, // Teeth 21-25
+      7,6,7,6,7,6,7,6,7,6, // Teeth 26-30
+      7,6,7,6,7,6,7,6,7,6, // Teeth 31-35
+
+      //Second crank rotation. First tooth and last tooth will be missing to make pattern work.
+      6,6,7,6,7,6,7,6,7,6, // Teeth 36 "missing" then to 40
+      7,6,7,6,7,6,7,6,7,6, // Teeth 41-45
+      7,6,7,6,7,0,1,0,1,0, // Teeth 46-50, cam off between teeth 48-49
+      1,0,1,0,1,0,1,0,1,0, // Teeth 51-55
+      1,0,1,0,1,0,1,0,1,0, // Teeth 56-60
+      1,0,1,0,1,0,1,0,1,0, // Teeth 61-65
+      1,0,1,0,1,0,1,0,1,0, // Teeth 66-70
+      1,0,0,0, // Teeth 71 & 72, 72 is missing.
+    };
 
 #endif
