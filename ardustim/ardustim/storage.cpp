@@ -1,17 +1,24 @@
 #include "storage.h"
-#include "EEPROM.h"
 #include "wheel_defs.h"
 #include "ardustim.h"
 #include "enums.h"
 #include "globals.h"
 
+#if defined(ESP32)
+Preferences preferences; // Global instance for ESP32
+#endif
+
+/**
+ * @brief Loads configuration from storage
+ */
 void loadConfig()
 {
   config.version = VERSION;
-  if(EEPROM.read(EEPROM_VERSION) == 255)
+  #if defined(__AVR__)
+  if(EEPROM.read(EEPROM_VERSION) == 255) // New device
   {
     //New arduino
-    config.wheel = 5; //36-1
+    config.wheel = 5; // Default: 36-1
     currentStatus.rpm = 3000;
     currentStatus.base_rpm = 3000;
     config.mode = POT_RPM;
@@ -67,7 +74,6 @@ void loadConfig()
     highByte = EEPROM.read(EEPROM_COMPRESSION_OFFSET);
     lowByte = EEPROM.read(EEPROM_COMPRESSION_OFFSET+1);
     config.compressionOffset = word(highByte, lowByte);
-    //config.compressionType = COMPRESSION_TYPE_6CYL_4STROKE;
 
     //Error checking
     if(config.wheel >= MAX_WHEELS) { config.wheel = 5; }
@@ -78,10 +84,34 @@ void loadConfig()
     if(config.compressionRPM > 1000) { config.compressionRPM = 400; }
     if(config.compressionOffset > 359) { config.compressionOffset = 0; }
   }
+  #elif defined(ESP32)
+  preferences.begin("ardustim", false);
+  preferences.getBytes("config", &config, sizeof(config));
+  if (config.version != VERSION) { // Version mismatch or first run
+    config.version = VERSION;
+    config.wheel = 5;
+    currentStatus.rpm = 3000;
+    currentStatus.base_rpm = 3000;
+    config.mode = POT_RPM;
+    config.fixed_rpm = 3500;
+    config.sweep_high_rpm = 6000;
+    config.sweep_low_rpm = 1000;
+    config.sweep_interval = 1000;
+    config.useCompression = false;
+    config.compressionType = COMPRESSION_TYPE_4CYL_4STROKE;
+    config.compressionRPM = 400;
+    config.compressionOffset = 0;
+    saveConfig();
+  }
+  #endif
 }
 
+/**
+ * @brief Saves configuration to storage
+ */
 void saveConfig()
 {
+  #if defined(__AVR__)
   EEPROM.update(EEPROM_WHEEL, config.wheel);
   EEPROM.update(EEPROM_RPM_MODE, config.mode);
   EEPROM.update(EEPROM_VERSION, VERSION);
@@ -121,4 +151,7 @@ void saveConfig()
   lowByte = lowByte(config.compressionOffset);
   EEPROM.update(EEPROM_COMPRESSION_OFFSET, highByte);
   EEPROM.update(EEPROM_COMPRESSION_OFFSET+1, lowByte);
+  #elif defined(ESP32)
+  preferences.putBytes("config", &config, sizeof(config));
+  #endif
 }

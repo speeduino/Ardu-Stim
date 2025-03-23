@@ -24,56 +24,53 @@
 #include "Arduino.h"
 #include "wheel_defs.h"
 
-#define VERSION 2
- 
-#define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
-#define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */
-#define EEPROM_LAST_MODE  100
+#define VERSION 2 // Configuration version number
 
-#define COMPRESSION_TYPE_1CYL_4STROKE 0 //Not initiallity supported
+#define TMP_RPM_SHIFT 4 // Shift factor for ADC to RPM conversion (x16, 0-16384 RPM)
+#define TMP_RPM_CAP 9000 // Maximum RPM via potentiometer (capped from 16384)
+#define EEPROM_LAST_MODE 100 // Unused EEPROM address
+
+// Compression type definitions
+#define COMPRESSION_TYPE_1CYL_4STROKE 0 // Not supported
 #define COMPRESSION_TYPE_2CYL_4STROKE 1
-#define COMPRESSION_TYPE_3CYL_4STROKE 2 //Not initiallity supported
+#define COMPRESSION_TYPE_3CYL_4STROKE 2 // Not supported
 #define COMPRESSION_TYPE_4CYL_4STROKE 3
 #define COMPRESSION_TYPE_6CYL_4STROKE 4
 #define COMPRESSION_TYPE_8CYL_4STROKE 5
 
-struct configTable 
-{
-  uint8_t version;                                                   
-  uint8_t wheel = FOUR_TWENTY_A;
-  uint8_t mode;
-  uint16_t fixed_rpm = 2500;
-  uint16_t sweep_low_rpm = 250;
-  uint16_t sweep_high_rpm = 4000;
-  uint16_t sweep_interval = 1000;
-
-  //11
-  bool useCompression = false;
-  uint8_t compressionType = 0;
-  uint16_t compressionRPM = 400;
-  uint16_t compressionOffset = 0;
-  bool compressionDynamic = false;
+// Configuration structure for persistent settings
+struct configTable {
+    uint8_t version;            // Configuration version
+    uint8_t wheel;              // Current wheel pattern index
+    uint8_t mode;               // RPM control mode
+    uint16_t fixed_rpm;         // Fixed RPM value
+    uint16_t sweep_low_rpm;     // Low RPM for sweep mode
+    uint16_t sweep_high_rpm;    // High RPM for sweep mode
+    uint16_t sweep_interval;    // Sweep interval in microseconds
+    bool useCompression;        // Enable compression simulation
+    uint8_t compressionType;    // Engine type for compression
+    uint16_t compressionRPM;    // RPM threshold for compression
+    uint16_t compressionOffset; // Angle offset for compression
+    bool compressionDynamic;    // Scale compression with RPM
 } __attribute__ ((packed));
 extern struct configTable config;
 
-
-struct status 
-{
-  uint16_t base_rpm; //RPM excluding compression modifier
-  uint16_t compressionModifier;
-  uint16_t rpm; //Final RPM
+// Status structure for runtime values
+struct status {
+    uint16_t base_rpm;          // RPM before compression modifier
+    uint16_t compressionModifier; // Compression effect on RPM
+    uint16_t rpm;               // Final RPM
 };
 extern struct status currentStatus;
 
-/* Tie things wheel related into one nicer structure ... */
+// Wheel structure definition
 typedef struct _wheels wheels;
 struct _wheels {
-  const char *decoder_name PROGMEM;
-  const unsigned char *edge_states_ptr PROGMEM;
-  const float rpm_scaler;
-  //const uint16_t rpm_scaler;
-  const uint16_t wheel_max_edges;
-  const uint16_t wheel_degrees;
+    const char *decoder_name PROGMEM;      // Friendly name of the wheel
+    const unsigned char *edge_states_ptr PROGMEM; // Edge state array
+    const float rpm_scaler;                // RPM scaling factor
+    const uint16_t wheel_max_edges;        // Number of edges in pattern
+    const uint16_t wheel_degrees;          // Degrees per cycle (360 or 720)
 };
 
 //A sin wave of amplitude 100 with a complete cycle in 180 degrees (1 entry per degree). 
@@ -106,7 +103,6 @@ const uint8_t sin_100_90[] PROGMEM =
 };
 
 //A sin wave of amplitude 100 with a complete cycle in 120 degrees
-
 const uint8_t sin_100_120[] PROGMEM = 
 { 
   0,0,0,1,1,2,2,3,4,5,7,8,10,11,13,15,17,19,

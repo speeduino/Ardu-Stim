@@ -19,43 +19,67 @@
  *
  */
 
-#include "globals.h"
-#include "ardustim.h"
-#include "enums.h"
-#include "comms.h"
-#include "storage.h"
-#include "wheel_defs.h"
-#include <avr/pgmspace.h>
-#include <EEPROM.h>
+ #include "globals.h"
+ #include "ardustim.h"
+ #include "enums.h"
+ #include "comms.h"
+ #include "storage.h"
+ #include "wheel_defs.h"
+ 
+ // Platform-specific headers
+ #if defined(__AVR__)
+ #include <avr/pgmspace.h>
+ #include <avr/interrupt.h>
+ #elif defined(ESP32)
+ #include <esp_timer.h>
+ #include <driver/gptimer.h>
+ #endif
+ 
+ // Pin definitions
+ volatile uint8_t analog_port = 0;
+ #if defined(__AVR__)
+ #define ADC_PIN A0             // Analog input for RPM potentiometer
+ #define PRIMARY_OUTPUT_PIN 8   // PB0 - Primary output (crank)
+ #define SECONDARY_OUTPUT_PIN 9 // PB1 - Secondary output (cam1)
+ #define TERTIARY_OUTPUT_PIN 10 // PB2 - Tertiary output (cam2)
+ #define KNOCK_OUTPUT_PIN 11    // PB3 - Knock signal
+ #elif defined(ESP32)
+ #define ADC_PIN 34             // GPIO 34 for ADC input (RPM pot)
+ #define PRIMARY_OUTPUT_PIN 2   // GPIO 2 - Primary output
+ #define SECONDARY_OUTPUT_PIN 4 // GPIO 4 - Secondary output
+ #define TERTIARY_OUTPUT_PIN 5  // GPIO 5 - Tertiary output
+ #define KNOCK_OUTPUT_PIN 18    // GPIO 18 - Knock signal
+ #endif
 
-struct configTable config;
-struct status currentStatus;
+// Global configuration and status structures
+struct configTable config;    // Holds settings like wheel type, RPM mode, etc.
+struct status currentStatus;  // Tracks current RPM and related values
 
-/* Sensistive stuff used in ISR's */
-volatile uint16_t adc0; /* POT RPM */
-volatile uint16_t adc1; /* Pot Wheel select */
-/* Setting rpm to any value over 0 will enabled sweeping by default */
-/* Stuff for handling prescaler changes (small tooth wheels are low RPM) */
-volatile uint8_t analog_port = 0;
-volatile bool adc0_read_complete = false;
-volatile bool adc1_read_complete = false;
-volatile bool reset_prescaler = false;
-volatile uint8_t output_invert_mask = 0x00; /* Don't invert anything */
-volatile uint8_t prescaler_bits = 0;
-volatile uint8_t last_prescaler_bits = 0;
-volatile uint16_t new_OCR1A = 5000; /* sane default */
-volatile uint16_t edge_counter = 0;
-volatile uint32_t cycleStartTime = micros();
-volatile uint32_t cycleDuration = 0;
-uint32_t sweep_time_counter = 0;
-uint8_t sweep_direction = ASCENDING;
+// Volatile variables used in Interrupt Service Routines (ISRs)
+volatile uint16_t adc0;            // ADC reading from potentiometer (RPM control)
+volatile uint16_t adc1;            // Reserved for future use (e.g., additional analog input)
+volatile bool adc0_read_complete = false; // Flag for completed ADC0 reading
+volatile bool adc1_read_complete = false; // Flag for completed ADC1 reading
+volatile bool reset_prescaler = false;    // Flag to reset timer prescaler in ISR
+volatile uint8_t output_invert_mask = 0x00; // Bitmask to invert output signals (default: no inversion)
+volatile uint8_t prescaler_bits = 0;       // Timer prescaler bits for AVR
+volatile uint8_t last_prescaler_bits = 0;  // Previous prescaler bits (unused in current code)
+volatile uint16_t new_OCR1A = 5000;        // Default timer compare value for AVR (controls interrupt frequency)
 
-/* Less sensitive globals */
-uint8_t bitshift = 0;
+#if defined(ESP32)
+uint32_t apb_frequency = 80000000UL; // APB clock frequency (typically 80 MHz for ESP32)
+volatile uint64_t new_timer_interval_us = 1000; // Default timer ticks for ESP32 (controls interrupt frequency)
+gptimer_handle_t timer = NULL;          // Pointer to ESP32 hardware timer instance
+#endif
 
+volatile uint16_t edge_counter = 0;      // Counts edges in the wheel pattern
+volatile uint32_t cycleStartTime = micros(); // Start time of current cycle (for crank angle calculation)
+volatile uint32_t cycleDuration = 0;     // Duration of the last complete cycle
 
+uint32_t sweep_time_counter = 0; // Timer for RPM sweep mode
+uint8_t sweep_direction = ASCENDING; // Direction of RPM sweep (ASCENDING or DESCENDING)
 
-
+// Array of wheel definitions for various crankshaft/camshaft patterns
 wheels Wheels[MAX_WHEELS] = {
    /* Pointer to friendly name string, pointer to edge array, RPM Scaler, Number of edges in the array, whether the number of edges covers 360 or 720 degrees */
   { dizzy_four_cylinder_friendly_name, dizzy_four_cylinder, 0.03333, 4, 360 },
@@ -124,343 +148,340 @@ wheels Wheels[MAX_WHEELS] = {
   { GM_40_Tooth_Trans_OSS_friendly_name, GM40toothOSS, 1.0, 80, 360 },
 };
 
-/* Initialization */
-void setup() {
-  loadConfig();
-  serialSetup();
+/**
+ * @brief AVR ADC Interrupt Service Routine
+ * 
+ * Reads the ADC value from the potentiometer (ADC0) when conversion is complete.
+ */
+#if defined(__AVR__)
+ISR(ADC_vect) {
+    if (analog_port == 0) { // Only reading ADC0 currently
+        adc0 = ADCL | (ADCH << 8); // Combine low and high bytes
+        adc0_read_complete = true; // Signal completion
+    }
+}
 
-  cli(); // stop interrupts
-
-  /* Configuring TIMER1 (pattern generator) */
-  // Set timer1 to generate pulses
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1 = 0;
-
-  // Set compare register to sane default
-  OCR1A = 1000;  /* 8000 RPM (60-2) */
-
-  // Turn on CTC mode
-  TCCR1B |= (1 << WGM12); // Normal mode (not PWM)
-  // Set prescaler to 1
-  TCCR1B |= (1 << CS10); /* Prescaler of 1 */
-  // Enable output compare interrupt for timer channel 1 (16 bit)
-  TIMSK1 |= (1 << OCIE1A);
-
-  // Set timer2 to run sweeper routine
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCNT2 = 0;
-
-  // Set compare register to sane default
-  OCR2A = 249;  /* With prescale of x64 gives 1ms tick */
-
-  // Turn on CTC mode
-  TCCR2A |= (1 << WGM21); // Normal mode (not PWM)
-  // Set prescaler to x64
-  TCCR2B |= (1 << CS22); /* Prescaler of 64 */
-  // Enable output compare interrupt for timer channel 2
-  //TIMSK2 |= (1 << OCIE2A); //Disabled as no longer using TIMER2 for sweep
-
-
-  /* Configure ADC as per http://www.glennsweeney.com/tutorials/interrupt-driven-analog-conversion-with-an-atmega328p */
-  // clear ADLAR in ADMUX (0x7C) to right-adjust the result
-  // ADCL will contain lower 8 bits, ADCH upper 2 (in last two bits)
-  ADMUX &= B11011111;
-  
-  // Set REFS1..0 in ADMUX (0x7C) to change reference voltage to the
-  // proper source (01)
-  ADMUX |= B01000000;
-  
-  // Clear MUX3..0 in ADMUX (0x7C) in preparation for setting the analog
-  // input
-  ADMUX &= B11110000;
-  
-  // Set MUX3..0 in ADMUX (0x7C) to read from AD8 (Internal temp)
-  // Do not set above 15! You will overrun other parts of ADMUX. A full
-  // list of possible inputs is available in Table 24-4 of the ATMega328
-  // datasheet
-  // ADMUX |= 8;
-  // ADMUX |= B00001000; // Binary equivalent
-  
-  // Set ADEN in ADCSRA (0x7A) to enable the ADC.
-  // Note, this instruction takes 12 ADC clocks to execute
-  ADCSRA |= B10000000;
-  
-  // Set ADATE in ADCSRA (0x7A) to enable auto-triggering.
-  ADCSRA |= B00100000;
-  
-  // Clear ADTS2..0 in ADCSRB (0x7B) to set trigger mode to free running.
-  // This means that as soon as an ADC has finished, the next will be
-  // immediately started.
-  ADCSRB &= B11111000;
-  
-  // Set the Prescaler to 128 (16000KHz/128 = 125KHz)
-  // Above 200KHz 10-bit results are not reliable.
-  ADCSRA |= B00000111;
-  
-  // Set ADIE in ADCSRA (0x7A) to enable the ADC interrupt.
-  // Without this, the internal interrupt will not trigger.
-  ADCSRA |= B00001000;
-
-//  pinMode(7, OUTPUT); /* Debug pin for Saleae to track sweep ISR execution speed */
-  pinMode(8, OUTPUT); /* Primary (crank usually) output */
-  pinMode(9, OUTPUT); /* Secondary (cam1 usually) output */
-  pinMode(10, OUTPUT); /* Tertiary (cam2 usually) output */
-  pinMode(11, OUTPUT); /* Knock signal for seank, ony on LS1 pattern, NOT IMPL YET */
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  pinMode(53, OUTPUT); /* crank */
-  pinMode(52, OUTPUT); /* cam 1 */
-  pinMode(51, OUTPUT); /* untested - should be cam2*/
+/**
+ * @brief AVR Timer1 Interrupt Service Routine
+ * 
+ * Generates the wheel pattern by setting PORTB pins based on the current edge state.
+ */
+ISR(TIMER1_COMPA_vect) {
+    // Set PORTB pins based on edge state (inverted if mask is set)
+    PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);
+    edge_counter++; // Advance to next edge
+    if (edge_counter == Wheels[config.wheel].wheel_max_edges) {
+        edge_counter = 0; // Reset to start of pattern
+        cycleDuration = micros() - cycleStartTime; // Update cycle duration
+        cycleStartTime = micros(); // Restart cycle timer
+    }
+    if (reset_prescaler) { // Adjust prescaler if flagged
+        TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); // Clear prescaler bits
+        TCCR1B |= prescaler_bits; // Set new prescaler
+        reset_prescaler = false;
+    }
+    OCR1A = new_OCR1A; // Update timer compare value
+}
+#elif defined(ESP32)
+/**
+ * @brief ESP32 Timer Interrupt Service Routine (ISR)
+ * 
+ * Generates the wheel pattern by setting output pins based on the current edge state.
+ * Runs on a hardware timer interrupt, updating pins every `new_timer_ticks` microseconds.
+ */
+bool __attribute__((section(".iram1.0"))) timer_callback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx) {
+    // Copy the body of your existing onTimer() function here
+    uint8_t state = pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]) ^ output_invert_mask;
+    digitalWrite(PRIMARY_OUTPUT_PIN, (state & 1) ? HIGH : LOW);
+    digitalWrite(SECONDARY_OUTPUT_PIN, (state & 2) ? HIGH : LOW);
+    digitalWrite(TERTIARY_OUTPUT_PIN, (state & 4) ? HIGH : LOW);
+    digitalWrite(KNOCK_OUTPUT_PIN, (state & 8) ? HIGH : LOW);
+    edge_counter = edge_counter + 1;
+    if (edge_counter == Wheels[config.wheel].wheel_max_edges) {
+      edge_counter = 0;
+      cycleDuration = micros() - cycleStartTime;
+      cycleStartTime = micros();
+    }
+    
+    // Update timer interval (equivalent to timerAlarmWrite in v2.x)
+    if (new_timer_interval_us != edata->alarm_value) {
+      gptimer_alarm_config_t alarm_config;
+      memset(&alarm_config, 0, sizeof(alarm_config));
+      alarm_config.alarm_count = new_timer_interval_us;
+      alarm_config.reload_count = 0; // one-shot mode
+      alarm_config.flags.auto_reload_on_alarm = true;
+      gptimer_set_alarm_action(timer, &alarm_config);
+    }
+    
+    return true; // Return true to keep timer running
+  }
 #endif
 
-  sei(); // Enable interrupts
-  // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
-  ADCSRA |= B01000000;
-  /* Make sure we are using the DEFAULT RPM on startup */
-  reset_new_OCR1A(currentStatus.rpm); 
-
-} // End setup
-
-
-//! ADC ISR for alternating between ADC pins 0 and 1
-/*!
- * Reads ADC ports 0 and 1 alternately. Port 0 is RPM, Port 1 is for
- * future fun (possible wheel selection)
+/**
+ * @brief Setup function to initialize the system
+ * 
+ * Configures serial communication, pins, timers, and interrupts based on the platform.
  */
-ISR(ADC_vect){
-  if (analog_port == 0)
-  {
-    adc0 = ADCL | (ADCH << 8);
-	  adc0_read_complete = true;
-    /* Flip to channel 1 */
-    //ADMUX |= B00000001;
-    //analog_port = 1;
-    /* Trigger another conversion */
-    //ADCSRA |= B01000000;
-    return;
-  } 
-//  if (analog_port == 1)
-//  {
-//    adc1 = ADCL | (ADCH << 8);
-//	adc1_read_complete = true;
-//    /* Flip to channel 0 */
-//    /* Tell it to read ADC0, clear MUX0..3 */
-//    ADMUX &= B11110000;
-//    analog_port = 0;
-//    /* Trigger another conversion */
-//    ADCSRA |= B01000000;
-//    return;
-//  }
-}
+void setup() {
+  loadConfig();  // Load configuration from storage
+  serialSetup(); // Initialize serial communication
 
-/* Pumps the pattern out of flash to the port 
- * The rate at which this runs is dependent on what OCR1A is set to
- */
-ISR(TIMER1_COMPA_vect) 
-{
-  /* This is VERY simple, just walk the array and wrap when we hit the limit */
-  PORTB = output_invert_mask ^ pgm_read_byte(&Wheels[config.wheel].edge_states_ptr[edge_counter]);   /* Write it to the port */
+  cli(); // Disable interrupts during setup to prevent interference
+
+  // Configure output pins
+  pinMode(PRIMARY_OUTPUT_PIN, OUTPUT);
+  pinMode(SECONDARY_OUTPUT_PIN, OUTPUT);
+  pinMode(TERTIARY_OUTPUT_PIN, OUTPUT);
+  pinMode(KNOCK_OUTPUT_PIN, OUTPUT);
+
+  // Platform-specific timer and ADC setup
+  #if defined(__AVR__)
+  // AVR Timer1 setup for pattern generation
+  TCCR1A = 0;              // Clear Timer1 control register A
+  TCCR1B = 0;              // Clear Timer1 control register B
+  TCNT1 = 0;               // Reset Timer1 counter
+  OCR1A = 1000;            // Initial compare value (approx. 8000 RPM for 60-2 wheel)
+  TCCR1B |= (1 << WGM12);  // CTC mode (Clear Timer on Compare)
+  TCCR1B |= (1 << CS10);   // Prescaler 1 (no prescaling)
+  TIMSK1 |= (1 << OCIE1A); // Enable Timer1 compare interrupt
+
+  // AVR ADC setup (interrupt-driven for potentiometer reading)
+  ADMUX &= B11011111;  // Right-adjust result
+  ADMUX |= B01000000;  // Use AVcc as reference voltage
+  ADMUX &= B11110000;  // Select ADC0 (A0 pin)
+  ADCSRA |= B10000000; // Enable ADC
+  ADCSRA |= B00100000; // Enable auto-trigger
+  ADCSRB &= B11111000; // Free-running mode
+  ADCSRA |= B00000111; // Prescaler 128
+  ADCSRA |= B00001000; // Enable ADC interrupt
+  ADCSRA |= B01000000; // Start first conversion
+  #elif defined(ESP32)
+  // ESP32 timer setup
+  apb_frequency = getApbFrequency(); // Get actual APB frequency (typically 80 MHz)
+  gptimer_config_t timer_config = {
+    .clk_src = GPTIMER_CLK_SRC_DEFAULT,
+    .direction = GPTIMER_COUNT_UP,
+    .resolution_hz = 1000000, // 1 MHz (1 tick = 1 microsecond)
+  };
+  ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &timer));
   
-  edge_counter++;
-  if (edge_counter == Wheels[config.wheel].wheel_max_edges) 
-  {
-    edge_counter = 0;
-    cycleDuration = micros() - cycleStartTime;
-    cycleStartTime = micros();
-  }
-  /* The tables are in flash so we need pgm_read_byte() */
+  // Set up callback
+  gptimer_event_callbacks_t timer_callbacks = {
+    .on_alarm = timer_callback,
+  };
+  ESP_ERROR_CHECK(gptimer_register_event_callbacks(timer, &timer_callbacks, NULL));
+  
+  // Set up initial alarm
+  gptimer_alarm_config_t alarm_config = {
+    .alarm_count = 1000, // 1000 microseconds = 1 ms
+    .reload_count = 0,
+  };
+  alarm_config.flags.auto_reload_on_alarm = true;
+  ESP_ERROR_CHECK(gptimer_set_alarm_action(timer, &alarm_config));
+  
+  // Enable timer
+  ESP_ERROR_CHECK(gptimer_enable(timer));
+  ESP_ERROR_CHECK(gptimer_start(timer));
+  #endif
 
-  /* Reset Prescaler only if flag is set */
-  if (reset_prescaler)
-  {
-    TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12)); /* Clear CS10, CS11 and CS12 */
-    TCCR1B |= prescaler_bits;
-    reset_prescaler = false;
-  }
-  /* Reset next compare value for RPM changes */
-  OCR1A = new_OCR1A;  /* Apply new "RPM" from Timer2 ISR, i.e. speed up/down the virtual "wheel" */
+  sei(); // Enable interrupts after setup
+  reset_new_OCR1A(currentStatus.rpm); // Set initial RPM based on loaded config
 }
 
-void loop() 
-{
-  uint16_t tmp_rpm = currentStatus.base_rpm;
-  /* Just handle the Serial UI, everything else is in 
-   * interrupt handlers or callbacks from SerialUI.
-   */
-  if(Serial.available() > 0) { commandParser(); }
+/**
+ * @brief Main loop function
+ * 
+ * Handles serial commands, updates RPM based on mode, and applies compression modifier.
+ */
+void loop() {
+  uint16_t tmp_rpm = currentStatus.base_rpm; // Temporary RPM value
 
-  if(config.mode == POT_RPM)
-  {
-    if (adc0_read_complete == true)
-    {
-      adc0_read_complete = false;
-      tmp_rpm = adc0 << TMP_RPM_SHIFT;
-      if (tmp_rpm > TMP_RPM_CAP) { tmp_rpm = TMP_RPM_CAP; }
-    }
+  if (Serial.available() > 0) {
+      commandParser(); // Process incoming serial commands
   }
-  else if (config.mode == LINEAR_SWEPT_RPM)
-  {
-    
-    if(micros() > (sweep_time_counter + config.sweep_interval))
-    {
-      sweep_time_counter = micros();
-      if(sweep_direction == ASCENDING)
-      {
-        tmp_rpm = currentStatus.base_rpm + 1;
-        if(tmp_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
+
+  // Update RPM based on selected mode
+  if (config.mode == POT_RPM) {
+      // Potentiometer-controlled RPM
+      #if defined(__AVR__)
+      if (adc0_read_complete) {
+          adc0_read_complete = false;
+          tmp_rpm = adc0 << TMP_RPM_SHIFT; // Scale ADC value (0-1023) to RPM (0-16384)
+          if (tmp_rpm > TMP_RPM_CAP) tmp_rpm = TMP_RPM_CAP; // Cap the maximum RPM
       }
-      else
-      {
-        tmp_rpm = currentStatus.base_rpm - 1;
-        if(tmp_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
+      #elif defined(ESP32)
+      adc0 = analogRead(ADC_PIN); // Polled ADC reading (0-4095)
+      tmp_rpm = adc0 << TMP_RPM_SHIFT; // Scale to RPM
+      if (tmp_rpm > TMP_RPM_CAP) tmp_rpm = TMP_RPM_CAP; // Cap the maximum RPM
+      #endif
+  } else if (config.mode == LINEAR_SWEPT_RPM) {
+      // Linear sweep between low and high RPM
+      if (micros() > (sweep_time_counter + config.sweep_interval)) {
+          sweep_time_counter = micros();
+          if (sweep_direction == ASCENDING) {
+              tmp_rpm = currentStatus.base_rpm + 1;
+              if (tmp_rpm >= config.sweep_high_rpm) sweep_direction = DESCENDING;
+          } else {
+              tmp_rpm = currentStatus.base_rpm - 1;
+              if (tmp_rpm <= config.sweep_low_rpm) sweep_direction = ASCENDING;
+          }
       }
-    }
-    
+  } else if (config.mode == FIXED_RPM) {
+      // Fixed RPM mode
+      tmp_rpm = config.fixed_rpm;
   }
-  else if (config.mode == FIXED_RPM)
-  {
-    tmp_rpm = config.fixed_rpm;
+
+  currentStatus.base_rpm = tmp_rpm; // Update base RPM
+  currentStatus.compressionModifier = calculateCompressionModifier(); // Calculate compression effect
+  if (currentStatus.compressionModifier >= currentStatus.base_rpm) {
+      currentStatus.compressionModifier = 0; // Prevent negative RPM
   }
-  currentStatus.base_rpm = tmp_rpm;
-
-  currentStatus.compressionModifier = calculateCompressionModifier();
-  if(currentStatus.compressionModifier >= currentStatus.base_rpm ) { currentStatus.compressionModifier = 0; }
-
-  setRPM( (currentStatus.base_rpm - currentStatus.compressionModifier) );
+  setRPM(currentStatus.base_rpm - currentStatus.compressionModifier); // Apply final RPM
 }
 
-uint16_t calculateCompressionModifier()
-{
-  if( (currentStatus.base_rpm > config.compressionRPM) || (config.useCompression != true) ) { return 0; }
-  //if( currentStatus.base_rpm > 400 ) { return 0;}
+/**
+ * @brief Calculates the compression modifier based on crank angle
+ * 
+ * Simulates engine compression effects by reducing RPM based on a sine wave pattern.
+ * @return uint16_t The compression modifier value (0 if disabled or above threshold)
+ */
+uint16_t calculateCompressionModifier() {
+  if (!config.useCompression || currentStatus.base_rpm > config.compressionRPM) {
+      return 0; // No modifier if disabled or RPM exceeds threshold
+  }
 
-  uint16_t crankAngle = calculateCurrentCrankAngle();
+  uint16_t crankAngle = calculateCurrentCrankAngle(); // Get current crank angle
   uint16_t modAngle = crankAngle;
-
   uint16_t compressionModifier = 0;
-  switch(config.compressionType)
-  {
-    case COMPRESSION_TYPE_2CYL_4STROKE:
-      modAngle = crankAngle / 2;
-      compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
-      break;
-    case COMPRESSION_TYPE_4CYL_4STROKE:
-      modAngle = (crankAngle % 180) ;
-      compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
-      break;
-    case COMPRESSION_TYPE_6CYL_4STROKE:
-      modAngle = crankAngle % 120;
-      compressionModifier = pgm_read_byte(&sin_100_120[modAngle]);
-      break;
-    case COMPRESSION_TYPE_8CYL_4STROKE:
-      modAngle = crankAngle % 90;
-      compressionModifier = pgm_read_byte(&sin_100_90[modAngle]);
-      break;
-    default:
-      modAngle = (crankAngle % 180) ;
-      compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
-      break;
+
+  // Adjust modifier based on engine type
+  switch (config.compressionType) {
+      case COMPRESSION_TYPE_2CYL_4STROKE:
+          modAngle = crankAngle / 2;
+          compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+          break;
+      case COMPRESSION_TYPE_4CYL_4STROKE:
+          modAngle = crankAngle % 180;
+          compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+          break;
+      case COMPRESSION_TYPE_6CYL_4STROKE:
+          modAngle = crankAngle % 120;
+          compressionModifier = pgm_read_byte(&sin_100_120[modAngle]);
+          break;
+      case COMPRESSION_TYPE_8CYL_4STROKE:
+          modAngle = crankAngle % 90;
+          compressionModifier = pgm_read_byte(&sin_100_90[modAngle]);
+          break;
+      default:
+          modAngle = crankAngle % 180;
+          compressionModifier = pgm_read_byte(&sin_100_180[modAngle]);
+          break;
   }
 
-  //RPM scaler - Varies the amplitude of the compression modifier based on how far below the compression RPM point we are. Eg:
-  //If the compression RPM value is 400
-  //At 300rpm the amplitude will be 75%
-  //At 200rpm the amplitude will be 50%
-  //At 100rpm the amplitude will be 25% etc
-  //Base RPM must be below 650 to prevent overflow
-  if(config.compressionDynamic && (currentStatus.base_rpm < 655U) ) { compressionModifier = (compressionModifier * currentStatus.base_rpm) / config.compressionRPM; }
-  
+  // Scale modifier dynamically based on RPM if enabled
+  if (config.compressionDynamic && currentStatus.base_rpm < 655U) {
+      compressionModifier = (compressionModifier * currentStatus.base_rpm) / config.compressionRPM;
+  }
   return compressionModifier;
 }
 
-uint16_t calculateCurrentCrankAngle()
-{
-  if(cycleDuration == 0) { return 0; }
+/**
+* @brief Calculates the current crank angle
+* 
+* Uses cycle timing to determine the current position in the wheel pattern.
+* @return uint16_t Crank angle in degrees (0-360)
+*/
+uint16_t calculateCurrentCrankAngle() {
+  if (cycleDuration == 0) return 0; // No valid cycle yet
 
   uint32_t cycleTime = micros() - cycleStartTime;
-  if( Wheels[config.wheel].wheel_degrees == 720 ) { cycleTime = cycleTime * 2; } 
+  if (Wheels[config.wheel].wheel_degrees == 720) cycleTime *= 2; // Adjust for 720-degree patterns
   
-  uint16_t tmpCrankAngle = ((cycleTime * 360U) / cycleDuration);
-  tmpCrankAngle += config.compressionOffset;
-  while(tmpCrankAngle > 360) { tmpCrankAngle -= 360; }
-
+  uint16_t tmpCrankAngle = ((cycleTime * 360U) / cycleDuration); // Calculate angle
+  tmpCrankAngle += config.compressionOffset; // Apply offset
+  while (tmpCrankAngle > 360) tmpCrankAngle -= 360; // Normalize to 0-360
   return tmpCrankAngle;
 }
 
-/*!
- * Validates the new user requested RPM and sets it if valid. 
- */ 
-void setRPM(uint16_t newRPM)
-{
-  if (newRPM < 10)  { return; }
-
-  if(currentStatus.rpm != newRPM) { reset_new_OCR1A( newRPM ); }
-  currentStatus.rpm = newRPM;
+/**
+* @brief Sets the RPM and adjusts the timer
+* 
+* Updates the timer interrupt frequency based on the desired RPM.
+* @param newRPM The target RPM value
+*/
+void setRPM(uint16_t newRPM) {
+  if (newRPM < 10) return; // Minimum RPM threshold
+  if (currentStatus.rpm != newRPM) reset_new_OCR1A(newRPM); // Update timer if RPM changes
+  currentStatus.rpm = newRPM; // Store final RPM
 }
 
+/**
+* @brief Calculates the timer compare value based on RPM
+* 
+* Adjusts the timer interrupt frequency to match the desired RPM.
+* @param new_rpm The target RPM
+*/
+void reset_new_OCR1A(uint32_t new_rpm) {
+  if (new_rpm < 10) return; // Minimum RPM threshold
 
-void reset_new_OCR1A(uint32_t new_rpm)
-{
-  uint32_t tmp;
-  uint8_t bitshift;
+  #if defined(__AVR__)
+  // AVR: Calculate timer ticks based on 8 MHz clock
+  uint32_t tmp = (uint32_t)(8000000.0 / (Wheels[config.wheel].rpm_scaler * (float)new_rpm));
   uint8_t tmp_prescaler_bits;
-  tmp = (uint32_t)(8000000.0/(Wheels[config.wheel].rpm_scaler * (float)(new_rpm < 10 ? 10:new_rpm)));
-  //tmp = (uint32_t)(8000000/(Wheels[config.wheel].rpm_scaler * (new_rpm < 10 ? 10:new_rpm)));
-  //uint64_t x = 800000000000ULL;
-
-  get_prescaler_bits(&tmp,&tmp_prescaler_bits,&bitshift);
-
-  new_OCR1A = (uint16_t)(tmp >> bitshift); 
+  uint8_t bitshift;
+  get_prescaler_bits(&tmp, &tmp_prescaler_bits, &bitshift); // Determine prescaler
+  new_OCR1A = (uint16_t)(tmp >> bitshift); // Adjust for prescaler
   prescaler_bits = tmp_prescaler_bits;
-  reset_prescaler = true; 
+  reset_prescaler = true; // Flag ISR to update prescaler
+  #elif defined(ESP32)
+  // ESP32: Calculate timer ticks based on APB frequency
+  uint64_t f_interrupt = ((uint64_t)new_rpm * Wheels[config.wheel].wheel_max_edges) / 60ULL;
+  if (f_interrupt == 0) f_interrupt = 1;
+  new_timer_interval_us = 1000000ULL / f_interrupt; // Convert frequency to period in microseconds
+  if (new_timer_interval_us < 1) new_timer_interval_us = 1;
+  #endif
 }
 
-
-uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits)
-{
-  switch (*prescaler_bits)
-  {
-    case PRESCALE_1024:
-    return 10;
-    case PRESCALE_256:
-    return 8;
-    case PRESCALE_64:
-    return 6;
-    case PRESCALE_8:
-    return 3;
-    case PRESCALE_1:
-    return 0;
+/**
+* @brief Gets the bit shift value for a given prescaler
+* 
+* @param prescaler_bits Pointer to the prescaler enum value
+* @return uint8_t Number of bits to shift
+*/
+uint8_t get_bitshift_from_prescaler(uint8_t *prescaler_bits) {
+  switch (*prescaler_bits) {
+      case PRESCALE_1024: return 10;
+      case PRESCALE_256:  return 8;
+      case PRESCALE_64:   return 6;
+      case PRESCALE_8:    return 3;
+      case PRESCALE_1:    return 0;
+      default:            return 0;
   }
-  return 0;
 }
 
-//! Gets prescaler enum and bitshift based on OC value
-void get_prescaler_bits(uint32_t *potential_oc_value, uint8_t *prescaler, uint8_t *bitshift)
-{
-  if (*potential_oc_value >= 16777216)
-  {
-    *prescaler = PRESCALE_1024;
-    *bitshift = 10;
-  }
-  else if (*potential_oc_value >= 4194304)
-  {
-    *prescaler = PRESCALE_256;
-    *bitshift = 8;
-  }
-  else if (*potential_oc_value >= 524288)
-  {
-    *prescaler = PRESCALE_64;
-    *bitshift = 6;
-  }
-  else if (*potential_oc_value >= 65536)
-  {
-    *prescaler = PRESCALE_8;
-    *bitshift = 3;
-  }
-  else
-  {
-    *prescaler = PRESCALE_1;
-    *bitshift = 0;
+/**
+* @brief Determines the prescaler and bit shift for the timer
+* 
+* Adjusts the timer prescaler to keep the compare value within 16-bit range.
+* @param potential_oc_value Pointer to the calculated timer value
+* @param prescaler Pointer to store the prescaler enum value
+* @param bitshift Pointer to store the bit shift value
+*/
+void get_prescaler_bits(uint32_t *potential_oc_value, uint8_t *prescaler, uint8_t *bitshift) {
+  if (*potential_oc_value >= 16777216) {
+      *prescaler = PRESCALE_1024;
+      *bitshift = 10;
+  } else if (*potential_oc_value >= 4194304) {
+      *prescaler = PRESCALE_256;
+      *bitshift = 8;
+  } else if (*potential_oc_value >= 524288) {
+      *prescaler = PRESCALE_64;
+      *bitshift = 6;
+  } else if (*potential_oc_value >= 65536) {
+      *prescaler = PRESCALE_8;
+      *bitshift = 3;
+  } else {
+      *prescaler = PRESCALE_1;
+      *bitshift = 0;
   }
 }

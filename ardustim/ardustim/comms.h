@@ -22,23 +22,21 @@
 #define __COMMS_H__
  
 #include <Arduino.h>
-/* Structures */
 
-/* Prototypes */
-void commandParser();
-void show_info_cb();
-void select_next_wheel_cb();
-void select_previous_wheel_cb();
-void toggle_invert_primary_cb();
-void toggle_invert_secondary_cb();
-void select_wheel_cb();
-void set_rpm_cb();
-void sweep_rpm_cb();
-void reverse_wheel_direction_cb();
+// Prototypes for serial command handlers
+void commandParser();               // Parses incoming serial commands
+void show_info_cb();                // Displays system information (not implemented here)
+void select_next_wheel_cb();        // Selects the next wheel pattern
+void select_previous_wheel_cb();    // Selects the previous wheel pattern
+void toggle_invert_primary_cb();    // Toggles inversion of primary output
+void toggle_invert_secondary_cb();  // Toggles inversion of secondary output
+void select_wheel_cb();             // Selects a specific wheel (not implemented here)
+void set_rpm_cb();                  // Sets RPM (not implemented here)
+void sweep_rpm_cb();                // Configures RPM sweep (not implemented here)
+void reverse_wheel_direction_cb();  // Reverses wheel direction (not implemented here)
 
-/* General functions */
-void serialSetup();
-void display_new_wheel();
-/* General functions */
+// General serial functions
+void serialSetup();                 // Initializes serial communication
+void display_new_wheel();           // Updates system for new wheel selection
 
 #endif

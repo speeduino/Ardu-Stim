@@ -24,14 +24,12 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-/* Prototypes */
-void reset_new_OCR1A(uint32_t);
-uint8_t get_bitshift_from_prescaler(uint8_t *);
-void get_prescaler_bits(uint32_t *, uint8_t *, uint8_t *);
-void setRPM(uint16_t);
-uint16_t calculateCompressionModifier();
-uint16_t calculateCurrentCrankAngle();
-
-/* Prototypes */
+// Function prototypes
+void reset_new_OCR1A(uint32_t);          // Calculates timer compare value for given RPM
+uint8_t get_bitshift_from_prescaler(uint8_t *); // Gets bit shift for prescaler
+void get_prescaler_bits(uint32_t *, uint8_t *, uint8_t *); // Determines prescaler settings
+void setRPM(uint16_t);                   // Sets the target RPM
+uint16_t calculateCompressionModifier(); // Calculates compression effect on RPM
+uint16_t calculateCurrentCrankAngle();   // Determines current crank angle
 
 #endif

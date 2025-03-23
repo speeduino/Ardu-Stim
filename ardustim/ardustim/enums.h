@@ -21,26 +21,28 @@
 #ifndef __ENUMS_H__
 #define __ENUMS_H__
  
-/* Enumerations */
-enum {                                                                          
+// Timer prescaler options for AVR
+enum {
   PRESCALE_1 = 1,
   PRESCALE_8 = 2,
   PRESCALE_64 = 3,
   PRESCALE_256 = 4,
   PRESCALE_1024 = 5,
-  RECALC
+  RECALC // Unused
 };
 
+// Sweep direction for LINEAR_SWEPT_RPM mode
 enum {
   DESCENDING,
   ASCENDING
 };
 
+// RPM control modes
 enum {
-  LINEAR_SWEPT_RPM,
-  FIXED_RPM,
-  POT_RPM,
-  MAX_MODES,
+  LINEAR_SWEPT_RPM, // Sweep between low and high RPM
+  FIXED_RPM,        // Fixed RPM value
+  POT_RPM,          // Potentiometer-controlled RPM
+  MAX_MODES         // Number of modes
 };
 
 #endif
