@@ -137,6 +137,10 @@
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    GM_40_OSS, // GM 40 tooth wheel no skips for transmission OSS simulation
+   FZR250_2KR, /* Yamaha FZR250 2KR 1986 - 1988 */
+   FZR250_3LN1_3_5, /* Yamaha FZR250 3LN1/3/5 1989 - 1991 */
+   FZR250_3LN6_7, /* Yamaha FZR250 3LN6/7 1992 - 1996 */
+   YZF600R_4JH, /* Yamaha YZF600R 4JH 1994 - 1996 */
 
    MAX_WHEELS,
  }WheelType;
@@ -206,6 +210,10 @@
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
  const char GM_40_Tooth_Trans_OSS_friendly_name[] PROGMEM = "GM 40 tooth OSS wheel for Transmissions";
+ const char YAMAHA_FZR250_2KR_friendly_name[] PROGMEM = "YAMAHA FZR250 2KR";
+ const char YAMAHA_FZR250_3LN_1_3_5_friendly_name[] PROGMEM = "YAMAHA FZR250 3LN1/3/5";
+ const char YAMAHA_FZR250_3LN_6_7_friendly_name[] PROGMEM = "YAMAHA FZR250 3LN6/7";
+ const char YAMAHA_YZF600R_4JH_friendly_name[] PROGMEM = "YAMAHA YZF600R 4JH";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -1545,4 +1553,111 @@
       1,0,1,0,1,0,1,0,1,0, // Teeth 36-40
    };
 
+   /* updated trigger settings */
+   /* Every number represents 2 degrees */
+  const unsigned char YAMAHA_FZR250_2KR[] PROGMEM = 
+   { 
+      0,0,0,0,0,0,0,0,0,0, /* TDC 10 degrees after #1 fired #4 wasted spark */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0, /* 80 degrees ATDC */
+      1,1,1,1,1,1,1,1,1,1, /* Trigger #1 - 100 degrees BTDC */
+      1,1,1,1,1,1,1,1,1,1, /* 40 degree duration */
+      0,0,0,0,0,0,0,0,0,0, /* 50 degree duration */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #2 10 degrees BTDC #3 firing #2 wasted spark */ 
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      1,1,1,0,0,0,0,0,0,0, /* Trigger #3 100 degrees BTDC */
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #4 - 10 degrees BTDC #4 firing #1 wasted spark */
+   }; 
+
+  /* The primary, but not sole purpose is to be able to interrogate the OEM TCI to accurately */
+  /* capture the spark map for Speeduino, which would hopefully enable it to be used for ignition only as */ 
+  /* first step towards full EFI */
+  /* Every number represents 2 degrees */
+  const unsigned char YAMAHA_FZR250_3LN_1_3_5[] PROGMEM = 
+  
+   { 
+      0,0,0,0,0,0,0,0,0,0, /* TDC 10 degrees after #1 fired #4 wasted spark */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0, /* 80 degrees ATDC */
+      1,1,1,1,1,1,1,1,1,1, /* Trigger #1 - 100 degrees BTDC */
+      1,1,1,1,1,1,1,1,1,1, /* 40 degree duration */
+      0,0,0,0,0,0,0,0,0,0, /* 50 degree duration */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #2 10 degrees BTDC #3 firing #2 wasted spark */ 
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      1,1,1,0,0,0,0,0,0,0, /* Trigger #3 100 degrees BTDC */
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #4 - 10 degrees BTDC #4 firing #1 wasted spark */
+   };
+
+  /* The primary, but not sole purpose is to be able to interrogate the OEM TCI to accurately */
+  /* capture the spark map for Speeduino, which would hopefully enable it to be used for ignition only as */ 
+  /* first step towards full EFI */
+  /* The 3LN6/7 run more static advance - this array will need to be modified accordingly */ 
+  /* Every number represents 2 degrees */
+  const unsigned char YAMAHA_FZR250_3LN_6_7[] PROGMEM = 
+  
+   { 
+      0,0,0,0,0,0,0,0,0,0, /* TDC 10 degrees after #1 fired #4 wasted spark */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0, /* 80 degrees ATDC */
+      1,1,1,1,1,1,1,1,1,1, /* Trigger #1 - 100 degrees BTDC */
+      1,1,1,1,1,1,1,1,1,1, /* 40 degree duration */
+      0,0,0,0,0,0,0,0,0,0, /* 50 degree duration */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #2 10 degrees BTDC #3 firing #2 wasted spark */ 
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      1,1,1,0,0,0,0,0,0,0, /* Trigger #3 100 degrees BTDC */
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #4 - 10 degrees BTDC #4 firing #1 wasted spark */
+   };
+
+  /* This is a placeholder for the YZF600R 4JH rotor trigger signal - the trigger sequence is yet to be verified */
+  /* The primary, but not sole purpose is to be able to interrogate the OEM TCI to accurately */
+  /* capture the spark map for Speeduino, which would hopefully enable it to be used for ignition only as */ 
+  /* first step towards full EFI */
+  /* updated trigger settings */
+  /* Every number represents 2 degrees */
+  const unsigned char YAMAHA_YZF600R_4JH[] PROGMEM = 
+  
+   { 
+      0,0,0,0,0,0,0,0,0,0, /* TDC 10 degrees after #1 fired #4 wasted spark */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0, /* 80 degrees ATDC */
+      1,1,1,1,1,1,1,1,1,1, /* Trigger #1 - 100 degrees BTDC */
+      1,1,1,1,1,1,1,1,1,1, /* 40 degree duration */
+      0,0,0,0,0,0,0,0,0,0, /* 50 degree duration */
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #2 10 degrees BTDC #3 firing #2 wasted spark */ 
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,
+      1,1,1,0,0,0,0,0,0,0, /* Trigger #3 100 degrees BTDC */
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,0,0,0,0,0, 
+      0,0,0,0,0,1,1,1,0,0, /* Trigger #4 - 10 degrees BTDC #4 firing #1 wasted spark */
+};
 #endif

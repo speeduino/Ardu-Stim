@@ -27,7 +27,7 @@
 #define VERSION 2
  
 #define TMP_RPM_SHIFT 4 /* x16, 0-16384 RPM via pot */
-#define TMP_RPM_CAP 9000 /* MAX RPM via pot control. Adjusted to 9,000rpm max from 16,384rpm to match the GUI */
+#define TMP_RPM_CAP 18000 /* MAX RPM via pot control. Adjusted to 18,000rpm max from 9,000rpm to suit the FZR250 */
 #define EEPROM_LAST_MODE  100
 
 #define COMPRESSION_TYPE_1CYL_4STROKE 0 //Not initiallity supported
