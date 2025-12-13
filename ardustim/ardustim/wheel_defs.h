@@ -137,7 +137,7 @@
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    GM_40_OSS, // GM 40 tooth wheel no skips for transmission OSS simulation
-   TWINTY_FOUR_MINUS_TWO_WITH_ONE_CAM_ZX10R,//2004-UP ZX10R 24 WITH 2 MISSING AND ONE CAM 
+   TWENTY_FOUR_MINUS_TWO_WITH_ONE_CAM_ZX10R,//2004-UP ZX10R 24 WITH 2 MISSING AND ONE CAM 
 
    MAX_WHEELS,
  }WheelType;
