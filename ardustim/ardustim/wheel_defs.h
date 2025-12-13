@@ -137,6 +137,7 @@
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    GM_40_OSS, // GM 40 tooth wheel no skips for transmission OSS simulation
+   TWINTY_FOUR_MINUS_TWO_WITH_ONE_CAM_ZX10R,//2004-UP ZX10R 24 WITH 2 MISSING AND ONE CAM 
 
    MAX_WHEELS,
  }WheelType;
@@ -206,7 +207,7 @@
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
  const char GM_40_Tooth_Trans_OSS_friendly_name[] PROGMEM = "GM 40 tooth OSS wheel for Transmissions";
-
+ const char twenty_four_minus_two_with_one_cam_zx10r_name[] PROGMEM = "24-2 with 1 tooth cam"
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
@@ -1544,5 +1545,20 @@
       1,0,1,0,1,0,1,0,1,0, // Teeth 31-35
       1,0,1,0,1,0,1,0,1,0, // Teeth 36-40
    };
+const unsigned char twenty_four_minus_two_with_one_cam_zx10r[] PROGMEM =
+{  /*ZX10R 24-2 WITH 1 CAM */
+   
+   1,0,1,0,1,0,1,0,1,0, //Teeth 1-5
+   1,0,1,0,1,0,1,0,1,0, //Teeth 6-10
+   1,0,1,0,1,0,1,0,0,0, //Teeth 11-15 Tooth 15 missing
+   0,0,1,0,1,0,1,0,1,0, //Teeth 16-20 Tooth 16 missing
+   1,0,1,0,1,0,1,0,     //Teeth 21-24
+   //crank revolution 2
+   1,0,3,2,1,0,1,0,1,0, //Teeth 1-5 with cam signal 
+   1,0,1,0,1,0,1,0,1,0, //Teeth 6-10 
+   1,0,1,0,1,0,1,0,0,0, //Teeth 11-15 Tooth 15 missing
+   0,0,1,0,1,0,1,0,1,0, //Teeth 16-20 Tooth 16 Missing
+   1,0,1,0,1,0,1,0,     //Teeth 21-24
 
+  };
 #endif
