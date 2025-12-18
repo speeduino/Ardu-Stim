@@ -207,7 +207,7 @@
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
  const char GM_40_Tooth_Trans_OSS_friendly_name[] PROGMEM = "GM 40 tooth OSS wheel for Transmissions";
- const char twenty_four_minus_two_with_one_cam_zx10r_name[] PROGMEM = "24-2 with 1 tooth cam"
+ const char twenty_four_minus_two_with_one_cam_zx10r_friendly_name[] PROGMEM = "24-2 with 1 tooth cam"
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
    { /* dizzy 4 cylinder */
