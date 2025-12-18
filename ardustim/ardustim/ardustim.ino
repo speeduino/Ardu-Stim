@@ -122,6 +122,7 @@ wheels Wheels[MAX_WHEELS] = {
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
   { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 0.6, 144, 720 },
   { GM_40_Tooth_Trans_OSS_friendly_name, GM40toothOSS, 1.0, 80, 360 },
+  {twenty_four_minus_two_with_one_cam_zx10r_friendly_name, twenty_four_minus_two_with_one_cam_zx10r, .36667, 44, 360},
 };
 
 /* Initialization */
