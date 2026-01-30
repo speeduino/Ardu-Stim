@@ -137,9 +137,10 @@
    VIPER_96_02, // Dodge Viper 1996-2002 wheel pattern
    THIRTY_SIX_MINUS_TWO_WITH_ONE_CAM, // 36-2 with  1 tooth cam - 2jz-gte VVTI crank pulley + non-vvti cam
    GM_40_OSS, // GM 40 tooth wheel no skips for transmission OSS simulation
+   CLASSIC_MINI_SPI_THIRTY_SIX_MINUS_ONE_ONE, /* Classic Rover Mini SPI (ca. 1992-1996) crank wheel 36-1-1 */
 
    MAX_WHEELS,
- }WheelType;
+ } WheelType;
 
 /* Name strings for EACH wheel type, for serial UI */
  const char dizzy_four_cylinder_friendly_name[] PROGMEM = "4 cylinder dizzy";
@@ -206,6 +207,7 @@
  const char VIPER9602_friendly_name[] PROGMEM = "Dodge Viper V10 1996-2002";
  const char thirty_six_minus_two_with_second_trigger_friendly_name[] PROGMEM = "36-2 with 1 tooth cam";
  const char GM_40_Tooth_Trans_OSS_friendly_name[] PROGMEM = "GM 40 tooth OSS wheel for Transmissions";
+ const char classic_mini_spi_thirty_six_minus_one_one_friendly_name[] PROGMEM = "Classic Rover Mini SPI (ca. 1992-1996)";
 
  /* Very simple 50% duty cycle */
  const unsigned char dizzy_four_cylinder[] PROGMEM = 
@@ -678,7 +680,8 @@
      1,0,1,0,1,0,1,0,1,0, /* teeth 26-30 */
      1,0,0,0,1,0,1,0,1,0, /* teeth 31, MISSING 32, 33-35 */
      0,0                  /* MISSING 36th tooth */
-   }; 
+   };
+
  const unsigned char honda_rc51_with_cam[] PROGMEM = 
    { /* Honda RC51 oddfire 90deg Vtwin with cam */
       0,1,0,1,0,1,0,1,0,1, /* teeth 1-5 */
@@ -1543,6 +1546,19 @@
       1,0,1,0,1,0,1,0,1,0, // Teeth 26-30
       1,0,1,0,1,0,1,0,1,0, // Teeth 31-35
       1,0,1,0,1,0,1,0,1,0, // Teeth 36-40
+   };
+
+ /* Classic Rover Mini SPI (ca. 1992-1996) crank wheel 36-1-1, 
+  * missing teeth at 18 and 36
+  */
+ const unsigned char classic_mini_spi_thirty_six_minus_one_one[] PROGMEM = 
+   { /* 36-1-1 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* teeth 1-6 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* teeth 7-12 */
+     1,0,1,0,1,0,1,0,1,0,0,0, /* teeth 13-17, MISSING 18 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* teeth 19-24 */
+     1,0,1,0,1,0,1,0,1,0,1,0, /* teeth 25-30 */
+     1,0,1,0,1,0,1,0,1,0,0,0, /* teeth 31-35, MISSING 36 */
    };
 
 #endif
